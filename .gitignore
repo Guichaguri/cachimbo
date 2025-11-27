@@ -1,0 +1,6 @@
+# Local
+node_modules
+.idea
+
+# Build
+dist
