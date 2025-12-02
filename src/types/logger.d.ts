@@ -1,5 +1,9 @@
 
 export interface Logger {
-  warn: (...message: any[]) => void;
-  debug: (...message: any[]) => void;
+  /**
+   * Sends a debug log
+   * @param name The cache name
+   * @param message The log message
+   */
+  debug: (name?: string, ...message: any[]) => void;
 }
