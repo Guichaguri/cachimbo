@@ -135,7 +135,7 @@ export class SWRCache implements ICache {
       };
     }
 
-    return this.cache.setMany(data, {
+    return this.cache.setMany(items, {
       ...options,
       ttl: ttl + this.staleTTL,
     });
