@@ -94,33 +94,38 @@ export class TieredCache extends BaseCache {
   }
 
   override async getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
-    // TODO backfilling
-
-    const data: Record<string, T | null> = {};
-    let remainingKeys: string[] = keys;
-
-    for (let i = 0; i < this.tiers.length; i++) {
+    const next = async (i: number, remainingKeys: string[]): Promise<Record<string, T | null>> => {
       this.logger?.debug(this.name, '[getMany] Reading from tier =', i, 'keys =', keys);
 
-      const tier = this.tiers[i];
+      const tier = this.tiers[i]!;
+      const isLastTier = i === this.tiers.length - 1;
+
       const items = await tier.cache.getMany<T>(remainingKeys);
 
-      remainingKeys = [];
+      remainingKeys = Object.entries(items)
+        .filter(([, value]) => value === null || value === undefined)
+        .map(([key]) => key);
 
-      for (const [key, value] of Object.entries(items)) {
-        if (value === null || value === undefined) {
-          remainingKeys.push(key);
-        } else {
-          data[key] = value;
-        }
+      if (isLastTier || remainingKeys.length === 0) {
+        return items;
       }
 
-      if (remainingKeys.length === 0) {
-        break;
-      }
-    }
+      const nextItems = await next(i + 1, remainingKeys);
 
-    return data;
+      const backfillItems = Object.entries(nextItems)
+        .filter(([, value]) => value !== null && value !== undefined);
+
+      if (backfillItems.length > 0) {
+        await tier.cache.setMany(Object.fromEntries(backfillItems), tier.options);
+      }
+
+      return {
+        ...items,
+        ...nextItems,
+      };
+    };
+
+    return next(0, keys);
   }
 
   override async setMany<T>(data: Record<string, T>, options?: SetCacheOptions): Promise<void> {
