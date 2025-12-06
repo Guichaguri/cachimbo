@@ -3,15 +3,25 @@ import type { BaseCacheOptions, SetCacheOptions } from '../../types/cache.js';
 
 export interface LocalMapCacheOptions extends BaseCacheOptions {
   /**
-   * The underlying cache
+   * The underlying map.
    */
-  cache?: Map<string, any>;
+  cache?: MapLike<string, any>;
 
   /**
    * The maximum size of the cache.
    * When not set, the cache can grow indefinitely.
    */
   max?: number;
+}
+
+export interface MapLike<K, V> {
+  get(key: K): V;
+  set(key: K, value: V): void;
+  delete(key: K): void;
+  has(key: K): boolean;
+  keys(): IterableIterator<K>;
+  size: number;
+  clear(): void;
 }
 
 /**
@@ -22,10 +32,10 @@ export interface LocalMapCacheOptions extends BaseCacheOptions {
  * Once the limit of items is reached, the first inserted keys will be purged.
  */
 export class LocalMapCache extends BaseCache {
-  protected readonly cache: Map<string, any>;
+  protected readonly cache: MapLike<string, any>;
   protected max: number;
 
-  constructor(options: LocalMapCacheOptions) {
+  constructor(options: LocalMapCacheOptions = {}) {
     super(options);
     this.cache = options.cache ?? new Map<string, any>();
     this.max = options.max ?? Infinity;
