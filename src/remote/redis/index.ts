@@ -14,6 +14,16 @@ export interface RedisCacheOptions extends BaseCacheOptions {
    * The default Time To Live in seconds
    */
   defaultTTL?: number;
+
+  /**
+   * Indicates whether the Redis server supports MSETEX command.
+   *
+   * {@link RedisCache#setMany} will use MSETEX if this option is set to `true`.
+   *
+   * This option should be set to `true` if the server runs Redis OSS 8.4.0 or above.
+   * Valkey does not support this yet. (see https://github.com/valkey-io/valkey/issues/2592)
+   */
+  isMSETEXSupported?: boolean;
 }
 
 /**
@@ -22,11 +32,13 @@ export interface RedisCacheOptions extends BaseCacheOptions {
 export class RedisCache extends BaseCache {
   protected readonly client: Redis;
   protected defaultTTL?: number;
+  protected isMSETEXSupported?: boolean;
 
   constructor(options: RedisCacheOptions) {
     super(options);
     this.client = options.client;
     this.defaultTTL = options.defaultTTL;
+    this.isMSETEXSupported = options.isMSETEXSupported;
   }
 
   async get<T>(key: string): Promise<T | null> {
@@ -72,6 +84,10 @@ export class RedisCache extends BaseCache {
   }
 
   override async setMany(data: Record<string, any>, options?: SetCacheOptions): Promise<void> {
+    if (!this.isMSETEXSupported) {
+      return super.setMany(data, options);
+    }
+
     this.logger?.debug(this.name, '[setMany] Running "MSETEX" command...', 'data =', data);
 
     const raw: [string, string][] = [];
