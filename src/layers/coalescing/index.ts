@@ -22,10 +22,10 @@ interface OngoingRequest {
  * This strategy can prevent the Thundering Herd problem as all parallel requests will be coalesced into one.
  */
 export class CoalescingCache implements ICache {
-  private readonly ongoingRequests: Map<string, OngoingRequest> = new Map();
-  private readonly cache: ICache;
-  private readonly name?: string;
-  private readonly logger?: Logger;
+  protected readonly ongoingRequests: Map<string, OngoingRequest> = new Map();
+  protected readonly cache: ICache;
+  protected readonly name?: string;
+  protected readonly logger?: Logger;
 
   constructor(options: CoalescingCacheOptions) {
     this.cache = options.cache;
