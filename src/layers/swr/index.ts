@@ -34,12 +34,12 @@ interface CachedItem<T> {
  * This strategy is only effective when calling {@link ICache#getOrLoad}.
  */
 export class SWRCache implements ICache {
-  private readonly revalidating: Map<string, Promise<any>> = new Map<string, Promise<any>>();
-  private readonly cache: ICache;
-  private readonly name?: string;
-  private readonly logger?: Logger;
-  private readonly defaultTTL: number;
-  private readonly staleTTL: number;
+  protected readonly revalidating: Map<string, Promise<any>> = new Map<string, Promise<any>>();
+  protected readonly cache: ICache;
+  protected readonly name?: string;
+  protected readonly logger?: Logger;
+  protected defaultTTL: number;
+  protected staleTTL: number;
 
   constructor(options: SWRCacheOptions) {
     this.cache = options.cache;
