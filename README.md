@@ -23,7 +23,7 @@ Cachimbo is a caching library that allows you to layer different strategies in o
 
 ## Usage
 
-First install the library:
+First, install the library:
 ```sh
 npm install cachimbo
 ```
@@ -65,21 +65,21 @@ In-memory caches offer extremely low latency since data is stored directly in th
 
 External caches (like Redis, Memcached, etc) provide fast, scalable, shared storage that can be accessed across multiple application instances. They offer high throughput, larger memory capacity, and centralized cache management beyond what in-memory caches can reliably provide.
 
-- [In-memory](./stores/in-memory.md)
-- [Redis](./stores/redis.md)
-- [Memcached](stores/memcached.md)
-- [Cloudflare Workers KV](./stores/cloudflare-workers-kv.md)
+- [In-memory](./docs/stores/in-memory.md)
+- [Redis](./docs/stores/redis.md)
+- [Memcached](./docs/stores/memcached.md)
+- [Cloudflare Workers KV](./docs/stores/cloudflare-workers-kv.md)
 
 ## Cache Layers
 
 These layers work just like "middlewares" but for caches, they customize how a cache is handled.
 
-- [Request Coalescing](./layers/request-coalescing.md) (deduplication)
-- [Tiered Caching](./layers/tiered.md) (multi-layer caching)
-- [Stale-While-Revalidate](./layers/stale-while-revalidate.md)
-- [Metrics Collection](layers/metrics-collection.md)
+- [Request Coalescing](./docs/layers/request-coalescing.md) (deduplication)
+- [Tiered Caching](./docs/layers/tiered.md) (multi-layer caching)
+- [Stale-While-Revalidate](./docs/layers/stale-while-revalidate.md)
+- [Metrics Collection](./docs/layers/metrics-collection.md)
 
 ## Guides
-- [Choosing the right combination of layers](./guides/choosing-layers.md)
-- [Disabling cache](./guides/disabling.md)
-- [Extending](./guides/extending.md)
+- [Choosing the right combination of layers](./docs/guides/choosing-layers.md)
+- [Disabling cache](./docs/guides/disabling.md)
+- [Extending](./docs/guides/extending.md)
