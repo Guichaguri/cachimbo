@@ -24,38 +24,38 @@ When building a caching solution with Cachimbo, selecting the appropriate combin
 ## Good Practices
 
 <details>
-<summary>Implement cache invalidation</summary>
+<summary><strong>Implement cache invalidation</strong></summary>
 
-Cache invalidation is crucial to ensure that your application serves fresh and accurate data.
-
-You can implement invalidation strategies such as:
-- **Event-driven invalidation**: invalidate or update cache entries when the underlying data changes (e.g., after a database update).
-- **Time-based expiration (TTL)**: set a short TTL data that should reflect changes quickly.
-- **Manual cache clearing**: provide mechanisms to manually clear or refresh cache entries when necessary (e.g., through an admin interface).
-
-Event-driven invalidation is generally the most effective method, as it ensures that cached data remains consistent with the source of truth. Implementing this strategy can enable longer TTLs, increasing cache hits.
-
-</details>
-
-
-<details>
-<summary>Always version your cache keys when using an external cache store</summary>
-
-An external cache makes your application stateful.
-If you change the structure of the cached data, old cache entries may become incompatible with the new code, causing errors or unexpected behavior.
-
-You can avoid collisions and ensure data integrity by versioning your cache keys.
-
-This can be done by simply appending the version number to the cache key directly on the methods (e.g. `cache.get("mykey:v1")`) or by adding a [Key Transformation](../layers/key-transformation.md) layer.
+> Cache invalidation is crucial to ensure that your application serves fresh and accurate data.
+>
+> You can implement invalidation strategies such as:
+> - **Event-driven invalidation**: invalidate or update cache entries when the underlying data changes (e.g., after a database update).
+> - **Time-based expiration (TTL)**: set a short TTL data that should reflect changes quickly.
+> - **Manual cache clearing**: provide mechanisms to manually clear or refresh cache entries when necessary (e.g., through an admin interface).
+>
+> Event-driven invalidation is generally the most effective method, as it ensures that cached data remains consistent with the source of truth. Implementing this strategy can enable longer TTLs, increasing cache hits.
 
 </details>
 
 
 <details>
-<summary>Always prefix your cache keys when sharing an external cache</summary>
+<summary><strong>Always version your cache keys when using an external cache store</strong></summary>
 
-Different applications may share the same external cache (e.g., a Redis server). This can be a problem if two applications use the same cache keys, leading to collisions and data corruption.
+> An external cache makes your application stateful.
+> If you change the structure of the cached data, old cache entries may become incompatible with the new code, causing errors or unexpected behavior.
+>
+> You can avoid collisions and ensure data integrity by versioning your cache keys.
+>
+> This can be done by simply appending the version number to the cache key directly on the methods (e.g. `cache.get("mykey:v1")`) or by adding a [Key Transformation](../layers/key-transformation.md) layer.
 
-To prevent this, add a unique prefix to your cache keys (e.g., `myapp:mykey`). You can do this manually or by using a [Key Transformation](../layers/key-transformation.md) layer.
+</details>
+
+
+<details>
+<summary><strong>Always prefix your cache keys when sharing an external cache</strong></summary>
+
+> Different applications may share the same external cache (e.g., a Redis server). This can be a problem if two applications use the same cache keys, leading to collisions and data corruption.
+>
+> To prevent this, add a unique prefix to your cache keys (e.g., `myapp:mykey`). You can do this manually or by using a [Key Transformation](../layers/key-transformation.md) layer.
 
 </details>
