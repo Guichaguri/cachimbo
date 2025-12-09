@@ -32,7 +32,7 @@ export class MemcacheCache extends BaseCache {
 
     const raw = await this.client.get(key);
 
-    return raw === undefined ? null : JSON.parse(raw);
+    return raw ? JSON.parse(raw) : null;
   }
 
   async set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {
