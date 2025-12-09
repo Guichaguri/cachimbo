@@ -66,9 +66,10 @@ In-memory caches offer extremely low latency since data is stored directly in th
 External caches (like Redis, Memcached, etc) provide fast, scalable, shared storage that can be accessed across multiple application instances. They offer high throughput, larger memory capacity, and centralized cache management beyond what in-memory caches can reliably provide.
 
 - [In-memory](./docs/stores/in-memory.md)
-- [Redis](./docs/stores/redis.md)
+- [Redis](docs/stores/redis-valkey.md) (and Valkey)
 - [Memcached](./docs/stores/memcached.md)
 - [Cloudflare Workers KV](./docs/stores/cloudflare-workers-kv.md)
+- [Keyv](./stores/keyv.md)
 
 ## Cache Layers
 
@@ -77,6 +78,9 @@ These layers work just like "middlewares" but for caches, they customize how a c
 - [Request Coalescing](./docs/layers/request-coalescing.md) (deduplication)
 - [Tiered Caching](./docs/layers/tiered.md) (multi-layer caching)
 - [Stale-While-Revalidate](./docs/layers/stale-while-revalidate.md)
+- [TTL Jittering](./docs/layers/jittering.md)
+- [Async/Lazy Initialization](./docs/layers/async-lazy.md)
+- [Key Transformation](./docs/layers/key-transformation.md)
 - [Metrics Collection](./docs/layers/metrics-collection.md)
 
 ## Guides

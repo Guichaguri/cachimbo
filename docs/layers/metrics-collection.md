@@ -3,7 +3,7 @@
 To measure the cache effectiveness, you can add a `MetricsCollectingCache` layer. It will collect how many times the cache was hit, missed, refreshed and deleted.
 
 ```ts
-import { MetricsCollectingCache } from 'cachimbo/layers';
+import { MetricsCollectingCache } from 'cachimbo';
 
 const metricsCache = new MetricsCollectingCache({
   cache: anotherCache,
