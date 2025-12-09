@@ -1,12 +1,12 @@
 {
   "name": "cachimbo",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "author": "Guilherme Chaguri",
   "license": "Apache-2.0",
   "description": "A caching library that allows you to layer different strategies in order to maximize the performance.",
   "type": "module",
   "scripts": {
-    "build": "rimraf dist && tsc -p tsconfig.build.json",
+    "build": "tsdown",
     "test": "vitest",
     "coverage": "vitest run --coverage --coverage.include=src/**/*.ts"
   },
@@ -28,6 +28,20 @@
   "files": [
     "dist"
   ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+      },
+      "require": {
+        "default": "./dist/index.cjs",
+        "types": "./dist/index.d.cts"
+      }
+    }
+  },
   "dependencies": {
     "@isaacs/ttlcache": "^2.1.2",
     "lru-cache": "^11.2.2"
@@ -44,6 +58,7 @@
     "keyv": "^5.5.5",
     "memcache": "^1.0.0",
     "rimraf": "^6.1.2",
+    "tsdown": "^0.17.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "vitest": "^4.0.15"
