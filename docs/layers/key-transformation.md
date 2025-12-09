@@ -29,5 +29,5 @@ const prefixedCache = new KeyTransformingCache({
 });
 ```
 
-## Notes
-- This layer is not recommended for in-memory caches as you can easily create separate instances for different key namespaces.
+## Remarks
+- This layer is only recommended for external caches as you can easily create separate instances for different key namespaces in in-memory caches.

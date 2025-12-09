@@ -16,10 +16,9 @@ await cache.set("key", "value", { ttl: 60 }); // 60 seconds
 const data = await cache.get("key"); // "value"
 ```
 
-## Notes
+## Remarks
 
-Cloudflare Workers KV has eventual consistency, which means that there might be a delay before a recently written value is visible to subsequent reads. This is important to consider when designing your caching strategy.
-
-KV also does not support TTLs shorter than 60 seconds.
+- Cloudflare Workers KV has eventual consistency, which means that there might be a delay before a recently written value is visible to subsequent reads. This is important to consider when designing your caching strategy.
+- KV also does not support TTLs shorter than 60 seconds.
 
 More information about Cloudflare Workers KV can be found in the [official documentation](https://developers.cloudflare.com/kv/concepts/how-kv-works/).

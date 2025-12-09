@@ -89,3 +89,25 @@ When building a caching solution with Cachimbo, selecting the appropriate combin
 > If you don't know whether a layer is useful for your application, start with and without it and measure the performance.
 
 </details>
+
+
+<details>
+<summary><strong>Don't use caching as a band-aid for slow operations</strong></summary>
+
+> Caching can be a quick and easy work-around for performance issues.
+> But always try to fix the root cause too.
+>
+> - Optimize database queries
+> - Improve external API performance
+> - Optimize algorithms
+> - Use indexing and proper data structures
+>
+> Keep caching as a complementary strategy, not the only solution.
+> 
+> There are cases where caching is unavoidable, here are some examples that are perfectly justifiable:
+> - Third-party APIs with rate limits
+> - Expensive computations
+> - Legacy systems with poor performance
+> - Slow databases
+
+</details>

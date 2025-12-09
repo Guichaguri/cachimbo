@@ -30,6 +30,6 @@ const memjsCache = new MemJSCache({
 });
 ```
 
-## Notes
+## Remarks
 
-MemJS does not support getting multiple keys at once. Therefore, the `getMany()` method will internally call `get()` for each key.
+- MemJS does not support getting multiple keys at once. Therefore, the `getMany()` method will internally call `get()` for each key.

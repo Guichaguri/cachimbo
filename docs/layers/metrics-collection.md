@@ -26,7 +26,7 @@ console.log(metricsCache.getMetrics());
 } */
 ```
 
-## Caveats
+## Remarks
 
 - This implementation adds some overhead to each cache operation due to the time measurement and metric counting. It's not recommended for production use.
 - Time in batch operations (`getMany`, `setMany` and `deleteMany`) are divided equally among all keys involved in the operation when calculating metrics.
