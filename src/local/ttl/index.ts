@@ -47,7 +47,7 @@ export class LocalTTLCache extends BaseCache {
 
     const data = this.cache.get(key);
 
-    return data === undefined ? null : data as T;
+    return data === undefined ? null : data;
   }
 
   async set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {
