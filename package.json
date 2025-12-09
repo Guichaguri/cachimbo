@@ -39,6 +39,7 @@
     "@types/node": "^24.10.1",
     "@vitest/coverage-v8": "^4.0.15",
     "ioredis": "^5.8.2",
+    "iovalkey": "^0.3.3",
     "memcache": "^1.0.0",
     "rimraf": "^6.1.2",
     "tsx": "^4.20.6",

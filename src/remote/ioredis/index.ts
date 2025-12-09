@@ -1,12 +1,13 @@
 import type { Redis } from 'ioredis';
+import type { Redis as Valkey } from 'iovalkey';
 import type { BaseCacheOptions, SetCacheOptions } from '../../types/cache.js';
 import { BaseCache } from '../../base/index.js';
 
 export interface IORedisCacheOptions extends BaseCacheOptions {
   /**
-   * The ioredis client
+   * The ioredis or iovalkey client
    */
-  client: Redis;
+  client: Redis | Valkey;
 
   /**
    * The default Time To Live in seconds
@@ -14,7 +15,7 @@ export interface IORedisCacheOptions extends BaseCacheOptions {
   defaultTTL?: number;
 
   /**
-   * Indicates whether the Redis server supports MSETEX command.
+   * Indicates whether the Redis server supports the MSETEX command.
    *
    * {@link IORedisCache#setMany} will use MSETEX if this option is set to `true`.
    *
@@ -28,7 +29,7 @@ export interface IORedisCacheOptions extends BaseCacheOptions {
  * A Redis cache implementation using ioredis
  */
 export class IORedisCache extends BaseCache {
-  protected readonly client: Redis;
+  protected readonly client: Redis | Valkey;
   protected defaultTTL?: number;
   protected isMSETEXSupported?: boolean;
 
