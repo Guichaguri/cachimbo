@@ -9,6 +9,7 @@
     "build": "tsdown",
     "test": "vitest",
     "coverage": "vitest run --coverage --coverage.include=src/**/*.ts",
+    "prepack": "tsdown",
 
     "sample:no-cache": "tsx ./tests/samples/1-no-cache.ts",
     "sample:redis-cache": "tsx ./tests/samples/2-redis-cache.ts",
