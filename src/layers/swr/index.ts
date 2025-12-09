@@ -54,7 +54,7 @@ export class SWRCache implements ICache {
 
     const item = await this.cache.get<CachedItem<T>>(key);
 
-    return item === null ? null : item.data;
+    return item ? item.data : null;
   }
 
   async getOrLoad<T>(key: string, load: () => Promise<T>, options: SetCacheOptions = {}): Promise<T> {
