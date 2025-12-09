@@ -12,8 +12,8 @@ const dedupedCache = new CoalescingCache({
 });
 ```
 
-<center>
+<p align="center">
     <img src="../assets/coalescing.svg" alt="Request Coalescing Cache">
-</center>
+</p>
 
 In the above example, the first request for a key triggers a load from the underlying cache. If a second request for the same key arrives while the first is still in progress, it waits for the first request to complete and then receives the same result, avoiding a duplicate load operation.

@@ -40,8 +40,8 @@ const data = await tieredCache.getOrLoad("key", () => loadData(), { ttl: 60 * 3 
 // and then backfill the LocalTTLCache with more 30 seconds
 ```
 
-<center>
+<p align="center">
     <img src="../assets/tiered.svg" alt="Tiered Cache">
-</center>
+</p>
 
 In the example above, the tiered cache first checks the in-memory cache for the requested key. If the key is not found there, it checks the external cache, backfilling the in-memory cache to reduce latency on future reads.

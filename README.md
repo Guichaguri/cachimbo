@@ -1,6 +1,8 @@
-<img align="right" src="./docs/assets/cachimbo.png" alt="Cachimbo" width="150" height="150">
+<p align="center">
+  <img width="200" src="https://raw.githubusercontent.com/Guichaguri/cachimbo/main/docs/assets/cachimbo.png">
+</p>
 
-# cachimbo
+<h1 align="center">Cachimbo</h1>
 
 Cachimbo is a caching library that allows you to layer different strategies in order to maximize the performance.
 
@@ -65,25 +67,25 @@ In-memory caches offer extremely low latency since data is stored directly in th
 
 External caches (like Redis, Memcached, etc) provide fast, scalable, shared storage that can be accessed across multiple application instances. They offer high throughput, larger memory capacity, and centralized cache management beyond what in-memory caches can reliably provide.
 
-- [In-memory](./docs/stores/in-memory.md)
-- [Redis](docs/stores/redis-valkey.md) (and Valkey)
-- [Memcached](./docs/stores/memcached.md)
-- [Cloudflare Workers KV](./docs/stores/cloudflare-workers-kv.md)
-- [Keyv](./stores/keyv.md)
+- [In-memory](/docs/stores/in-memory.md)
+- [Redis](/docs/stores/redis-valkey.md) (and Valkey)
+- [Memcached](/docs/stores/memcached.md)
+- [Cloudflare Workers KV](/docs/stores/cloudflare-workers-kv.md)
+- [Keyv](/docs/stores/keyv.md)
 
 ## Cache Layers
 
 These layers work just like "middlewares" but for caches, they customize how a cache is handled.
 
-- [Request Coalescing](./docs/layers/request-coalescing.md) (deduplication)
-- [Tiered Caching](./docs/layers/tiered.md) (multi-layer caching)
-- [Stale-While-Revalidate](./docs/layers/stale-while-revalidate.md)
-- [TTL Jittering](./docs/layers/jittering.md)
-- [Async/Lazy Initialization](./docs/layers/async-lazy.md)
-- [Key Transformation](./docs/layers/key-transformation.md)
-- [Metrics Collection](./docs/layers/metrics-collection.md)
+- [Request Coalescing](/docs/layers/request-coalescing.md) (deduplication)
+- [Tiered Caching](/docs/layers/tiered.md) (multi-layer caching)
+- [Stale-While-Revalidate](/docs/layers/stale-while-revalidate.md)
+- [TTL Jittering](/docs/layers/jittering.md)
+- [Async/Lazy Initialization](/docs/layers/async-lazy.md)
+- [Key Transformation](/docs/layers/key-transformation.md)
+- [Metrics Collection](/docs/layers/metrics-collection.md)
 
 ## Guides
-- [Choosing the right combination of layers](./docs/guides/choosing-layers.md)
-- [Disabling cache](./docs/guides/disabling.md)
-- [Extending](./docs/guides/extending.md)
+- [Choosing the right combination of layers](/docs/guides/choosing-layers.md)
+- [Disabling cache](/docs/guides/disabling.md)
+- [Extending](/docs/guides/extending.md)

@@ -23,9 +23,9 @@ const data = await swrCache.getOrLoad("key", () => loadData());
 // After 70 seconds, the item will be completely removed from cache, and any new requests will have to load the resource in foreground
 ```
 
-<center>
+<p align="center">
     <img src="../assets/swr.svg" alt="Stale While Revalidate Cache">
-</center>
+</p>
 
 In the example above, the resource is cached. After a few seconds, the cache becomes stale but is still served from the cache while a background refresh is triggered. Once the background refresh completes, the cache is updated with fresh data.
 

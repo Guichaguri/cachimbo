@@ -17,8 +17,8 @@ jitterCache.set("mykey", myData, { ttl: 200 });
 // the actual ttl would be a random number from 200 to 230 seconds
 ```
 
-<center>
+<p align="center">
     <img src="../assets/jitter.svg" alt="TTL Jitter">
-</center>
+</p>
 
 Notice how in the diagram above, the expiration times are spread out due to the added jitter, preventing a thundering herd effect.
