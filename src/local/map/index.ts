@@ -15,7 +15,7 @@ export interface LocalMapCacheOptions extends BaseCacheOptions {
 }
 
 export interface MapLike<K, V> {
-  get(key: K): V;
+  get(key: K): V | undefined;
   set(key: K, value: V): void;
   delete(key: K): void;
   has(key: K): boolean;
