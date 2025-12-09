@@ -8,7 +8,14 @@
   "scripts": {
     "build": "tsdown",
     "test": "vitest",
-    "coverage": "vitest run --coverage --coverage.include=src/**/*.ts"
+    "coverage": "vitest run --coverage --coverage.include=src/**/*.ts",
+
+    "sample:no-cache": "tsx ./tests/samples/1-no-cache.ts",
+    "sample:redis-cache": "tsx ./tests/samples/2-redis-cache.ts",
+    "sample:ttl-cache": "tsx ./tests/samples/3-ttl-cache.ts",
+    "sample:coalescing-redis-cache": "tsx ./tests/samples/4-coalescing-redis-cache.ts",
+    "sample:swr-ttl-cache": "tsx ./tests/samples/5-swr-ttl-cache.ts",
+    "sample:tiered-ttl-redis-cache": "tsx ./tests/samples/6-tiered-ttl-redis-cache.ts"
   },
   "keywords": [
     "cache",
@@ -23,7 +30,9 @@
     "tiered-cache",
     "multi-layer-cache",
     "ttl",
-    "lru"
+    "lru",
+    "kv",
+    "keyv"
   ],
   "files": [
     "dist"
