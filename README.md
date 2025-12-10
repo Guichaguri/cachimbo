@@ -4,22 +4,25 @@
 
 <h1 align="center">Cachimbo</h1>
 
-Cachimbo is a caching library that allows you to layer different strategies in order to maximize the performance.
+Cachimbo is an advanced caching library that allows you to layer different strategies in order to maximize the performance.
 
 ## Features
 
 - Supports external cache stores
   - Redis
+  - Valkey
   - Memcached
   - Cloudflare Workers KV
+  - Keyv
 - Supports in-memory cache stores
-  - Least Recently Used (LRU)
-  - Time To Live (TTL)
-  - Map-based
+  - Least Recently Used (LRU) eviction
+  - Time-based (TTL) eviction
+  - FIFO eviction
 - Supports intermediary cache strategies
   - Request coalescing (deduplication)
   - Multi-layer caching (tiered cache)
   - Stale-While-Revalidate
+  - TTL jittering
 - Metrics collection
 - Easily extendable
 

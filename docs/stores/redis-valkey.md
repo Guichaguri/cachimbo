@@ -43,7 +43,7 @@ const valkeyCache = new ValkeyGlideCache({
 ### ioredis & iovalkey
 
 ```ts
-import Redis from 'ioredis';
+import Redis from 'ioredis'; // or import Valkey from 'iovalkey';
 import { IORedisCache } from 'cachimbo';
 
 const redisClient = new Redis("redis://user:password@localhost:6380");

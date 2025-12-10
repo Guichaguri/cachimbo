@@ -29,6 +29,7 @@ export interface MapLike<K, V> {
  *
  * It ignores expiration times, but a limit of cached items can be set.
  *
+ * It implements a simple FIFO eviction policy:
  * Once the limit of items is reached, the first inserted keys will be purged.
  */
 export class LocalMapCache extends BaseCache {

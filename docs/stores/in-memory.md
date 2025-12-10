@@ -44,6 +44,8 @@ const value = await cache.get("key"); // "value"
 
 If you don't need an access-pattern awareness nor a time-based expiration policy, you can use a simple Map-based cache. This is useful for testing or scenarios where you want to keep things extremely simple.
 
+This implementation uses a FIFO eviction policy when the maximum size is reached, which means that the first inserted keys will be removed first.
+
 ```ts
 import { LocalMapCache } from 'cachimbo';
 
