@@ -1,6 +1,6 @@
 import { LRUCache } from 'lru-cache';
-import { BaseCache } from '../../base/index.js';
 import type { BaseCacheOptions, SetCacheOptions } from '../../types/cache.js';
+import { BaseLocalCache } from '../../base/local.js';
 
 export interface ExistingLRUCacheOptions extends BaseCacheOptions {
   /**
@@ -40,7 +40,7 @@ export interface LocalLRUCacheOptions extends BaseCacheOptions {
  *
  * Once the limit of items is reached, the least recently used items will be purged.
  */
-export class LocalLRUCache extends BaseCache {
+export class LocalLRUCache extends BaseLocalCache {
   protected readonly cache: LRUCache<string, any, () => Promise<any>>;
   protected shouldUseFetch?: boolean;
 
@@ -56,17 +56,37 @@ export class LocalLRUCache extends BaseCache {
         max: options.max || 10_000,
         ttlAutopurge: false,
         fetchMethod: (_key, _staleValue, options) => options.context(),
+        disposeAfter: (value, key, reason) => this.onDispose(key, value, reason),
       });
       this.shouldUseFetch = true;
     }
   }
 
-  async get<T>(key: string): Promise<T | null> {
+  /** @internal */
+  _get<T>(key: string): T | null {
     this.logger?.debug(this.name, '[get]', 'key =', key);
 
     const data = this.cache.get(key);
 
     return data === undefined ? null : data;
+  }
+
+  /** @internal */
+  _set<T>(key: string, value: T, options?: SetCacheOptions): void {
+    this.logger?.debug(this.name, '[set]', 'key =', key);
+
+    const ttl = options?.ttl;
+
+    this.cache.set(key, value, {
+      ttl: ttl ? ttl * 1000 : undefined,
+    });
+  }
+
+  /** @internal */
+  _delete(key: string): void {
+    this.logger?.debug(this.name, '[delete]', 'key =', key);
+
+    this.cache.delete(key);
   }
 
   override getOrLoad<T>(key: string, load: () => Promise<T>, options?: SetCacheOptions): Promise<T> {
@@ -82,22 +102,6 @@ export class LocalLRUCache extends BaseCache {
       context: load,
       ttl: ttl ? ttl * 1000 : undefined,
     });
-  }
-
-  async set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {
-    this.logger?.debug(this.name, '[set]', 'key =', key);
-
-    const ttl = options?.ttl;
-
-    this.cache.set(key, value, {
-      ttl: ttl ? ttl * 1000 : undefined,
-    });
-  }
-
-  async delete(key: string): Promise<void> {
-    this.logger?.debug(this.name, '[delete]', 'key =', key);
-
-    this.cache.delete(key);
   }
 
 }

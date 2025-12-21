@@ -114,5 +114,19 @@ describe('LocalLRUCache', () => {
 
       expect(mockLRUCache.delete).toHaveBeenCalledWith('key');
     });
+
+    test('calls dispose when deleting', async () => {
+      const cache = new LocalLRUCache();
+      const onDispose = vi.fn();
+      cache._addDisposeListener(onDispose);
+
+      await cache.set('key', 'sample');
+
+      expect(onDispose).not.toHaveBeenCalled();
+
+      await cache.delete('key');
+
+      expect(onDispose).toHaveBeenCalledWith('key', 'sample', 'delete');
+    });
   });
 });
