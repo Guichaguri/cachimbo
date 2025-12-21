@@ -2,7 +2,7 @@ import type { ICache, SetCacheOptions } from '../../types/cache.js';
 
 /**
  * A cache implementation that does nothing.
- * It's useful for disabling cache.
+ * It's useful for disabling cache and unit testing.
  *
  * @example
  * ```ts
