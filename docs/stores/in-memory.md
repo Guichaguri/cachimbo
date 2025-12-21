@@ -57,3 +57,25 @@ await cache.set("key", "value");
 
 const value = await cache.get("key"); // "value"
 ```
+
+## Weak References
+
+Weak References allow the JavaScript engine to automatically reclaim memory when there are no strong references to an object. This is particularly useful for caching scenarios where you want to allow the garbage collector to free up memory when needed.
+
+There is a cache layer that uses `WeakRef` and `FinalizationRegistry` for its entries:
+
+```ts
+import { WeakCache, LocalTTLCache } from 'cachimbo';
+
+const cache = new WeakCache({
+  cache: new LocalTTLCache(), // underlying cache store, has to be a local one
+});
+
+await cache.set("key", { myCoolValue: 1234 });
+
+// Memory fills up, garbage collector runs
+
+const valueAfter = await cache.get("key"); // could be { myCoolValue: 1234 } or null
+```
+
+You can combine the WeakCache with any local cache store (like `LocalMapCache`, `LocalTTLCache` or `LocalLRUCache`) to benefit from both caching strategies.
