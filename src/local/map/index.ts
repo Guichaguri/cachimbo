@@ -1,5 +1,5 @@
-import { BaseCache } from '../../base/index.js';
 import type { BaseCacheOptions, SetCacheOptions } from '../../types/cache.js';
+import { BaseLocalCache } from '../../base/local.js';
 
 export interface LocalMapCacheOptions extends BaseCacheOptions {
   /**
@@ -32,7 +32,7 @@ export interface MapLike<K, V> {
  * It implements a simple FIFO eviction policy:
  * Once the limit of items is reached, the first inserted keys will be purged.
  */
-export class LocalMapCache extends BaseCache {
+export class LocalMapCache extends BaseLocalCache {
   protected readonly cache: MapLike<string, any>;
   protected max: number;
 
@@ -42,7 +42,8 @@ export class LocalMapCache extends BaseCache {
     this.max = options.max ?? Infinity;
   }
 
-  async get<T>(key: string): Promise<T | null> {
+  /** @internal */
+  _get<T>(key: string): T | null {
     this.logger?.debug(this.name, '[get]', 'key =', key);
 
     const data = this.cache.get(key);
@@ -50,20 +51,27 @@ export class LocalMapCache extends BaseCache {
     return data === undefined ? null : data;
   }
 
-  async set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {
+  /** @internal */
+  _set<T>(key: string, value: T, options?: SetCacheOptions): void {
     this.logger?.debug(this.name, '[set]', 'key =', key);
 
-    if (this.cache.size >= this.max && !this.cache.has(key)) {
+    const previousValue = this.cache.get(key);
+
+    if (this.cache.size >= this.max && previousValue === undefined) {
       this.evict(1);
     }
 
     this.cache.set(key, value);
+    this.onDispose(key, previousValue, 'set');
   }
 
-  async delete(key: string): Promise<void> {
+  /** @internal */
+  _delete(key: string): void {
     this.logger?.debug(this.name, '[delete]', 'key =', key);
 
+    const previousValue = this.cache.get(key);
     this.cache.delete(key);
+    this.onDispose(key, previousValue, 'delete');
   }
 
   override async setMany(data: Record<string, any>, options?: SetCacheOptions): Promise<void> {
@@ -78,14 +86,26 @@ export class LocalMapCache extends BaseCache {
     }
 
     for (const [key, value] of entries) {
+      const previousValue = this.cache.get(key);
       this.cache.set(key, value);
+      this.onDispose(key, previousValue, 'set');
     }
   }
 
   clear(): void {
     this.logger?.debug(this.name, '[clear]');
 
+    for (const key of this.cache.keys()) {
+      this.onDispose(key, this.cache.get(key), 'delete');
+    }
+
     this.cache.clear();
+  }
+
+  protected override onDispose(key: string, value: any, reason?: string) {
+    if (value !== undefined) {
+      super.onDispose(key, value, reason);
+    }
   }
 
   protected evict(length: number): void {
@@ -100,7 +120,9 @@ export class LocalMapCache extends BaseCache {
 
       this.logger?.debug(this.name, '[evict]', 'key = ', key);
 
+      const previousValue = this.cache.get(key.value);
       this.cache.delete(key.value);
+      this.onDispose(key.value, previousValue, 'evict');
     }
   }
 

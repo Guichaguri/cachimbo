@@ -1,12 +1,13 @@
 import { describe, expect, test, vi } from 'vitest';
 import { LocalMapCache } from './index.js';
+import { LocalLRUCache } from '../lru/index.js';
 
 const mockMap = {
   get: vi.fn(),
   set: vi.fn(),
   delete: vi.fn(),
   has: vi.fn(),
-  keys: vi.fn(),
+  keys: vi.fn(() => new Map([['key', 'value']]).keys()),
   size: 0,
   clear: vi.fn(),
 };
@@ -75,6 +76,20 @@ describe('LocalMapCache', () => {
       await cache.delete('key');
 
       expect(mockMap.delete).toHaveBeenCalledWith('key');
+    });
+
+    test('calls dispose when deleting', async () => {
+      const cache = new LocalMapCache();
+      const onDispose = vi.fn();
+      cache._addDisposeListener(onDispose);
+
+      await cache.set('key', 'sample');
+
+      expect(onDispose).not.toHaveBeenCalled();
+
+      await cache.delete('key');
+
+      expect(onDispose).toHaveBeenCalledWith('key', 'sample', 'delete');
     });
   });
 
