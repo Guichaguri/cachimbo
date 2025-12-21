@@ -6,6 +6,9 @@ The library has built-in support for two Memcache clients:
 
 ### Memcache
 
+```sh
+npm install memcache
+```
 ```ts
 import { Memcache } from 'memcache';
 import { MemcacheCache } from 'cachimbo';
@@ -19,6 +22,9 @@ const memcacheCache = new MemcacheCache({
 
 ### MemJS
 
+```sh
+npm install memjs
+```
 ```ts
 import { Client } from 'memjs';
 import { MemJSCache } from 'cachimbo';
