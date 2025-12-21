@@ -18,6 +18,7 @@ Cachimbo is an advanced caching library that allows you to layer different strat
   - Least Recently Used (LRU) eviction
   - Time-based (TTL) eviction
   - FIFO eviction
+  - Weak References (garbage collectable cached items)
 - Supports intermediary cache strategies
   - Request coalescing (deduplication)
   - Multi-layer caching (tiered cache)
