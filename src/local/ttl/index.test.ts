@@ -76,5 +76,19 @@ describe('LocalTTLCache', () => {
 
       expect(mockTTLCache.delete).toHaveBeenCalledWith('key');
     });
+
+    test('calls dispose when deleting', async () => {
+      const cache = new LocalTTLCache({ ttl: 60 });
+      const onDispose = vi.fn();
+      cache._addDisposeListener(onDispose);
+
+      await cache.set('key', 'sample');
+
+      expect(onDispose).not.toHaveBeenCalled();
+
+      await cache.delete('key');
+
+      expect(onDispose).toHaveBeenCalledWith('key', 'sample', 'delete');
+    });
   });
 });

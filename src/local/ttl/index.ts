@@ -1,6 +1,6 @@
 import { TTLCache } from '@isaacs/ttlcache';
-import { BaseCache } from '../../base/index.js';
 import type { BaseCacheOptions, SetCacheOptions } from '../../types/cache.js';
+import { BaseLocalCache } from '../../base/local.js';
 
 export interface ExistingTTLCacheOptions extends BaseCacheOptions {
   /**
@@ -26,7 +26,7 @@ export interface LocalTTLCacheOptions extends BaseCacheOptions {
  *
  * Once the limit of items is reached, the soonest expiring items will be purged.
  */
-export class LocalTTLCache extends BaseCache {
+export class LocalTTLCache extends BaseLocalCache {
   protected readonly cache: TTLCache<string, any>;
 
   constructor(options: LocalTTLCacheOptions | ExistingTTLCacheOptions = {}) {
@@ -38,11 +38,13 @@ export class LocalTTLCache extends BaseCache {
       this.cache = new TTLCache<string, any>({
         max: options.max,
         ttl: options.ttl ? options.ttl * 1000 : undefined,
+        dispose: (value, key, reason) => this.onDispose(key, value, reason),
       });
     }
   }
 
-  async get<T>(key: string): Promise<T | null> {
+  /** @internal */
+  _get<T>(key: string): T | null {
     this.logger?.debug(this.name, '[get]', 'key =', key);
 
     const data = this.cache.get(key);
@@ -50,7 +52,8 @@ export class LocalTTLCache extends BaseCache {
     return data === undefined ? null : data;
   }
 
-  async set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {
+  /** @internal */
+  _set<T>(key: string, value: T, options?: SetCacheOptions): void {
     this.logger?.debug(this.name, '[set]', 'key =', key);
 
     const ttl = options?.ttl;
@@ -60,7 +63,8 @@ export class LocalTTLCache extends BaseCache {
     });
   }
 
-  async delete(key: string): Promise<void> {
+  /** @internal */
+  _delete(key: string): void {
     this.logger?.debug(this.name, '[delete]', 'key =', key);
 
     this.cache.delete(key);
