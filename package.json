@@ -1,6 +1,6 @@
 {
   "name": "cachimbo",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Guilherme Chaguri",
   "license": "Apache-2.0",
   "description": "An advanced caching library that allows you to layer different strategies in order to maximize the performance.",
@@ -15,12 +15,12 @@
     "coverage": "vitest run --coverage --coverage.include=src/**/*.ts",
     "prepack": "tsdown",
 
-    "sample:no-cache": "tsx ./tests/samples/1-no-cache.ts",
-    "sample:redis-cache": "tsx ./tests/samples/2-redis-cache.ts",
-    "sample:ttl-cache": "tsx ./tests/samples/3-ttl-cache.ts",
-    "sample:coalescing-redis-cache": "tsx ./tests/samples/4-coalescing-redis-cache.ts",
-    "sample:swr-ttl-cache": "tsx ./tests/samples/5-swr-ttl-cache.ts",
-    "sample:tiered-ttl-redis-cache": "tsx ./tests/samples/6-tiered-ttl-redis-cache.ts"
+    "sample:no-cache": "tsx ./samples/1-no-cache.ts",
+    "sample:redis-cache": "tsx ./samples/2-redis-cache.ts",
+    "sample:ttl-cache": "tsx ./samples/3-ttl-cache.ts",
+    "sample:coalescing-redis-cache": "tsx ./samples/4-coalescing-redis-cache.ts",
+    "sample:swr-ttl-cache": "tsx ./samples/5-swr-ttl-cache.ts",
+    "sample:tiered-ttl-redis-cache": "tsx ./samples/6-tiered-ttl-redis-cache.ts"
   },
   "keywords": [
     "cache",
@@ -57,22 +57,22 @@
     }
   },
   "dependencies": {
-    "@isaacs/ttlcache": "^2.1.2",
-    "lru-cache": "^11.2.2"
+    "@isaacs/ttlcache": "^2.1.3",
+    "lru-cache": "^11.2.4"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20251127.0",
+    "@cloudflare/workers-types": "^4.20251221.0",
     "@redis/client": "^5.10.0",
     "@types/memjs": "^1.3.3",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.10.4",
     "@valkey/valkey-glide": "^2.2.1",
-    "@vitest/coverage-v8": "^4.0.15",
+    "@vitest/coverage-v8": "^4.0.16",
     "ioredis": "^5.8.2",
     "iovalkey": "^0.3.3",
     "keyv": "^5.5.5",
-    "memcache": "^1.0.0",
-    "tsdown": "^0.17.0",
-    "tsx": "^4.20.6",
+    "memcache": "^1.2.0",
+    "tsdown": "^0.17.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.15"
   }
