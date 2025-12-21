@@ -4,7 +4,7 @@ import { ValkeyGlideCache } from './index.js';
 const mockClient = {
   get: vi.fn(),
   set: vi.fn(),
-  del: vi.fn(),
+  unlink: vi.fn(),
   mget: vi.fn(),
 } as any;
 
@@ -79,7 +79,7 @@ describe('ValkeyGlideCache', () => {
 
       await cache.delete('key');
 
-      expect(mockClient.del).toHaveBeenCalledWith(['key']);
+      expect(mockClient.unlink).toHaveBeenCalledWith(['key']);
     });
   });
 
@@ -109,7 +109,7 @@ describe('ValkeyGlideCache', () => {
 
       await cache.deleteMany(['key1', 'key2']);
 
-      expect(mockClient.del).toHaveBeenCalledWith(['key1', 'key2']);
+      expect(mockClient.unlink).toHaveBeenCalledWith(['key1', 'key2']);
     });
   });
 });

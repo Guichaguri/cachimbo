@@ -48,9 +48,9 @@ export class ValkeyGlideCache extends BaseCache {
   }
 
   async delete(key: string): Promise<void> {
-    this.logger?.debug(this.name, '[delete] Running "DEL" command...', 'key =', key);
+    this.logger?.debug(this.name, '[delete] Running "UNLINK" command...', 'key =', key);
 
-    await this.client.del([key]);
+    await this.client.unlink([key]);
   }
 
   override async getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
@@ -70,9 +70,9 @@ export class ValkeyGlideCache extends BaseCache {
   }
 
   override async deleteMany(keys: string[]): Promise<void> {
-    this.logger?.debug(this.name, '[deleteMany] Running "DEL" command...', 'keys =', keys);
+    this.logger?.debug(this.name, '[deleteMany] Running "UNLINK" command...', 'keys =', keys);
 
-    await this.client.del(keys);
+    await this.client.unlink(keys);
   }
 
 }

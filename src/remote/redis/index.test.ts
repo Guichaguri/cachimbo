@@ -5,6 +5,7 @@ const mockRedisClient = {
   get: vi.fn(),
   set: vi.fn(),
   del: vi.fn(),
+  unlink: vi.fn(),
   mGet: vi.fn(),
   mSetEx: vi.fn(),
 } as any;
@@ -67,6 +68,14 @@ describe('RedisCache', () => {
   describe('delete', () => {
     test('removes the key from the cache', async () => {
       const cache = new RedisCache({ client: mockRedisClient });
+
+      await cache.delete('key');
+
+      expect(mockRedisClient.unlink).toHaveBeenCalledWith('key');
+    });
+
+    test('removes the key from the cache with unlink disabled', async () => {
+      const cache = new RedisCache({ client: mockRedisClient, isUNLINKSupported: false });
 
       await cache.delete('key');
 
@@ -138,6 +147,14 @@ describe('RedisCache', () => {
   describe('deleteMany', () => {
     test('removes multiple keys from the cache', async () => {
       const cache = new RedisCache({ client: mockRedisClient });
+
+      await cache.deleteMany(['key1', 'key2']);
+
+      expect(mockRedisClient.unlink).toHaveBeenCalledWith(['key1', 'key2']);
+    });
+
+    test('removes multiple keys from the cache with unlink disabled', async () => {
+      const cache = new RedisCache({ client: mockRedisClient, isUNLINKSupported: false });
 
       await cache.deleteMany(['key1', 'key2']);
 

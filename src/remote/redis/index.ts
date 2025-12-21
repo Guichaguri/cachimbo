@@ -16,12 +16,27 @@ export interface RedisCacheOptions extends BaseCacheOptions {
   defaultTTL?: number;
 
   /**
-   * Indicates whether the Redis server supports MSETEX command.
+   * Indicates whether the Redis server supports the UNLINK command.
+   *
+   * {@link RedisCache#delete} and {@link RedisCache#deleteMany} will use UNLINK instead of DEL if this
+   * option is set to `true`. This is recommended to improve the deletion performance.
+   *
+   * This option should be set to `true` if the server runs Redis OSS 4.0.0 or above.
+   *
+   * @defaultValue true
+   */
+  isUNLINKSupported?: boolean;
+
+  /**
+   * Indicates whether the Redis server supports the MSETEX command.
    *
    * {@link RedisCache#setMany} will use MSETEX if this option is set to `true`.
+   * This is recommended to improve the performance of setting multiple items.
    *
    * This option should be set to `true` if the server runs Redis OSS 8.4.0 or above.
    * Valkey does not support this yet. (see https://github.com/valkey-io/valkey/issues/2592)
+   *
+   * @defaultValue false
    */
   isMSETEXSupported?: boolean;
 }
@@ -32,13 +47,15 @@ export interface RedisCacheOptions extends BaseCacheOptions {
 export class RedisCache extends BaseCache {
   protected readonly client: Redis;
   protected defaultTTL?: number;
-  protected isMSETEXSupported?: boolean;
+  protected isUNLINKSupported: boolean;
+  protected isMSETEXSupported: boolean;
 
   constructor(options: RedisCacheOptions) {
     super(options);
     this.client = options.client;
     this.defaultTTL = options.defaultTTL;
-    this.isMSETEXSupported = options.isMSETEXSupported;
+    this.isUNLINKSupported = options.isUNLINKSupported ?? true;
+    this.isMSETEXSupported = options.isMSETEXSupported ?? false;
   }
 
   async get<T>(key: string): Promise<T | null> {
@@ -62,9 +79,15 @@ export class RedisCache extends BaseCache {
   }
 
   async delete(key: string): Promise<void> {
-    this.logger?.debug(this.name, '[delete] Running "DEL" command...', 'key =', key);
+    if (this.isUNLINKSupported) {
+      this.logger?.debug(this.name, '[delete] Running "UNLINK" command...', 'key =', key);
 
-    await this.client.del(key);
+      await this.client.unlink(key);
+    } else {
+      this.logger?.debug(this.name, '[delete] Running "DEL" command...', 'key =', key);
+
+      await this.client.del(key);
+    }
   }
 
   override async getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
@@ -104,9 +127,15 @@ export class RedisCache extends BaseCache {
   }
 
   override async deleteMany(keys: string[]): Promise<void> {
-    this.logger?.debug(this.name, '[deleteMany] Running "DEL" command...', 'keys =', keys);
+    if (this.isUNLINKSupported) {
+      this.logger?.debug(this.name, '[deleteMany] Running "UNLINK" command...', 'keys =', keys);
 
-    await this.client.del(keys);
+      await this.client.unlink(keys);
+    } else {
+      this.logger?.debug(this.name, '[deleteMany] Running "DEL" command...', 'keys =', keys);
+
+      await this.client.del(keys);
+    }
   }
 
 }
