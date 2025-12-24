@@ -79,29 +79,35 @@ export abstract class BaseLocalCache extends BaseCache {
     return this as unknown as LocalCacheInternal;
   }
 
+  /** @sealed **/
   get<T>(key: string): Promise<T | null> {
     return Promise.resolve(this._get<T>(key));
   }
 
+  /** @sealed **/
   set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {
     this._set(key, value, options);
     return Promise.resolve();
   }
 
+  /** @sealed **/
   delete(key: string): Promise<void> {
     this._delete(key);
     return Promise.resolve();
   }
 
+  /** @sealed **/
   override getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
     return Promise.resolve(this._getMany(keys));
   }
 
+  /** @sealed **/
   override setMany<T>(data: Record<string, T>, options?: SetCacheOptions): Promise<void> {
     this._setMany(data, options);
     return Promise.resolve();
   }
 
+  /** @sealed **/
   override deleteMany(keys: string[]): Promise<void> {
     this._deleteMany(keys);
     return Promise.resolve();
