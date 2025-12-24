@@ -7,6 +7,8 @@ The library has built-in support for three Redis/Valkey/Garnet clients:
 
 If you don't know which one to use, choose `node-redis` when running Redis or `@valkey/valkey-glide` when running Valkey.
 
+These two are the recommended clients by Redis and Valkey, respectively, and are the most actively maintained.
+
 ### node-redis
 
 ```sh
@@ -17,8 +19,10 @@ import { createClient } from '@redis/client';
 import { RedisCache } from 'cachimbo';
 
 const redisClient = await createClient({
-  url: "redis://user:password@localhost:6380",
+  url: "redis://user:password@localhost:6379",
 });
+
+await redisClient.connect();
 
 const redisCache = new RedisCache({
   client: redisClient,
@@ -39,6 +43,10 @@ const valkeyClient = await GlideClient.createClient({
     host: "localhost",
     port: 6379,
   }],
+  credentials: {
+    username: "user",
+    password: "password",
+  },
 });
 
 const valkeyCache = new ValkeyGlideCache({
@@ -57,7 +65,7 @@ npm install iovalkey # if you want to use Valkey
 import Redis from 'ioredis'; // or import Valkey from 'iovalkey';
 import { IORedisCache } from 'cachimbo';
 
-const redisClient = new Redis("redis://user:password@localhost:6380");
+const redisClient = new Redis("redis://user:password@localhost:6379");
 
 const redisCache = new IORedisCache({
   client: redisClient,
