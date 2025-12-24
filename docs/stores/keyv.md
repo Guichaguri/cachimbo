@@ -1,6 +1,6 @@
 # Keyv as a Cache Store
 
-Keyv is a simple key-value storage library for Node.js that supports multiple backends.
+[Keyv](https://www.npmjs.com/package/keyv) is a simple key-value storage library for Node.js that supports multiple backends.
 
 Although both Keyv and Cachimbo provide Redis, Valkey, Memcached and Cloudflare Workers KV support, they have different focuses and features:
 - Keyv is primarily a key-value store with support for various backends like SQLite, Etcd, MongoDB, etc. It is designed to be a simple and flexible storage solution.
