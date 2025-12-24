@@ -8,6 +8,7 @@ export type * from './types/logger.d.ts';
 export * from './local/lru/index.js';
 export * from './local/ttl/index.js';
 export * from './local/map/index.js';
+export * from './local/weak/index.js';
 export * from './local/noop/index.js';
 
 // Remote Caches
