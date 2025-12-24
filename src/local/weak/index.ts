@@ -1,5 +1,5 @@
 import type { BaseCacheOptions, SetCacheOptions } from '../../types/cache.js';
-import { BaseLocalCache } from '../../base/local.js';
+import { BaseLocalCache, type LocalCacheInternal } from '../../base/local.js';
 
 export interface WeakCacheOptions extends BaseCacheOptions {
   /**
@@ -22,16 +22,18 @@ type WeakValue = { v: WeakRef<any>; w: true; } | { v: any; w: false; };
  */
 export class WeakCache extends BaseLocalCache {
   protected readonly cache: BaseLocalCache;
+  protected readonly cacheInternal: LocalCacheInternal;
   protected readonly registry: FinalizationRegistry<string>;
 
   constructor(options: WeakCacheOptions) {
     super(options);
     this.cache = options.cache;
-    this.cache._addDisposeListener(this.onCacheDispose);
+    this.cacheInternal = options.cache.internal;
+    this.cacheInternal._addDisposeListener(this.onCacheDispose);
     this.registry = new FinalizationRegistry<string>(this.onGarbageCollect);
   }
 
-  protected onGarbageCollect = (key: string) => this.cache._delete(key);
+  protected onGarbageCollect = (key: string) => this.cacheInternal._delete(key);
 
   protected onCacheDispose = (key: string, value: any, reason?: string) => {
     this.unregister(value);
@@ -40,23 +42,23 @@ export class WeakCache extends BaseLocalCache {
 
   /** @internal */
   override _get<T>(key: string): T | null {
-    return this.unwrap(this.cache._get<WeakValue>(key));
+    return this.unwrap(this.cacheInternal._get<WeakValue>(key));
   }
 
   /** @internal */
   override _set<T>(key: string, value: T, options?: SetCacheOptions): void {
-    this.cache._set<WeakValue>(key, this.wrapAndRegister(key, value), options);
+    this.cacheInternal._set<WeakValue>(key, this.wrapAndRegister(key, value), options);
   }
 
   /** @internal */
   override _delete(key: string): void {
     this.unregisterByKey(key);
-    this.cache._delete(key);
+    this.cacheInternal._delete(key);
   }
 
   /** @internal */
   override _getMany<T>(keys: string[]): Record<string, T | null> {
-    const data = this.cache._getMany<any>(keys);
+    const data = this.cacheInternal._getMany<any>(keys);
 
     for (const key of keys) {
       data[key] = this.unwrap(data[key]);
@@ -75,14 +77,14 @@ export class WeakCache extends BaseLocalCache {
       wrappedData[key] = this.wrapAndRegister(key, value);
     }
 
-    this.cache._setMany<WeakValue>(wrappedData, options);
+    this.cacheInternal._setMany<WeakValue>(wrappedData, options);
   }
 
   /** @internal */
   override _deleteMany(keys: string[]): void {
     keys.forEach(key => this.unregisterByKey(key));
 
-    this.cache._deleteMany(keys);
+    this.cacheInternal._deleteMany(keys);
   }
 
   override async getOrLoad<T>(key: string, load: () => Promise<T>, options?: SetCacheOptions): Promise<T> {
@@ -145,6 +147,6 @@ export class WeakCache extends BaseLocalCache {
    * @param key The key
    */
   protected unregisterByKey(key: string): void {
-    this.unregister(this.cache._get<WeakValue>(key));
+    this.unregister(this.cacheInternal._get<WeakValue>(key));
   }
 }
