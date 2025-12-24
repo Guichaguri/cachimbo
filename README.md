@@ -4,7 +4,7 @@
 
 <h1 align="center">Cachimbo</h1>
 
-Cachimbo is an advanced caching library that allows you to layer different strategies in order to maximize the performance.
+Cachimbo is a composable caching library that allows you to layer different strategies in order to maximize the performance.
 
 ## Features
 
@@ -19,7 +19,7 @@ Cachimbo is an advanced caching library that allows you to layer different strat
   - Time-based (TTL) eviction
   - FIFO eviction
   - Weak References (garbage collectable cached items)
-- Supports intermediary cache strategies
+- Supports composable cache strategies
   - Request coalescing (deduplication)
   - Multi-layer caching (tiered cache)
   - Stale-While-Revalidate
@@ -79,7 +79,9 @@ External caches (like Redis, Memcached, etc) provide fast, scalable, shared stor
 
 ## Cache Layers
 
-These layers work just like "middlewares" but for caches, they customize how a cache is handled.
+Cache layers are composable components that sit between your code and the cache store. While cache stores define *where* data is stored, cache layers define *how* the cache is accessed.
+
+Each layer intercepts cache operations to add behavior. Layers can be stacked to form a pipeline, allowing advanced caching strategies to be reused across different cache backends.
 
 - [Request Coalescing](/docs/layers/request-coalescing.md) (deduplication)
 - [Tiered Caching](/docs/layers/tiered.md) (multi-layer caching)
