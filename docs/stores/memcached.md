@@ -4,6 +4,8 @@ The library has built-in support for two Memcache clients:
 - [Memcache](https://www.npmjs.com/package/memcache) through the `MemcacheCache` class
 - [MemJS](https://www.npmjs.com/package/memjs) through the `MemJSCache` class
 
+If you don't know which one to use, choose `memcache` as it is the most actively maintained.
+
 ### Memcache
 
 ```sh
@@ -38,4 +40,4 @@ const memjsCache = new MemJSCache({
 
 ## Remarks
 
-- MemJS does not support getting multiple keys at once. Therefore, the `getMany()` method will internally call `get()` for each key.
+- MemJS does not support getting multiple keys in batch. Therefore, the `getMany()` method will internally call `get()` for each key.
