@@ -6,6 +6,9 @@
 
 Cachimbo is a composable caching library that allows you to layer different strategies in order to maximize the performance.
 
+[![NPM](https://img.shields.io/npm/v/cachimbo)](https://www.npmjs.com/package/cachimbo)
+[![Coverage](https://img.shields.io/codecov/c/github/Guichaguri/cachimbo)](https://app.codecov.io/gh/Guichaguri/cachimbo)
+
 ## Features
 
 - Supports external cache stores
