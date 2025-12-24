@@ -1,5 +1,6 @@
 // Base and Types
 export * from './base/index.js';
+export * from './base/local.js';
 export type * from './types/cache.d.ts';
 export type * from './types/logger.d.ts';
 
