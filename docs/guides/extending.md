@@ -53,3 +53,38 @@ class MyCache extends BaseCache {
   }
 }
 ```
+
+If you are building a in-memory cache, consider extending `BaseLocalCache` instead.
+This allows layers such as `WeakCache` work with your cache implementation.
+
+You only need to implement synchronous methods (`_get()`, `_set()`, `_delete()`) and emit disposal events.
+
+```ts
+import { BaseLocalCache, BaseCacheOptions } from 'cachimbo';
+
+class MyLocalCache extends BaseLocalCache {
+  constructor(options: BaseCacheOptions = {}) {
+    super(options);
+  }
+
+  _get<T>(key: string): T | null {
+    /* your implementation */
+  }
+
+  _set<T>(key: string, value: T, options?: SetCacheOptions): void {
+    /* your implementation */
+    
+    if (previousValue !== null) {
+      // call onDispose for the previous value when an item is overwritten
+      this.onDispose(key, previousValue, 'set');
+    }
+  }
+
+  _delete(key: string): void {
+    /* your implementation */
+    
+    // call onDispose when an item is deleted
+    this.onDispose(key, previousValue, 'delete');
+  }
+}
+```
