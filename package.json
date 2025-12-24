@@ -1,6 +1,6 @@
 {
   "name": "cachimbo",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "Guilherme Chaguri",
   "license": "Apache-2.0",
   "description": "An advanced caching library that allows you to layer different strategies in order to maximize the performance.",
@@ -31,13 +31,15 @@
     "valkey",
     "elasticache",
     "stale-while-revalidate",
+    "swr",
     "request-coalescing",
     "tiered-cache",
     "multi-layer-cache",
     "ttl",
     "lru",
     "kv",
-    "keyv"
+    "keyv",
+    "weak"
   ],
   "files": [
     "dist"
@@ -61,7 +63,7 @@
     "lru-cache": "^11.2.4"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20251221.0",
+    "@cloudflare/workers-types": "^4.20251224.0",
     "@redis/client": "^5.10.0",
     "@types/memjs": "^1.3.3",
     "@types/node": "^24.10.4",
