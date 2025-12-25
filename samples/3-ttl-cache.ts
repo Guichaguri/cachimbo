@@ -1,5 +1,5 @@
-import { httpServer, load, loadWithCache } from './utils/samples.js';
-import { LocalTTLCache } from '../src/local/ttl/index.js';
+import { httpServer, loadWithCache } from './utils/samples.js';
+import { LocalTTLCache } from '../src/index.js';
 
 const avgMs = 3000;
 const errorMs = 500;

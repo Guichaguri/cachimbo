@@ -1,6 +1,5 @@
 import { httpServer, loadWithCache } from './utils/samples.js';
-import { LocalTTLCache } from '../src/local/ttl/index.js';
-import { SWRCache } from '../src/layers/swr/index.js';
+import { LocalTTLCache, SWRCache } from '../src/index.js';
 
 const avgMs = 3000;
 const errorMs = 500;

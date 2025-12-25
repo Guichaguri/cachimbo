@@ -1,13 +1,13 @@
 import { httpServer, loadWithCache } from './utils/samples.js';
 import { createClient } from '@redis/client';
-import { RedisCache } from '../src/remote/redis/index.js';
+import { RedisCache } from '../src/index.js';
 
 const avgMs = 3000;
 const errorMs = 500;
 const ttl = 10_000;
 
 const redis = createClient({
-  url: process.env.REDIS_URL || 'redis://root:root@localhost:6379'
+  url: process.env.REDIS_URL || 'redis://localhost:6379'
 });
 
 const cache = new RedisCache({
