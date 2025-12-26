@@ -47,7 +47,7 @@ export class KeyTransformingCache implements ICache {
   constructor(options: KeyTransformingCacheOptions) {
     this.cache = options.cache;
 
-    if ('transform' in options) {
+    if ('transform' in options && typeof options.transform === 'function') {
       this.transform = options.transform;
     } else {
       const prefix = options.prefix || '';
