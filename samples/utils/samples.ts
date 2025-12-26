@@ -1,5 +1,5 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import type { ICache } from '../../src/types/cache.js';
+import type { ICache } from '../../src/index.js';
 
 export function load(avgMs: number, error: number = 500): Promise<{ rand: number }> {
   const randTime = (Math.random() - 0.5) * 2 * error;
