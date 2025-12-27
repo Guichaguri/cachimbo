@@ -15,7 +15,7 @@ const mockMap = {
 describe('LocalMapCache', () => {
   describe('constructor', () => {
     test('initializes with provided Map instance', () => {
-      expect(() => new LocalMapCache({ cache: mockMap })).not.toThrow();
+      expect(() => new LocalMapCache({ map: mockMap })).not.toThrow();
     });
 
     test('initializes with default Map instance when none provided', () => {
@@ -25,7 +25,7 @@ describe('LocalMapCache', () => {
 
   describe('get', () => {
     test('returns the value for an existing key', async () => {
-      const cache = new LocalMapCache({ cache: mockMap });
+      const cache = new LocalMapCache({ map: mockMap });
       mockMap.get.mockReturnValueOnce('value');
 
       const result = await cache.get('existing-key');
@@ -35,7 +35,7 @@ describe('LocalMapCache', () => {
     });
 
     test('returns null for a non-existing key', async () => {
-      const cache = new LocalMapCache({ cache: mockMap });
+      const cache = new LocalMapCache({ map: mockMap });
       mockMap.get.mockReturnValueOnce(undefined);
 
       const result = await cache.get('non-existing-key');
@@ -47,7 +47,7 @@ describe('LocalMapCache', () => {
 
   describe('set', () => {
     test('stores the value when the cache is not full', async () => {
-      const cache = new LocalMapCache({ cache: mockMap, max: 2 });
+      const cache = new LocalMapCache({ map: mockMap, max: 2 });
       mockMap.size = 1;
       mockMap.has.mockReturnValueOnce(false);
 
@@ -57,7 +57,7 @@ describe('LocalMapCache', () => {
     });
 
     test('evicts the oldest key when the cache is full', async () => {
-      const cache = new LocalMapCache({ cache: mockMap, max: 1 });
+      const cache = new LocalMapCache({ map: mockMap, max: 1 });
       mockMap.size = 1;
       mockMap.has.mockReturnValueOnce(false);
       mockMap.keys.mockReturnValueOnce(['old-key'][Symbol.iterator]());
@@ -71,7 +71,7 @@ describe('LocalMapCache', () => {
 
   describe('delete', () => {
     test('removes the key from the cache', async () => {
-      const cache = new LocalMapCache({ cache: mockMap });
+      const cache = new LocalMapCache({ map: mockMap });
 
       await cache.delete('key');
 
@@ -81,7 +81,7 @@ describe('LocalMapCache', () => {
     test('calls dispose when deleting', async () => {
       const cache = new LocalMapCache();
       const onDispose = vi.fn();
-      cache._addDisposeListener(onDispose);
+      cache.internal._addDisposeListener(onDispose);
 
       await cache.set('key', 'sample');
 
@@ -95,7 +95,7 @@ describe('LocalMapCache', () => {
 
   describe('setMany', () => {
     test('stores multiple values when the cache has enough space', async () => {
-      const cache = new LocalMapCache({ cache: mockMap, max: 5 });
+      const cache = new LocalMapCache({ map: mockMap, max: 5 });
       mockMap.size = 2;
       mockMap.has.mockReturnValue(false);
 
@@ -106,7 +106,7 @@ describe('LocalMapCache', () => {
     });
 
     test('evicts the oldest keys when the cache is full', async () => {
-      const cache = new LocalMapCache({ cache: mockMap, max: 3 });
+      const cache = new LocalMapCache({ map: mockMap, max: 3 });
       mockMap.size = 3;
       mockMap.has.mockReturnValue(false);
       mockMap.keys.mockReturnValueOnce(['old-key1', 'old-key2'][Symbol.iterator]());
@@ -123,7 +123,7 @@ describe('LocalMapCache', () => {
 
   describe('clear', () => {
     test('removes all keys from the cache', () => {
-      const cache = new LocalMapCache({ cache: mockMap });
+      const cache = new LocalMapCache({ map: mockMap });
 
       cache.clear();
 
