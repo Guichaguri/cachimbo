@@ -83,9 +83,10 @@ const cache = new LocalMapCache({
 
 ## In-memory Cache Layers
 
-| Cache Layer              | Use Case                                                                                               |
-|--------------------------|--------------------------------------------------------------------------------------------------------|
-| [Weak](#weak-references) | When you want the JavaScript engine to automatically delete cached items when it needs to free memory. |
+| Cache Layer                         | Use Case                                                                                               |
+|-------------------------------------|--------------------------------------------------------------------------------------------------------|
+| [Weak References](#weak-references) | When you want the JavaScript engine to automatically delete cached items when it needs to free memory. |
+| [Deep Cloning](#deep-cloning)       | When you want to modify objects and not affect the ones stored in the cache.                           |
 
 ### Weak References
 
@@ -110,3 +111,39 @@ const valueAfter = await cache.get("key"); // could be { myCoolValue: 1234 } or 
 You can combine the WeakCache with any local cache store (like `LocalMapCache`, `LocalTTLCache` or `LocalLRUCache`) to benefit from both caching strategies.
 
 Be warned: The items can be deleted in an unpredictable time and order, as it all depends on the JavaScript engine's memory management and garbage collection process.
+
+### Deep Cloning
+
+By default, Cachimbo in-memory caches store references to the original objects. This means that if you modify a cached object after storing it, the changes will be reflected in the cache.
+
+This behavior is specific to in-memory caches and doesn't happen in external caches (like Redis or Memcached) since the objects are serialized before being stored.
+
+If you want to avoid this behavior and ensure that cached objects remain unchanged, you can enable deep cloning. This will create a deep copy of the object when storing it in the cache and when retrieving it.
+
+```ts
+import { DeepCloningCache } from 'cachimbo';
+
+const cache = new DeepCloningCache({
+  cache: new LocalTTLCache(), // any in-memory cache store
+});
+
+const obj = { a: 1 };
+
+await cache.set("key", obj);
+
+obj.a = 2;
+
+const cachedObj = await cache.get("key"); // { a: 1 }
+```
+
+Be warned: Deep cloning can have performance implications, especially for large or complex objects. Use this feature carefully based on your application's requirements.
+
+If you're using this layer together with a `WeakCache`, make sure that the `DeepCloningCache` layers is on top of the `WeakCache`, so that the weak references objects are not cloned.
+```ts
+// This is correct:
+const cache = new DeepCloningCache({
+  cache: new WeakCache({
+    cache: new LocalTTLCache(),
+  }),
+});
+```
