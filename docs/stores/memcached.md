@@ -1,5 +1,8 @@
 # Memcached as a Cache Store
 
+Memcached is an open source, distributed, non-persistent key-value store.
+You can self-host it or use a managed service (such as Amazon ElastiCache and Google Cloud Memorystore).
+
 The library has built-in support for two Memcache clients:
 - [Memcache](https://www.npmjs.com/package/memcache) through the `MemcacheCache` class
 - [MemJS](https://www.npmjs.com/package/memjs) through the `MemJSCache` class
