@@ -9,6 +9,7 @@ export * from './local/lru/index.js';
 export * from './local/ttl/index.js';
 export * from './local/map/index.js';
 export * from './local/weak/index.js';
+export * from './local/cloning/index.js';
 export * from './local/noop/index.js';
 
 // Remote Caches
