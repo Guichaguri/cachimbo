@@ -26,5 +26,6 @@ npm install cachimbo
 ## Guides
 - [Choosing the right combination of layers](./guides/choosing-layers.md)
 - [Disabling cache](./guides/disabling.md)
+- [Testing](./guides/testing.md)
 - [Extending](./guides/extending.md)
 - [Samples](../samples)

@@ -97,5 +97,6 @@ Each layer intercepts cache operations to add behavior. Layers can be stacked to
 ## Guides
 - [Choosing the right combination of layers](/docs/guides/choosing-layers.md)
 - [Disabling cache](/docs/guides/disabling.md)
+- [Testing](./docs/guides/testing.md)
 - [Extending](/docs/guides/extending.md)
 - [Samples](./samples)
