@@ -37,7 +37,7 @@ const tieredCache = new TieredCache({
     },
     {
       cache: new KeyvCache({
-        store: keyv,
+        keyv: keyv,
       })
     },
   ],
