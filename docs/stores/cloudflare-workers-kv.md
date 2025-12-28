@@ -1,5 +1,7 @@
 # Cloudflare Workers KV as a Cache Store
 
+KV is a distributed, low-latency, key-value data store available in Cloudflare's global network.
+
 If you're building on top of Cloudflare Workers, you can use the KV storage as a distributed cache.
 
 This is designed to be used with the [Workers Binding API](https://developers.cloudflare.com/kv/concepts/kv-bindings/).
