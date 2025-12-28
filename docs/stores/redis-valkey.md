@@ -1,5 +1,8 @@
 # Redis/Valkey as a Cache Store
 
+Redis, Valkey and Garnet are a distributed, key-value store and message broker.
+You can self-host it or use a managed service (such as Redis Cloud, Amazon ElastiCache, Azure Cache and Google Cloud Memorystore).
+
 The library has built-in support for three Redis/Valkey/Garnet clients:
 - [node-redis](https://www.npmjs.com/package/redis) through the `RedisCache` class
 - [@valkey/valkey-glide](https://www.npmjs.com/package/@valkey/valkey-glide) through the `ValkeyGlideCache` class
