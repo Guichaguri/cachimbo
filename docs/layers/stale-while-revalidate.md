@@ -34,6 +34,8 @@ All requests coming in during the stale period receive the stale data immediatel
 ### Remarks
 
 - This cache layer only affects the `getOrLoad` method. Other methods like `get`, `set`, `delete`, etc., behave as they would in the underlying cache.
+- When the cached data becomes stale, the first request that detects this will trigger a background refresh. Subsequent requests during the stale period will continue to receive the stale data until the refresh completes.
+  - This means that it does request coalescing for background refreshes, avoiding multiple concurrent refreshes for the same key.
 - This cache layer wraps the data into an object that contains metadata about its freshness.
   - This is done mostly transparently, so you don't have to worry about it when using the cache but keep in mind that it essentially changes the structure of the data in cache.
   - If you are using an external cache store, make sure to version your cache keys using a [Key Transformation](./key-transformation.md) layer to avoid collisions with other data.
