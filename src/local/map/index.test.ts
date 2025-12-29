@@ -1,6 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
 import { LocalMapCache } from './index.js';
-import { LocalLRUCache } from '../lru/index.js';
 
 const mockMap = {
   get: vi.fn(),
