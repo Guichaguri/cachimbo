@@ -2,9 +2,17 @@
 
 # cachimbo
 
-```shell
+```sh
 npm install cachimbo
 ```
+
+## Guides
+- [Getting Started](./guides/getting-started.md)
+- [Choosing the right combination of layers](./guides/choosing-layers.md)
+- [Disabling cache](./guides/disabling.md)
+- [Testing](./guides/testing.md)
+- [Extending](./guides/extending.md)
+- [Samples](../samples)
 
 ## Cache Stores
 - [In-memory](./stores/in-memory.md)
@@ -22,10 +30,3 @@ npm install cachimbo
 - [Async/Lazy Initialization](./layers/async-lazy.md)
 - [Key Transformation](./layers/key-transformation.md)
 - [Metrics Collection](./layers/metrics-collection.md)
-
-## Guides
-- [Choosing the right combination of layers](./guides/choosing-layers.md)
-- [Disabling cache](./guides/disabling.md)
-- [Testing](./guides/testing.md)
-- [Extending](./guides/extending.md)
-- [Samples](../samples)

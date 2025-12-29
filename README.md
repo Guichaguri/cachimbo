@@ -4,7 +4,7 @@
 
 <h1 align="center">Cachimbo</h1>
 
-Cachimbo is a composable caching library that allows you to layer different strategies in order to maximize the performance.
+Cachimbo is a composable caching library that allows layering different strategies in order to maximize the performance.
 
 [![NPM](https://img.shields.io/npm/v/cachimbo)](https://www.npmjs.com/package/cachimbo)
 [![Coverage](https://img.shields.io/codecov/c/github/Guichaguri/cachimbo)](https://app.codecov.io/gh/Guichaguri/cachimbo)
@@ -95,8 +95,9 @@ Each layer intercepts cache operations to add behavior. Layers can be stacked to
 - [Metrics Collection](/docs/layers/metrics-collection.md)
 
 ## Guides
+- [Getting Started](/docs/guides/getting-started.md)
 - [Choosing the right combination of layers](/docs/guides/choosing-layers.md)
 - [Disabling cache](/docs/guides/disabling.md)
-- [Testing](./docs/guides/testing.md)
+- [Testing](/docs/guides/testing.md)
 - [Extending](/docs/guides/extending.md)
-- [Samples](./samples)
+- [Samples](/samples)
