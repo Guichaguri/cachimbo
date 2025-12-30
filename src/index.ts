@@ -19,6 +19,7 @@ export * from './remote/valkey-glide/index.js';
 export * from './remote/memcache/index.js';
 export * from './remote/memjs/index.js';
 export * from './remote/workers-kv/index.js';
+export * from './remote/hazelcast/index.js';
 export * from './remote/keyv/index.js';
 
 // Layers
