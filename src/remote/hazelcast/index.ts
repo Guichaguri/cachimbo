@@ -12,7 +12,7 @@ export interface HazelcastCacheOptions extends BaseCacheOptions {
    * import { Client } from 'hazelcast-client';
    *
    * const client = await Client.newHazelcastClient();
-   * const map = await client.getMap('my-cache-map');
+   * const map = await client.getMap('my-cache');
    *
    * const cache = new HazelcastCache({ map });
    * ```

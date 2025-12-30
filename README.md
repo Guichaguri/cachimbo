@@ -16,6 +16,7 @@ Cachimbo is a composable caching library that allows layering different strategi
   - Valkey
   - Memcached
   - Cloudflare Workers KV
+  - Hazelcast
   - Keyv
 - Supports in-memory cache stores
   - Least Recently Used (LRU) eviction
@@ -78,6 +79,7 @@ External caches (like Redis, Memcached, etc) provide fast, scalable, shared stor
 - [Redis](/docs/stores/redis-valkey.md) (and Valkey)
 - [Memcached](/docs/stores/memcached.md)
 - [Cloudflare Workers KV](/docs/stores/cloudflare-workers-kv.md)
+- [Hazelcast](/docs/stores/hazelcast.md)
 - [Keyv](/docs/stores/keyv.md)
 
 ## Cache Layers

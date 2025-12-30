@@ -19,6 +19,7 @@ npm install cachimbo
 - [Redis](stores/redis-valkey.md) (and Valkey)
 - [Memcached](./stores/memcached.md)
 - [Cloudflare Workers KV](./stores/cloudflare-workers-kv.md)
+- [Hazelcast](./stores/hazelcast.md)
 - [Keyv](./stores/keyv.md)
 
 ## Cache Layers
