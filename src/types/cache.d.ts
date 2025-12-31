@@ -33,6 +33,8 @@ export interface ICache {
    * Reads the cached resource from a key.
    * If the cached resource is not found, fetches it by calling the `load` function and then saves it into cache.
    *
+   * This method implements the Cache-Aside pattern.
+   *
    * @param key The cache key
    * @param load The function which should fetch the fresh data from origin
    * @param options The options used to save the cache
