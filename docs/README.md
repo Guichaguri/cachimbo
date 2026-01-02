@@ -28,6 +28,7 @@ npm install cachimbo
 - [Tiered Caching](./layers/tiered.md) (multi-layer caching)
 - [Stale-While-Revalidate](./layers/stale-while-revalidate.md)
 - [TTL Jittering](./layers/jittering.md)
+- [Fail Safe](./layers/fail-safe.md)
 - [Async/Lazy Initialization](./layers/async-lazy.md)
 - [Key Transformation](./layers/key-transformation.md)
 - [Metrics Collection](./layers/metrics-collection.md)

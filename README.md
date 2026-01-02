@@ -28,6 +28,7 @@ Cachimbo is a composable caching library that allows layering different strategi
   - Multi-layer caching (tiered cache)
   - Stale-While-Revalidate
   - TTL jittering
+  - Fail-safety
 - Metrics collection
 - Easily extendable
 
@@ -92,6 +93,7 @@ Each layer intercepts cache operations to add behavior. Layers can be stacked to
 - [Tiered Caching](/docs/layers/tiered.md) (multi-layer caching)
 - [Stale-While-Revalidate](/docs/layers/stale-while-revalidate.md)
 - [TTL Jittering](/docs/layers/jittering.md)
+- [Fail-Safety](/docs/layers/fail-safe.md)
 - [Async/Lazy Initialization](/docs/layers/async-lazy.md)
 - [Key Transformation](/docs/layers/key-transformation.md)
 - [Metrics Collection](/docs/layers/metrics-collection.md)
