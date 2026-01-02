@@ -25,6 +25,7 @@ export * from './remote/keyv/index.js';
 // Layers
 export * from './layers/async-lazy/index.js';
 export * from './layers/coalescing/index.js';
+export * from './layers/fail-safe/index.js';
 export * from './layers/jittering/index.js';
 export * from './layers/key-transforming/index.js';
 export * from './layers/swr/index.js';
