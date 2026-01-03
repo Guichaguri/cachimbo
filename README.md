@@ -74,7 +74,7 @@ const data = await cache.getOrLoad<MyData>(
 
 In-memory caches offer extremely low latency since data is stored directly in the application’s process. They reduce external round-trips, improve performance under load, and are ideal for fast, frequently accessed data.
 
-External caches (like Redis, Memcached, etc) provide fast, scalable, shared storage that can be accessed across multiple application instances. They offer high throughput, larger memory capacity, and centralized cache management beyond what in-memory caches can reliably provide.
+External caches (like Redis, Memcached, etc.) provide fast, scalable, shared storage that can be accessed across multiple application instances. They offer high throughput, larger memory capacity, and centralized cache management beyond what in-memory caches can reliably provide.
 
 - [In-memory](/docs/stores/in-memory.md)
 - [Redis](/docs/stores/redis-valkey.md) (and Valkey)
@@ -93,7 +93,7 @@ Each layer intercepts cache operations to add behavior. Layers can be stacked to
 - [Tiered Caching](/docs/layers/tiered.md) (multi-layer caching)
 - [Stale-While-Revalidate](/docs/layers/stale-while-revalidate.md)
 - [TTL Jittering](/docs/layers/jittering.md)
-- [Fail-Safety](/docs/layers/fail-safe.md)
+- [Fail-safety](/docs/layers/fail-safe.md)
 - [Async/Lazy Initialization](/docs/layers/async-lazy.md)
 - [Key Transformation](/docs/layers/key-transformation.md)
 - [Metrics Collection](/docs/layers/metrics-collection.md)
@@ -104,4 +104,5 @@ Each layer intercepts cache operations to add behavior. Layers can be stacked to
 - [Disabling cache](/docs/guides/disabling.md)
 - [Testing](/docs/guides/testing.md)
 - [Extending](/docs/guides/extending.md)
+- [Design Principles](/docs/guides/design-principles.md)
 - [Samples](/samples)

@@ -12,6 +12,7 @@ npm install cachimbo
 - [Disabling cache](./guides/disabling.md)
 - [Testing](./guides/testing.md)
 - [Extending](./guides/extending.md)
+- [Design Principles](./guides/design-principles.md)
 - [Samples](../samples)
 
 ## Cache Stores
@@ -28,7 +29,7 @@ npm install cachimbo
 - [Tiered Caching](./layers/tiered.md) (multi-layer caching)
 - [Stale-While-Revalidate](./layers/stale-while-revalidate.md)
 - [TTL Jittering](./layers/jittering.md)
-- [Fail Safe](./layers/fail-safe.md)
+- [Fail-safety](./layers/fail-safe.md)
 - [Async/Lazy Initialization](./layers/async-lazy.md)
 - [Key Transformation](./layers/key-transformation.md)
 - [Metrics Collection](./layers/metrics-collection.md)
