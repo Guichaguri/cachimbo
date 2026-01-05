@@ -1,22 +1,23 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import type { ICache } from '../../src/index.js';
 
-export function load(avgMs: number, error: number = 500): Promise<{ rand: number }> {
-  const randTime = (Math.random() - 0.5) * 2 * error;
+export function load(avgSecs: number, errorSecs: number = 0.5): Promise<{ rand: number }> {
+  const randTime = (Math.random() - 0.5) * 2 * errorSecs;
 
   return new Promise(resolve => {
-    setTimeout(() => resolve({ rand: Math.random() }), avgMs + randTime);
+    setTimeout(() => resolve({ rand: Math.random() }), (avgSecs + randTime) * 1000);
   });
 }
 
 export function loadWithCache(
   cache: ICache,
   key: string | undefined,
-  avgMs: number,
-  error?: number,
+  avgSecs: number,
+  errorSecs?: number,
   ttl?: number,
+  options: object = {},
 ): Promise<{ rand: number }> {
-  return cache.getOrLoad(key || "sample", () => load(avgMs, error), { ttl });
+  return cache.getOrLoad(key || "sample", () => load(avgSecs, errorSecs), { ttl, ...options });
 }
 
 export function httpServer(handleRequest: (req: IncomingMessage, res: ServerResponse) => Promise<any>) {
@@ -27,7 +28,7 @@ export function httpServer(handleRequest: (req: IncomingMessage, res: ServerResp
       .then(data => res.end(JSON.stringify(data)))
       .catch(err => {
         res.statusCode = 500;
-        res.end(JSON.stringify({ error: err.message, stack: err.stack }));
+        res.end(JSON.stringify({ error: err.message, stack: err.stack }, null, 4));
       });
   }).listen(port);
 

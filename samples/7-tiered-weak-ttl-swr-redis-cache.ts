@@ -1,16 +1,23 @@
+// Play with these variables and see how it affects caching behavior
+// All variables are in seconds
+
+const avgSecs = 3; // Average time a request should take
+const errorSecs = 0.5; // The amount of random error to add to the request time
+const localTTL = 15; // The amount of time items should remain cached in the in-memory cache
+const ttl = 10; // The amount of time items should remain cached in Redis and considered fresh
+const staleTTL = 5; // The amount of time items should remain cached in Redis and considered stale
+
+// ---
+
 import { httpServer, loadWithCache } from './utils/samples.js';
 import { createClient } from '@redis/client';
 import { RedisCache, TieredCache, LocalTTLCache, WeakCache, SWRCache } from '../src/index.js';
 
-const avgMs = 3000;
-const errorMs = 500;
-const localTTL = 1500;
-const ttl = 10_000;
-const staleTTL = 5000;
-
 const redis = createClient({
   url: process.env.REDIS_URL || 'redis://localhost:6379'
 });
+
+redis.connect();
 
 const cache = new TieredCache({
   tiers: [
@@ -35,5 +42,5 @@ const cache = new TieredCache({
 });
 
 httpServer(async (req) => {
-  return await loadWithCache(cache, req.url, avgMs, errorMs, ttl);
+  return await loadWithCache(cache, req.url, avgSecs, errorSecs, ttl);
 });
