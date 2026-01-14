@@ -94,6 +94,7 @@ Each layer intercepts cache operations to add behavior. Layers can be stacked to
 - [Stale-While-Revalidate](/docs/layers/stale-while-revalidate.md)
 - [TTL Jittering](/docs/layers/jittering.md)
 - [Fail-safety](/docs/layers/fail-safe.md)
+- [Tagging](/docs/layers/tagging.md)
 - [Async/Lazy Initialization](/docs/layers/async-lazy.md)
 - [Key Transformation](/docs/layers/key-transformation.md)
 - [Metrics Collection](/docs/layers/metrics-collection.md)

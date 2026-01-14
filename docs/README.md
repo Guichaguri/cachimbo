@@ -30,6 +30,7 @@ npm install cachimbo
 - [Stale-While-Revalidate](./layers/stale-while-revalidate.md)
 - [TTL Jittering](./layers/jittering.md)
 - [Fail-safety](./layers/fail-safe.md)
+- [Tagging](/docs/layers/tagging.md) (easier invalidation)
 - [Async/Lazy Initialization](./layers/async-lazy.md)
 - [Key Transformation](./layers/key-transformation.md)
 - [Metrics Collection](./layers/metrics-collection.md)
