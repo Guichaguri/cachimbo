@@ -6,7 +6,7 @@ The Tiered Cache strategy organizes caches into multiple levels, checking each t
 
 A common recommendation is to use two tiers: a small in-memory cache as the first level and your external cache as the second. The in-memory cache should have a short time-to-live to minimize the risk of serving stale data when the external cache is updated.
 
-The concept behind the tiered cache is also known as multi-level caching, L1/L2/L3 caching, CPU caching, or hierarchical caching.
+The concept behind the tiered cache is also known as multi-level caching, L1/L2/L3 caching, CPU caching, hierarchical caching or hybrid caching.
 
 ```ts
 import { TieredCache } from 'cachimbo';

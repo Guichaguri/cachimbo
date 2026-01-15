@@ -48,6 +48,8 @@ When building a caching solution with Cachimbo, selecting the appropriate combin
 > | Manual cache clearing     | Implement admin tools or APIs to clear specific cache entries. | Provides control over cache state when needed.                                   | Not automatic.                                                                      |
 >
 > Event-driven invalidation is generally the bulletproof method, as it ensures that cached data remains consistent with the source of truth. Implementing this strategy can enable longer TTLs, increasing cache hits.
+>
+> You might not know all cache keys ahead of time, especially when caching dynamic data. In such cases, consider using a [Tagging](../layers/tagging.md) layer to group related cache entries and invalidate them together when needed.
 
 </details>
 
@@ -57,7 +59,7 @@ When building a caching solution with Cachimbo, selecting the appropriate combin
 
 > Fact: An external cache makes your application stateful.
 > 
-> If you change the structure of the cached data, old cache entries become incompatible with the new code, causing errors or unexpected behavior.
+> If you change the structure of the cached data, old cache entries might become incompatible with the new code, causing errors or unexpected behavior.
 >
 > You can avoid collisions and ensure data integrity by versioning your cache keys.
 >

@@ -29,6 +29,7 @@ Cachimbo is a composable caching library that allows layering different strategi
   - Stale-While-Revalidate
   - TTL jittering
   - Fail-safety
+  - Tagging
 - Metrics collection
 - Easily extendable
 
