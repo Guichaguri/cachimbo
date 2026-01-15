@@ -1,0 +1,14 @@
+services:
+  redis:
+    image: redis
+    command: redis-server
+    ports:
+      - "6379:6379"
+  memcached:
+    image: memcached
+    command:
+      - --conn-limit=1024
+      - --memory-limit=64
+      - --threads=4
+    ports:
+      - "11211:11211"

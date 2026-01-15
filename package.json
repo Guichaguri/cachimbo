@@ -14,13 +14,16 @@
     "test": "vitest",
     "coverage": "vitest run --coverage --coverage.include=src/**/*.ts",
     "prepack": "tsdown",
+    "sample:docker-compose": "docker-compose -f ./samples/redis-docker-compose.yml up -d",
     "sample:no-cache": "tsx ./samples/1-no-cache.ts",
     "sample:redis-cache": "tsx ./samples/2-redis-cache.ts",
     "sample:ttl-cache": "tsx ./samples/3-ttl-cache.ts",
     "sample:coalescing-redis-cache": "tsx ./samples/4-coalescing-redis-cache.ts",
     "sample:swr-ttl-cache": "tsx ./samples/5-swr-ttl-cache.ts",
     "sample:tiered-ttl-redis-cache": "tsx ./samples/6-tiered-ttl-redis-cache.ts",
-    "sample:tiered-weak-ttl-swr-redis-cache": "tsx ./samples/7-tiered-weak-ttl-swr-redis.ts"
+    "sample:tiered-weak-ttl-swr-redis-cache": "tsx ./samples/7-tiered-weak-ttl-swr-redis-cache.ts",
+    "sample:tagged-tiered-cache": "tsx ./samples/8-tagged-tiered-cache.ts",
+    "sample:memcached-cache": "tsx ./samples/9-memcached-cache.ts"
   },
   "keywords": [
     "cache",
