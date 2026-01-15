@@ -14,7 +14,7 @@
     "test": "vitest",
     "coverage": "vitest run --coverage --coverage.include=src/**/*.ts",
     "prepack": "tsdown",
-    "sample:docker-compose": "docker-compose -f ./samples/redis-docker-compose.yml up -d",
+    "sample:docker-compose": "docker-compose -f ./samples/docker-compose.yml up -d",
     "sample:no-cache": "tsx ./samples/1-no-cache.ts",
     "sample:redis-cache": "tsx ./samples/2-redis-cache.ts",
     "sample:ttl-cache": "tsx ./samples/3-ttl-cache.ts",
