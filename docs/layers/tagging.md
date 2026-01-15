@@ -9,15 +9,15 @@ There's no doubt that invalidating cache entries is hard. Sometimes you need to 
 The tagging layer allows you to assign tags to cached entries, making it easier to manage cache consistency, especially when dealing with complex data relationships.
 
 ```ts
-import { TaggingCache } from 'cachimbo';
+import { TaggedCache } from 'cachimbo';
 
-const taggingCache = new TaggingCache({
+const taggedCache = new TaggedCache({
   cache: anotherCache,
 });
 
-await taggingCache.set('key1', 'value1', { tags: ['tagA', 'tagB'] });
-await taggingCache.invalidateTag('tagA');
-const value = await taggingCache.get('key1'); // === null
+await taggedCache.set('key1', 'value1', { tags: ['tagA', 'tagB'] });
+await taggedCache.invalidateTag('tagA');
+const value = await taggedCache.get('key1'); // === null
 ```
 
 For instance, let's say you have a cache storing user profiles and their associated posts. When a user's profile is updated, you want to invalidate both the profile and all posts related to that user. By tagging the cache entries with the user's ID, you can easily invalidate all related entries in one go.
