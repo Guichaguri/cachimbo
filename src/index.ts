@@ -29,5 +29,6 @@ export * from './layers/fail-safe/index.js';
 export * from './layers/jittering/index.js';
 export * from './layers/key-transforming/index.js';
 export * from './layers/swr/index.js';
+export * from './layers/tagged/index.js';
 export * from './layers/tiered/index.js';
 export * from './layers/metrics/index.js';

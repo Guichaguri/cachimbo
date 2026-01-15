@@ -1,14 +1,16 @@
 import type { BaseCacheOptions, ICache, SetCacheOptions } from '../../types/cache.js';
 import type { Logger } from '../../types/logger.js';
 
-export interface TaggingCacheOptions extends BaseCacheOptions {
+export interface TaggedCacheOptions extends BaseCacheOptions {
   /**
    * The underlying cache
    */
   cache: ICache;
 
   /**
-   * The tag entry prefix
+   * The prefix for the tag entries
+   *
+   * @defaultValue '__ctag__:'
    */
   tagPrefix?: string;
 
@@ -22,24 +24,30 @@ export interface TaggingCacheOptions extends BaseCacheOptions {
   tagTTL?: number;
 }
 
-export interface SetTaggingCacheOptions extends SetCacheOptions {
+export interface SetTaggedCacheOptions extends SetCacheOptions {
+  /**
+   * The list of tags that can be used to invalidate the cached item
+   */
   tags?: string[];
 }
 
 interface TaggedValue<T> {
+  /** The underlying value */
   v: T;
+  /** The unix epoch that this item was cached */
   d: number;
+  /** The list of tags */
   t: string[];
 }
 
-export class TaggingCache implements ICache {
+export class TaggedCache implements ICache {
   protected readonly cache: ICache;
   protected readonly logger?: Logger;
   protected readonly name?: string;
   protected tagPrefix: string;
   protected tagTTL: number;
 
-  constructor(options: TaggingCacheOptions) {
+  constructor(options: TaggedCacheOptions) {
     this.cache = options.cache;
     this.logger = options.logger;
     this.name = options.name;
@@ -65,7 +73,7 @@ export class TaggingCache implements ICache {
     return value.v;
   }
 
-  async set<T>(key: string, value: T, options: SetTaggingCacheOptions = {}): Promise<void> {
+  async set<T>(key: string, value: T, options: SetTaggedCacheOptions = {}): Promise<void> {
     const tags = options.tags || [];
     const now = Date.now();
 
@@ -102,7 +110,7 @@ export class TaggingCache implements ICache {
     );
   }
 
-  async setMany<T>(data: Record<string, T>, options: SetTaggingCacheOptions = {}): Promise<void> {
+  async setMany<T>(data: Record<string, T>, options: SetTaggedCacheOptions = {}): Promise<void> {
     const taggedData: Record<string, TaggedValue<T>> = {};
     const tags = options.tags || [];
     const now = Date.now();
@@ -120,7 +128,7 @@ export class TaggingCache implements ICache {
     return this.cache.deleteMany(keys);
   }
 
-  async getOrLoad<T>(key: string, load: () => Promise<T>, options: SetTaggingCacheOptions = {}): Promise<T> {
+  async getOrLoad<T>(key: string, load: () => Promise<T>, options: SetTaggedCacheOptions = {}): Promise<T> {
     const tags = options.tags || [];
     const now = Date.now();
 

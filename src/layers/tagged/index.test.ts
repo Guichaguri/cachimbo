@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import { TaggingCache } from './index.js';
 import type { ICache } from '../../types/cache.js';
 import { LocalMapCache } from '../../local/map/index.js';
+import { TaggedCache } from './index.js';
 
 const mockCache = {
   get: vi.fn().mockResolvedValue(null),
@@ -15,13 +15,13 @@ const mockCache = {
 
 const wait = (ms: number = 2) => new Promise((resolve) => setTimeout(resolve, ms));
 
-describe('TaggingCache', () => {
+describe('TaggedCache', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   test('should get a value from the cache', async () => {
-    const taggingCache = new TaggingCache({ cache: mockCache });
+    const taggingCache = new TaggedCache({ cache: mockCache });
     const key = 'test-key';
     const value = { v: 'test-value', d: Date.now(), t: [] };
     mockCache.get.mockResolvedValue(value);
@@ -33,7 +33,7 @@ describe('TaggingCache', () => {
   });
 
   test('should set a value in the cache', async () => {
-    const taggingCache = new TaggingCache({ cache: mockCache });
+    const taggingCache = new TaggedCache({ cache: mockCache });
     const key = 'test-key';
     const value = 'test-value';
     const tags = ['tag1', 'tag2'];
@@ -48,7 +48,7 @@ describe('TaggingCache', () => {
   });
 
   test('should delete a value from the cache', async () => {
-    const taggingCache = new TaggingCache({ cache: mockCache });
+    const taggingCache = new TaggedCache({ cache: mockCache });
     const key = 'test-key';
 
     await taggingCache.delete(key);
@@ -57,7 +57,7 @@ describe('TaggingCache', () => {
   });
 
   test('should delete many keys', async () => {
-    const taggingCache = new TaggingCache({ cache: mockCache });
+    const taggingCache = new TaggedCache({ cache: mockCache });
     const key = 'test-key';
 
     await taggingCache.deleteMany([key]);
@@ -66,7 +66,7 @@ describe('TaggingCache', () => {
   });
 
   test('should invalidate a tag', async () => {
-    const taggingCache = new TaggingCache({ cache: mockCache });
+    const taggingCache = new TaggedCache({ cache: mockCache });
     const tag = 'test-tag';
 
     await taggingCache.invalidateTag(tag);
@@ -79,7 +79,7 @@ describe('TaggingCache', () => {
   });
 
   test('should return null for invalidated tags in get', async () => {
-    const taggingCache = new TaggingCache({ cache: new LocalMapCache() });
+    const taggingCache = new TaggedCache({ cache: new LocalMapCache() });
 
     await taggingCache.set('key1', 'value1', { tags: ['tag1'] });
     await taggingCache.set('key2', 'value2', { tags: ['tag2'] });
@@ -98,7 +98,7 @@ describe('TaggingCache', () => {
   });
 
   test('should return null for invalidated tags in getMany', async () => {
-    const taggingCache = new TaggingCache({ cache: new LocalMapCache() });
+    const taggingCache = new TaggedCache({ cache: new LocalMapCache() });
 
     await taggingCache.set('key1', 'value1', { tags: ['tag1'] });
     await taggingCache.set('key2', 'value2', { tags: ['tag2'] });
@@ -115,7 +115,7 @@ describe('TaggingCache', () => {
   });
 
   test('should not return null for old invalidations', async () => {
-    const taggingCache = new TaggingCache({ cache: new LocalMapCache() });
+    const taggingCache = new TaggedCache({ cache: new LocalMapCache() });
 
     await taggingCache.setMany({ key1: 'value1', key2: 'value2' }, { tags: ['tag1'] });
 
@@ -134,7 +134,7 @@ describe('TaggingCache', () => {
   });
 
   test('should clear up tags', async () => {
-    const taggingCache = new TaggingCache({ cache: new LocalMapCache() });
+    const taggingCache = new TaggedCache({ cache: new LocalMapCache() });
 
     await taggingCache.setMany({ key1: 'value2', key2: 'value3', key3: 'value5' }, { tags: ['tag1'] });
     await taggingCache.set('key1', 'value1');
@@ -156,7 +156,7 @@ describe('TaggingCache', () => {
   });
 
   test('should return null on missing key successfully', async () => {
-    const taggingCache = new TaggingCache({ cache: new LocalMapCache() });
+    const taggingCache = new TaggedCache({ cache: new LocalMapCache() });
 
     const value = await taggingCache.get<string>('unknown');
 
@@ -164,7 +164,7 @@ describe('TaggingCache', () => {
   });
 
   test('should load from source if not in cache', async () => {
-    const taggingCache = new TaggingCache({ cache: new LocalMapCache() });
+    const taggingCache = new TaggedCache({ cache: new LocalMapCache() });
     const load = vi.fn().mockResolvedValue('value-from-source');
 
     const value = await taggingCache.getOrLoad('key1', load);
@@ -176,7 +176,7 @@ describe('TaggingCache', () => {
   });
 
   test('should load from cache and not from source', async () => {
-    const taggingCache = new TaggingCache({ cache: new LocalMapCache() });
+    const taggingCache = new TaggedCache({ cache: new LocalMapCache() });
     const load = vi.fn().mockResolvedValue('value-from-source');
 
     await taggingCache.set('key1', 'cached-value');
@@ -188,7 +188,7 @@ describe('TaggingCache', () => {
   });
 
   test('should load from cache if tag is invalidated', async () => {
-    const taggingCache = new TaggingCache({ cache: new LocalMapCache() });
+    const taggingCache = new TaggedCache({ cache: new LocalMapCache() });
     const load = vi.fn().mockResolvedValue('value-from-source');
 
     await taggingCache.set('key1', 'cached-value', { tags: ['tag1'] });
