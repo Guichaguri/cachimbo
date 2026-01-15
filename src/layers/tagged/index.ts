@@ -154,7 +154,6 @@ export class TaggedCache implements ICache {
       value = await loadWithTags();
 
       await this.cache.set<TaggedValue<T>>(key, value, options);
-      await this.refreshTags(tags, now);
     }
 
     return value.v;
