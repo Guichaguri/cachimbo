@@ -1,6 +1,6 @@
 {
   "name": "cachimbo",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": "Guilherme Chaguri",
   "license": "Apache-2.0",
   "description": "An advanced caching library that allows you to layer different strategies in order to maximize the performance.",
