@@ -1,6 +1,7 @@
 // Base and Types
 export * from './base/index.js';
 export * from './base/local.js';
+export * from './base/backplane.js';
 export type * from './types/cache.d.ts';
 export type * from './types/logger.d.ts';
 
@@ -21,6 +22,11 @@ export * from './remote/memjs/index.js';
 export * from './remote/workers-kv/index.js';
 export * from './remote/hazelcast/index.js';
 export * from './remote/keyv/index.js';
+
+// Backplane Caches
+export * from './backplane/ioredis/index.js';
+export * from './backplane/redis/index.js';
+export * from './backplane/mqtt/index.js';
 
 // Layers
 export * from './layers/async-lazy/index.js';
