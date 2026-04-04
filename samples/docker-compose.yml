@@ -12,3 +12,7 @@ services:
       - --threads=4
     ports:
       - "11211:11211"
+  mqtt:
+    image: eclipse-mosquitto:latest
+    ports:
+      - "1883:1883"
