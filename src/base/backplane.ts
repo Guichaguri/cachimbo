@@ -25,15 +25,30 @@ export interface BaseBackplaneOptions extends BaseCacheOptions {
    * It should only be used with local caches since it does not propagate changes automatically.
    */
   cache: BaseLocalCache;
+
+  /**
+   * The mode in which the backplane will publish updates.
+   *
+   * **Active**: publishes the payload of the updated cache entry to other nodes.
+   * This allows other nodes to update their cache with the new value without having to fetch it from origin.
+   * This is the default mode.
+   *
+   * **Lazy**: only publishes the keys of the updated cache entry to other nodes.
+   * This forces other nodes to invalidate their cache and fetch the new value from origin on the next request.
+   * This mode can be used to reduce network traffic at the cost of potentially higher latency for cache updates.
+   */
+  mode?: 'active' | 'lazy';
 }
 
 export abstract class BaseBackplane implements ICache {
   protected readonly cache: BaseLocalCache;
+  protected readonly mode: 'active' | 'lazy';
   protected readonly logger?: Logger;
   protected readonly name?: string;
 
   constructor(options: BaseBackplaneOptions) {
     this.cache = options.cache;
+    this.mode = options.mode || 'active';
     this.logger = options.logger;
     this.name = options.name;
   }
@@ -45,7 +60,13 @@ export abstract class BaseBackplane implements ICache {
   getOrLoad<T>(key: string, load: () => Promise<T>, options?: SetCacheOptions): Promise<T> {
     const loadWrapped = async (): Promise<T> => {
       const data = await load();
-      await this.emit({ action: 'set', key, data, options });
+
+      if (this.mode === 'active') {
+        await this.emit({ action: 'set', key, data, options });
+      } else {
+        await this.emit({ action: 'delete', key });
+      }
+
       return data;
     };
 
@@ -54,7 +75,12 @@ export abstract class BaseBackplane implements ICache {
 
   async set<T>(key: string, data: T, options?: SetCacheOptions): Promise<void> {
     await this.cache.set<T>(key, data, options);
-    await this.emit({ action: 'set', key, data, options });
+
+    if (this.mode === 'active') {
+      await this.emit({ action: 'set', key, data, options });
+    } else {
+      await this.emit({ action: 'delete', key });
+    }
   }
 
   async delete(key: string): Promise<void> {
@@ -68,7 +94,12 @@ export abstract class BaseBackplane implements ICache {
 
   async setMany<T>(data: Record<string, T>, options?: SetCacheOptions): Promise<void> {
     await this.cache.setMany<T>(data, options);
-    await this.emit({ action: 'setMany', data, options });
+
+    if (this.mode === 'active') {
+      await this.emit({ action: 'setMany', data, options });
+    } else {
+      await this.emit({ action: 'deleteMany', keys: Object.keys(data) });
+    }
   }
 
   async deleteMany(keys: string[]): Promise<void> {
