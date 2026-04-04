@@ -23,7 +23,10 @@
     "sample:tiered-ttl-redis-cache": "tsx ./samples/6-tiered-ttl-redis-cache.ts",
     "sample:tiered-weak-ttl-swr-redis-cache": "tsx ./samples/7-tiered-weak-ttl-swr-redis-cache.ts",
     "sample:tagged-tiered-cache": "tsx ./samples/8-tagged-tiered-cache.ts",
-    "sample:memcached-cache": "tsx ./samples/9-memcached-cache.ts"
+    "sample:memcached-cache": "tsx ./samples/9-memcached-cache.ts",
+    "sample:redis-backplane-cache": "tsx ./samples/10-redis-backplane-cache.ts",
+    "sample:ioredis-backplane-cache": "tsx ./samples/11-ioredis-backplane-cache.ts",
+    "sample:mqtt-backplane-cache": "tsx ./samples/12-mqtt-backplane-cache.ts"
   },
   "keywords": [
     "cache",
