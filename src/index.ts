@@ -27,6 +27,7 @@ export * from './remote/keyv/index.js';
 export * from './backplane/ioredis/index.js';
 export * from './backplane/redis/index.js';
 export * from './backplane/mqtt/index.js';
+export * from './backplane/hazelcast/index.js';
 
 // Layers
 export * from './layers/async-lazy/index.js';
