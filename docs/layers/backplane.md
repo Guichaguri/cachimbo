@@ -4,7 +4,7 @@ The backplane cache layer enables multiple instances of your application to sync
 
 This is particularly useful in distributed systems where you have several instances running behind a load balancer, and you want to ensure that when one instance updates or invalidates a cache entry, all other instances are aware of this change.
 
-The propagation can be done through various pub-sub backends, such as Redis, Valkey or MQTT.
+The propagation can be done through various pub-sub backends, such as Redis, Valkey, MQTT or Hazelcast.
 
 There are two modes supported for propagating cache updates:
 - **Active**: when an instance updates an item, the payload is sent to the backplane and all other instances receive the event and update their cache accordingly.
@@ -89,10 +89,31 @@ const cacheWithBackplane = new MqttBackplane({
 await cacheWithBackplane.set("key", "value");
 ```
 
+### Hazelcast
+
+```sh
+npm install hazelcast-client
+```
+
+```ts
+import { Client } from 'hazelcast-client';
+import { HazelcastBackplane } from 'cachimbo';
+
+const client = await Client.newHazelcastClient();
+const topic = await client.getReliableTopic('my-cool-app-backplane'); // this should be unique across your organization to avoid collisions with other applications using the same Hazelcast instance
+
+const cacheWithBackplane = new HazelcastBackplane({
+  topic: topic,
+  mode: 'active', // or 'lazy', depending on your needs
+  cache: new LocalTTLCache(), // this can be any in-memory cache
+});
+
+// This will set the value in the local cache and publish an update event to other instances
+await cacheWithBackplane.set("key", "value");
+```
+
 ## Caveats
 
-- There might be a slight delay between the time an entry is invalidated in one instance and the time other instances receive the invalidation event, depending on the backplane server's performance.
+- There might be a slight delay between the time an entry is invalidated in one instance and the time other instances receive the invalidation event, depending on the backplane server's performance. Keep in mind that in this short period of time, different instances might have inconsistent cache states.
 - Make sure to handle potential connection issues with the backplane store gracefully to avoid losing invalidation events.
-- The backplane layer introduces additional network overhead due to the pub/sub communication. Evaluate the performance impact in your specific use case.
-- When using the backplane layer, ensure that all instances of your application are configured to use the same backplane store to maintain consistency across the distributed system.
-- A Redis client can only be used for either pub-sub or regular cache operations, but not both. If you're using Redis as your backplane, make sure to create separate clients for publishing and subscribing to avoid connection issues.
+- A Redis client can only be used for either pub-sub or regular cache operations, but not both. If you're using Redis as your backplane, you will have to create separate clients for publishing and subscribing.
