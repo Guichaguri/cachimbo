@@ -112,6 +112,29 @@ const cacheWithBackplane = new HazelcastBackplane({
 await cacheWithBackplane.set("key", "value");
 ```
 
+### NATS
+
+```sh
+npm install @nats-io/transport-node
+```
+
+```ts
+import { connect } from '@nats-io/transport-node';
+import { NatsBackplane } from 'cachimbo';
+
+const nats = await connect({ servers: "demo.nats.io:4222" });
+
+const cacheWithBackplane = new NatsBackplane({
+  nats: nats,
+  subject: 'my-cool-app-backplane', // this should be unique across your organization to avoid collisions with other applications using the same NATS instance
+  mode: 'active', // or 'lazy', depending on your needs
+  cache: new LocalTTLCache(), // this can be any in-memory cache
+});
+
+// This will set the value in the local cache and publish an update event to other instances
+await cacheWithBackplane.set("key", "value");
+```
+
 ## Caveats
 
 - There might be a slight delay between the time an entry is invalidated in one instance and the time other instances receive the invalidation event, depending on the backplane server's performance. Keep in mind that in this short period of time, different instances might have inconsistent cache states.

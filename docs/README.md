@@ -21,6 +21,7 @@ npm install cachimbo
 - [Memcached](./stores/memcached.md)
 - [Cloudflare Workers KV](./stores/cloudflare-workers-kv.md)
 - [Hazelcast](./stores/hazelcast.md)
+- [NATS](./stores/nats.md)
 - [Keyv](./stores/keyv.md)
 
 ## Cache Layers
