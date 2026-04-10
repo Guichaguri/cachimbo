@@ -26,7 +26,9 @@
     "sample:memcached-cache": "tsx ./samples/9-memcached-cache.ts",
     "sample:redis-backplane-cache": "tsx ./samples/10-redis-backplane-cache.ts",
     "sample:ioredis-backplane-cache": "tsx ./samples/11-ioredis-backplane-cache.ts",
-    "sample:mqtt-backplane-cache": "tsx ./samples/12-mqtt-backplane-cache.ts"
+    "sample:mqtt-backplane-cache": "tsx ./samples/12-mqtt-backplane-cache.ts",
+    "sample:nats-cache": "tsx ./samples/13-nats-cache.ts",
+    "sample:nats-backplane-cache": "tsx ./samples/14-nats-backplane-cache.ts"
   },
   "keywords": [
     "cache",

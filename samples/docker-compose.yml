@@ -16,3 +16,9 @@ services:
     image: eclipse-mosquitto:latest
     ports:
       - "1883:1883"
+  nats:
+    image: nats:latest
+    command:
+      - --jetstream
+    ports:
+      - "4222:4222"
