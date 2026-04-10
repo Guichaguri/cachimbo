@@ -32,6 +32,9 @@ export interface RedisBackplaneOptions extends BaseBackplaneOptions {
   channel: string;
 }
 
+/**
+ * A Redis Pub/Sub backplane implementation using node-redis.
+ */
 export class RedisBackplane extends BaseBackplane {
   protected readonly publishClient: Redis;
   protected readonly subscriptionClient: Redis;

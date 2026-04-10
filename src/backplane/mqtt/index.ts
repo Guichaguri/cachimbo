@@ -18,6 +18,9 @@ export interface MqttBackplaneOptions extends BaseBackplaneOptions {
   topic: string;
 }
 
+/**
+ * A MQTT backplane implementation
+ */
 export class MqttBackplane extends BaseBackplane {
   protected readonly client: MqttClient;
   protected readonly topic: string;

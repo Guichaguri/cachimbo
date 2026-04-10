@@ -29,6 +29,9 @@ export interface IORedisBackplaneOptions extends BaseBackplaneOptions {
   channel: string;
 }
 
+/**
+ * A Redis Pub/Sub backplane implementation using ioredis or iovalkey.
+ */
 export class IORedisBackplane extends BaseBackplane {
   protected readonly publishClient: Redis | Valkey;
   protected readonly subscriptionClient: Redis | Valkey;

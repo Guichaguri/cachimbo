@@ -1,4 +1,4 @@
-import { type ITopic, type Message } from 'hazelcast-client';
+import type { ITopic, Message } from 'hazelcast-client';
 import { type BackplaneEvent, type BaseBackplaneOptions, BaseBackplane } from '../../base/backplane.js';
 
 export interface HazelcastBackplaneOptions extends BaseBackplaneOptions {
@@ -19,6 +19,9 @@ export interface HazelcastBackplaneOptions extends BaseBackplaneOptions {
   topic: ITopic<any>;
 }
 
+/**
+ * A Hazelcast topic backplane implementation
+ */
 export class HazelcastBackplane extends BaseBackplane {
   protected readonly topic: ITopic<BackplaneEvent>;
   protected listenerId?: string;
