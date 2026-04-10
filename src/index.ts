@@ -21,6 +21,7 @@ export * from './remote/memcache/index.js';
 export * from './remote/memjs/index.js';
 export * from './remote/workers-kv/index.js';
 export * from './remote/hazelcast/index.js';
+export * from './remote/nats/index.js';
 export * from './remote/keyv/index.js';
 
 // Backplane Caches
@@ -28,6 +29,7 @@ export * from './backplane/ioredis/index.js';
 export * from './backplane/redis/index.js';
 export * from './backplane/mqtt/index.js';
 export * from './backplane/hazelcast/index.js';
+export * from './backplane/nats/index.js';
 
 // Layers
 export * from './layers/async-lazy/index.js';
