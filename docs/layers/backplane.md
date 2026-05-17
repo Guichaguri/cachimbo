@@ -135,6 +135,23 @@ const cacheWithBackplane = new NatsBackplane({
 await cacheWithBackplane.set("key", "value");
 ```
 
+### BroadcastChannel (for browsers)
+
+BroadcastChannel is a browser API that allows communication between different tabs or windows of the same origin. This can be used as a backplane for synchronizing in-memory caches across multiple tabs of a web application.
+
+```ts
+import { BroadcastChannelBackplane } from 'cachimbo';
+
+const cacheWithBackplane = new BroadcastChannelBackplane({
+  channel: new BroadcastChannel('my-cool-app-backplane'), // this should be unique across your app to avoid collisions with other channels
+  mode: 'active', // or 'lazy', depending on your needs
+  cache: new LocalTTLCache(), // this can be any in-memory cache
+});
+
+// This will set the value in the local cache and publish an update event to other browser tabs
+await cacheWithBackplane.set("key", "value");
+```
+
 ## Caveats
 
 - There might be a slight delay between the time an entry is invalidated in one instance and the time other instances receive the invalidation event, depending on the backplane server's performance. Keep in mind that in this short period of time, different instances might have inconsistent cache states.
