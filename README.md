@@ -19,6 +19,7 @@ Cachimbo is a composable caching library that allows layering different strategi
   - Hazelcast
   - NATS
   - Keyv
+  - IndexedDB (for browsers)
 - Supports in-memory cache stores
   - Least Recently Used (LRU) eviction
   - Time-based (TTL) eviction
