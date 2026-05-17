@@ -23,6 +23,7 @@ export * from './remote/workers-kv/index.js';
 export * from './remote/hazelcast/index.js';
 export * from './remote/nats/index.js';
 export * from './remote/keyv/index.js';
+export * from './remote/indexeddb/index.js';
 
 // Backplane Caches
 export * from './backplane/ioredis/index.js';
