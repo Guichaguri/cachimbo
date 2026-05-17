@@ -194,7 +194,7 @@ export class IndexedDBCache extends BaseCache {
       return null;
     }
 
-    if (entry.e && Date.now() > entry.e) {
+    if (entry.e && Date.now() >= entry.e) {
       // Mark for deletion on next auto-evict
       this.shouldEvict = true;
       return null;
