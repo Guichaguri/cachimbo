@@ -88,3 +88,51 @@ class MyLocalCache extends BaseLocalCache {
   }
 }
 ```
+
+---
+
+### Example: localStorage Cache Store
+
+Here's a fully working example of a cache implementation that uses the browser's `localStorage` as the underlying storage mechanism:
+
+```ts
+export interface BrowserStorageCacheOptions extends BaseCacheOptions {
+  /**
+   * The storage instance to use.
+   * 
+   * Can be either `localStorage` or `sessionStorage`.
+   *
+   * @default `localStorage`
+   */
+  storage?: Storage;
+}
+
+export class BrowserStorageCache extends BaseCache {
+  protected readonly storage: Storage;
+
+  constructor(options: BrowserStorageCacheOptions) {
+    super(options);
+    this.storage = options.storage ?? localStorage;
+  }
+
+  async get<T>(key: string): Promise<T | null> {
+    try {
+      const raw = this.storage.getItem(key);
+
+      return raw ? JSON.parse(raw) : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {
+    this.storage.setItem(key, JSON.stringify(value));
+  }
+
+  async delete(key: string): Promise<void> {
+    this.storage.removeItem(key);
+  }
+}
+```
+
+Note: this implementation does not support TTL or other advanced features, but it serves as a basic example of how to extend `BaseCache` to create a custom cache store.
