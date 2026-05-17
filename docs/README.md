@@ -23,6 +23,7 @@ npm install cachimbo
 - [Hazelcast](./stores/hazelcast.md)
 - [NATS](./stores/nats.md)
 - [Keyv](./stores/keyv.md)
+- [IndexedDB](./stores/indexeddb.md) (for browsers)
 
 ## Cache Layers
 

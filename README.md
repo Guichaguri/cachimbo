@@ -86,6 +86,7 @@ External caches (like Redis, Memcached, etc.) provide fast, scalable, shared sto
 - [Hazelcast](/docs/stores/hazelcast.md)
 - [NATS](/docs/stores/nats.md)
 - [Keyv](/docs/stores/keyv.md)
+- [IndexedDB](/docs/stores/indexeddb.md) (for browsers)
 
 ## Cache Layers
 
