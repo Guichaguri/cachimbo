@@ -69,29 +69,29 @@
     }
   },
   "dependencies": {
-    "@isaacs/ttlcache": "^2.1.4",
-    "lru-cache": "^11.3.6"
+    "@isaacs/ttlcache": "^2.1.5",
+    "lru-cache": "^11.5.1"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260516.1",
+    "@cloudflare/workers-types": "^4.20260611.1",
     "@nats-io/kv": "^3.4.0",
     "@nats-io/nats-core": "^3.3.1",
     "@nats-io/transport-node": "^3.4.0",
     "@redis/client": "^5.12.1",
     "@types/memjs": "^1.3.3",
-    "@types/node": "^24.12.4",
-    "@valkey/valkey-glide": "^2.4.0",
+    "@types/node": "^24.13.2",
+    "@valkey/valkey-glide": "^2.4.1",
     "@vitest/coverage-v8": "^4.1.2",
     "amqplib": "^2.0.1",
     "fake-indexeddb": "^6.2.5",
     "hazelcast-client": "^5.6.0",
-    "ioredis": "^5.10.1",
+    "ioredis": "^5.11.1",
     "iovalkey": "^0.3.3",
     "keyv": "^5.6.0",
-    "memcache": "^1.7.0",
+    "memcache": "^1.8.0",
     "mqtt": "^5.15.1",
     "tsdown": "^0.17.2",
-    "tsx": "^4.22.0",
+    "tsx": "^4.22.4",
     "typescript": "^5.9.3",
     "vitest": "^4.0.15"
   }
