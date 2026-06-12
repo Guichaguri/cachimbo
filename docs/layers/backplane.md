@@ -76,7 +76,7 @@ npm install mqtt
 import { connect } from 'mqtt';
 import { MqttBackplane } from 'cachimbo';
 
-const mqtt = connect(process.env.MQTT_URL || 'mqtt://localhost:1883');
+const mqtt = connect('mqtt://localhost:1883');
 
 const cacheWithBackplane = new MqttBackplane({
   client: mqtt,
@@ -87,6 +87,28 @@ const cacheWithBackplane = new MqttBackplane({
 
 // This will set the value in the local cache and publish an update event to other instances
 await cacheWithBackplane.set("key", "value");
+```
+
+### amqplib
+
+RabbitMQ, Apache ActiveMQ, and other AMQP-based message brokers.
+
+```sh
+npm install amqplib
+```
+
+```ts
+import amqp from 'amqplib';
+import { AmqpBackplane } from 'cachimbo';
+
+const amqpConnection = await connect('amqp://rabbitmq:rabbitmq@localhost:5672');
+
+const cacheWithBackplane = new AmqpBackplane({
+  connection: amqpConnection,
+  mode: 'active', // or 'lazy', depending on your needs
+  exchange: 'sample-backplane', // this should be unique across your organization to avoid collisions with other applications using the same RabbitMQ instance. You can also use a topic exchange and set a routing key if you want to have more control over which instances receive which events.
+  cache: new LocalTTLCache(), // this can be any in-memory cache
+});
 ```
 
 ### Hazelcast
@@ -144,7 +166,6 @@ import { BroadcastChannelBackplane } from 'cachimbo';
 
 const cacheWithBackplane = new BroadcastChannelBackplane({
   channel: new BroadcastChannel('my-cool-app-backplane'), // this should be unique across your app to avoid collisions with other channels
-  mode: 'active', // or 'lazy', depending on your needs
   cache: new LocalTTLCache(), // this can be any in-memory cache
 });
 
