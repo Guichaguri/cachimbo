@@ -1,4 +1,4 @@
-import type { ICache, SetCacheOptions } from '../../types/cache.js';
+import type { ICache, LoadContext, SetCacheOptions } from '../../types/cache.js';
 
 /**
  * A cache implementation that does nothing.
@@ -20,8 +20,8 @@ export class NoOpCache implements ICache {
     return {};
   }
 
-  getOrLoad<T>(key: string, load: () => Promise<T>, options?: SetCacheOptions): Promise<T> {
-    return load();
+  getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options: SetCacheOptions = {}): Promise<T> {
+    return load({ options });
   }
 
   async set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {}

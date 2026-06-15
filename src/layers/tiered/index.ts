@@ -1,5 +1,5 @@
 import { BaseCache } from '../../base/index.js';
-import type { BaseCacheOptions, ICache, SetCacheOptions } from '../../types/cache.js';
+import type { BaseCacheOptions, ICache, LoadContext, SetCacheOptions } from '../../types/cache.js';
 
 export interface TieredCacheOptions extends BaseCacheOptions {
   /**
@@ -56,7 +56,7 @@ export class TieredCache extends BaseCache {
     return next(0);
   }
 
-  override async getOrLoad<T>(key: string, load: () => Promise<T>, options?: SetCacheOptions): Promise<T> {
+  override async getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options?: SetCacheOptions): Promise<T> {
     const next = (i: number): Promise<T> => {
       this.logger?.debug(this.name, '[getOrLoad] Reading from tier =', i, 'key =', key);
 

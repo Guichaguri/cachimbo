@@ -1,4 +1,4 @@
-import type { BaseCacheOptions, ICache, SetCacheOptions } from '../types/cache.js';
+import type { BaseCacheOptions, ICache, LoadContext, SetCacheOptions } from '../types/cache.js';
 import type { Logger } from '../types/logger.js';
 
 /**
@@ -22,7 +22,7 @@ export abstract class BaseCache implements ICache {
 
   abstract delete(key: string): Promise<void>;
 
-  async getOrLoad<T>(key: string, load: () => Promise<T>, options?: SetCacheOptions): Promise<T> {
+  async getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options?: SetCacheOptions): Promise<T> {
     let data = await this.get<T>(key);
 
     if (data !== null) {
@@ -33,9 +33,11 @@ export abstract class BaseCache implements ICache {
 
     this.logger?.debug(this.name, '[getOrLoad] Refreshing the cache...', 'key =', key);
 
-    data = await load();
+    const context: LoadContext = { options: options || {} };
 
-    await this.set(key, data, options);
+    data = await load(context);
+
+    await this.set(key, data, context.options);
 
     return data;
   }

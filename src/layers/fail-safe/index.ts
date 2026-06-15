@@ -1,4 +1,4 @@
-import type { BaseCacheOptions, ICache, SetCacheOptions } from '../../types/cache.js';
+import type { BaseCacheOptions, ICache, LoadContext, SetCacheOptions } from '../../types/cache.js';
 
 export interface FailSafeCacheOptions extends BaseCacheOptions {
   /**
@@ -112,14 +112,14 @@ export class FailSafeCache implements ICache {
     return this.cache.deleteMany(keys).catch(error => this.handleError('delete', error, void 0));
   }
 
-  async getOrLoad<T>(key: string, load: () => Promise<T>, options?: SetCacheOptions): Promise<T> {
+  async getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options?: SetCacheOptions): Promise<T> {
     let loadResult: T;
     let loadErrored = false;
     let loadSuccessful = false;
 
-    const loadWithErrorHandling = async (): Promise<T> => {
+    const loadWithErrorHandling = async (ctx: LoadContext): Promise<T> => {
       try {
-        loadResult = await load();
+        loadResult = await load(ctx);
         loadSuccessful = true;
         return loadResult;
       } catch (error) {
@@ -140,7 +140,7 @@ export class FailSafeCache implements ICache {
       await this.handleError('getOrLoad', error, null);
 
       // In case handleError didn't throw, we load from origin
-      return loadSuccessful ? loadResult! : await load();
+      return loadSuccessful ? loadResult! : await load({ options: options || {} });
     }
   }
 

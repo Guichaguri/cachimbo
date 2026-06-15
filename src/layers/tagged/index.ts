@@ -1,4 +1,4 @@
-import type { BaseCacheOptions, ICache, SetCacheOptions } from '../../types/cache.js';
+import type { BaseCacheOptions, ICache, LoadContext, SetCacheOptions } from '../../types/cache.js';
 import type { Logger } from '../../types/logger.js';
 
 export interface TaggedCacheOptions extends BaseCacheOptions {
@@ -128,14 +128,14 @@ export class TaggedCache implements ICache {
     return this.cache.deleteMany(keys);
   }
 
-  async getOrLoad<T>(key: string, load: () => Promise<T>, options: SetTaggedCacheOptions = {}): Promise<T> {
+  async getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options: SetTaggedCacheOptions = {}): Promise<T> {
     const tags = options.tags || [];
     const now = Date.now();
 
     let hasLoaded = false;
 
-    const loadWithTags = async (): Promise<TaggedValue<T>> => {
-      const value = await load();
+    const loadWithTags = async (ctx: LoadContext): Promise<TaggedValue<T>> => {
+      const value = await load(ctx);
 
       await this.refreshTags(tags, now);
 
@@ -150,10 +150,12 @@ export class TaggedCache implements ICache {
     if (!hasLoaded && await this.isItemExpired(value.t, value.d)) {
       this.logger?.debug(this.name, '[getOrLoad] Item expired due to tag invalidation. Loading from source...', 'key =', key);
 
-      // If it is expired, we force load from source
-      value = await loadWithTags();
+      const context: LoadContext = { options };
 
-      await this.cache.set<TaggedValue<T>>(key, value, options);
+      // If it is expired, we force load from source
+      value = await loadWithTags(context);
+
+      await this.cache.set<TaggedValue<T>>(key, value, context.options);
     }
 
     return value.v;

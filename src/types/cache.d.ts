@@ -19,6 +19,25 @@ export interface BaseCacheOptions {
   logger?: Logger;
 }
 
+export interface LoadContext {
+  /**
+   * The options that will be used for saving the resource.
+   *
+   * @example
+   * ```ts
+   * cache.getOrLoad('key', async (ctx) => {
+   *   const data = await loadData();
+   *
+   *   // change the ttl to a minute
+   *   ctx.options.ttl = 60;
+   *
+   *   return data;
+   * });
+   * ```
+   */
+  options: SetCacheOptions;
+}
+
 export interface ICache {
 
   /**
@@ -39,7 +58,7 @@ export interface ICache {
    * @param load The function which should fetch the fresh data from origin
    * @param options The options used to save the cache
    */
-  getOrLoad<T>(key: string, load: () => Promise<T>, options?: SetCacheOptions): Promise<T>;
+  getOrLoad<T>(key: string, load: (context: LoadContext) => Promise<T>, options?: SetCacheOptions): Promise<T>;
 
   /**
    * Writes a resource into cache.

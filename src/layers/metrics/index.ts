@@ -1,4 +1,4 @@
-import type { BaseCacheOptions, ICache, SetCacheOptions } from '../../types/cache.js';
+import type { BaseCacheOptions, ICache, LoadContext, SetCacheOptions } from '../../types/cache.js';
 import type { Logger } from '../../types/logger.js';
 
 export interface MetricsCollectingCacheOptions extends BaseCacheOptions {
@@ -97,11 +97,11 @@ export class MetricsCollectingCache implements ICache {
     return data;
   }
 
-  async getOrLoad<T>(key: string, load: () => Promise<T>, options?: SetCacheOptions): Promise<T> {
+  async getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options?: SetCacheOptions): Promise<T> {
     let didTriggerLoad: boolean = false;
     let loadFinishAt: number = 0;
 
-    const loadMiddleware = (): Promise<T> => {
+    const loadMiddleware = (ctx: LoadContext): Promise<T> => {
       const missFinishAt = performance.now();
 
       this.countMetrics.missCount++;
@@ -113,7 +113,7 @@ export class MetricsCollectingCache implements ICache {
 
       const loadStartAt = performance.now();
 
-      return load().finally(() => {
+      return load(ctx).finally(() => {
         loadFinishAt = performance.now();
 
         this.countMetrics.loadCount++;

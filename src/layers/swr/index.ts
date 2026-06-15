@@ -1,4 +1,4 @@
-import type { BaseCacheOptions, ICache, SetCacheOptions } from '../../types/cache.js';
+import type { BaseCacheOptions, ICache, LoadContext, SetCacheOptions } from '../../types/cache.js';
 import type { Logger } from '../../types/logger.js';
 
 /**
@@ -57,7 +57,7 @@ export class SWRCache implements ICache {
     return item ? item.data : null;
   }
 
-  async getOrLoad<T>(key: string, load: () => Promise<T>, options: SetCacheOptions = {}): Promise<T> {
+  async getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options: SetCacheOptions = {}): Promise<T> {
     this.logger?.debug(this.name, '[getOrLoad]', 'key =', key);
 
     const ttl = options.ttl || this.defaultTTL;
@@ -66,8 +66,8 @@ export class SWRCache implements ICache {
       ttl: ttl + this.staleTTL,
     };
 
-    const loadItem = async (): Promise<CachedItem<T>> => ({
-      data: await load(),
+    const loadItem = async (ctx: LoadContext): Promise<CachedItem<T>> => ({
+      data: await load(ctx),
       expiresAt: Date.now() + ttl * 1000,
     });
 
@@ -77,8 +77,10 @@ export class SWRCache implements ICache {
     if (item && item.expiresAt < Date.now() && !this.revalidating.has(key)) {
       this.logger?.debug(this.name, '[getOrLoad] Refreshing stale resource in background...', 'key =', key);
 
-      const promise = loadItem()
-        .then(newItem => this.cache.set(key, newItem, cacheOptions))
+      const context: LoadContext = { options: cacheOptions };
+
+      const promise = loadItem(context)
+        .then(newItem => this.cache.set(key, newItem, context.options))
         .finally(() => this.revalidating.delete(key));
 
       this.revalidating.set(key, promise);

@@ -1,4 +1,4 @@
-import type { BaseCacheOptions, ICache, SetCacheOptions } from '../../types/cache.d.ts';
+import type { BaseCacheOptions, ICache, LoadContext, SetCacheOptions } from '../../types/cache.d.ts';
 import type { Logger } from '../../types/logger.js';
 
 /**
@@ -51,7 +51,7 @@ export class CoalescingCache implements ICache {
     return promise.finally(() => this.ongoingRequests.delete(key));
   }
 
-  async getOrLoad<T>(key: string, load: () => Promise<T>, options?: SetCacheOptions): Promise<T> {
+  async getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options?: SetCacheOptions): Promise<T> {
     const ongoingRequest = this.ongoingRequests.get(key);
 
     // When there's no ongoing requests, we'll do a new one
@@ -77,8 +77,10 @@ export class CoalescingCache implements ICache {
 
     this.logger?.debug(this.name, '[getOrLoad] Refreshing the cache...', 'key =', key);
 
+    const context: LoadContext = { options: options || {} };
+
     // Otherwise, we'll load it manually
-    const promise = load();
+    const promise = load(context);
 
     this.ongoingRequests.set(key, { promise, type: 'getOrLoad' });
 
@@ -87,7 +89,7 @@ export class CoalescingCache implements ICache {
 
       // When the request is successful, we'll store it in cache
       if (request !== null) {
-        await this.cache.set(key, request, options);
+        await this.cache.set(key, request, context.options);
       }
     } finally {
       // We'll only delete from "ongoing requests" when we finish saving it

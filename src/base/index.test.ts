@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from 'vitest';
 import { BaseCache } from './index.js';
+import type { LoadContext } from '../types/cache.js';
 
 class MockedCache extends BaseCache {
   constructor() {
@@ -35,6 +36,21 @@ describe('BaseCache', () => {
       expect(result).toBe('existing');
       expect(cache.get).toHaveBeenCalledWith('key');
       expect(cache.set).not.toHaveBeenCalled();
+    });
+
+    test('should change ttl from context', async () => {
+      const cache = new MockedCache();
+      const load = vi.fn(async (ctx: LoadContext) => {
+        ctx.options.ttl = 50;
+        return 'result';
+      });
+      const options = { ttl: 30 };
+
+      const result = await cache.getOrLoad('sample', load, options);
+
+      expect(result).toBe('result');
+      expect(cache.get).toHaveBeenCalledWith('sample');
+      expect(cache.set).toHaveBeenCalledWith('sample', 'result', { ttl: 50 });
     });
   });
 

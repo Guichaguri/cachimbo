@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { LocalLRUCache } from './index.js';
+import { LRUCache } from 'lru-cache';
+import { LocalLRUCache, LocalLRUCacheFetcher, type LocalLRUCacheFetcherContext } from './index.js';
+import type { LoadContext } from '../../types/cache.js';
 
 const mockLRUCache = {
   get: vi.fn(),
@@ -55,11 +57,12 @@ describe('LocalLRUCache', () => {
       const load = vi.fn().mockResolvedValue('loaded-value');
       mockLRUCache.fetch.mockResolvedValueOnce('loaded-value');
 
-      const result = await cache.getOrLoad('key', load, { ttl: 30 });
+      const options = { ttl: 30 };
+      const result = await cache.getOrLoad('key', load, options);
 
       expect(result).toBe('loaded-value');
       expect(mockLRUCache.fetch).toHaveBeenCalledWith('key', {
-        context: load,
+        context: { load, options },
         ttl: 30000,
       });
     });
@@ -83,6 +86,26 @@ describe('LocalLRUCache', () => {
 
       expect(result).toBe('sample-value');
       expect(load).toHaveBeenCalled();
+    });
+
+    test('should update ttl when shouldUseFetch is true', async () => {
+      const lruCache = new LRUCache<string, any, LocalLRUCacheFetcherContext>({
+        max: 10,
+        fetchMethod: LocalLRUCacheFetcher
+      });
+      const cache = new LocalLRUCache({ cache: lruCache, shouldUseFetch: true });
+
+      const load = vi.fn(async (ctx: LoadContext) => {
+        ctx.options.ttl = 60;
+        return 'sample-value';
+      });
+
+      const result = await cache.getOrLoad('key', load, { ttl: 10 });
+      const remainingTTL = lruCache.getRemainingTTL('key');
+
+      expect(result).toBe('sample-value');
+      expect(load).toHaveBeenCalled();
+      expect(remainingTTL).toBeGreaterThan(59_000); // Time may have passed
     });
   });
 
@@ -118,6 +141,7 @@ describe('LocalLRUCache', () => {
     test('calls dispose when deleting', async () => {
       const cache = new LocalLRUCache();
       const onDispose = vi.fn();
+      // @ts-expect-error TS2445
       cache._addDisposeListener(onDispose);
 
       await cache.set('key', 'sample');

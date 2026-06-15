@@ -1,20 +1,21 @@
 import { LRUCache } from 'lru-cache';
-import type { BaseCacheOptions, SetCacheOptions } from '../../types/cache.js';
+import type { BaseCacheOptions, LoadContext, SetCacheOptions } from '../../types/cache.js';
 import { BaseLocalCache } from '../../base/local.js';
 
 export interface ExistingLRUCacheOptions extends BaseCacheOptions {
   /**
    * The existing instance of a LRUCache.
    */
-  cache: LRUCache<string, any, () => Promise<any>>;
+  cache: LRUCache<string, any, LocalLRUCacheFetcherContext>;
 
   /**
    * Whether it should call {@link LRUCache#fetch} when `getOrLoad` is called.
    *
    * For that, {@link LRUCache#fetchMethod} needs to call the context function:
    * ```ts
-   * new LRUCache<string, any, () => Promise<any>>({
-   *   fetchMethod: (_key, _staleValue, options) => options.context(),
+   * new LRUCache<string, any, LocalLRUCacheFetcherContext>({
+   *   fetchMethod: LocalLRUCacheFetcher,
+   *   max: 100,
    * });
    * ```
    */
@@ -33,6 +34,18 @@ export interface LocalLRUCacheOptions extends BaseCacheOptions {
   max?: number;
 }
 
+export type LocalLRUCacheFetcherContext = { load: (ctx: LoadContext) => Promise<any>, options?: SetCacheOptions };
+
+export const LocalLRUCacheFetcher = async (_key: string, _staleValue: any, options: LRUCache.FetcherOptions<string, any, LocalLRUCacheFetcherContext>) => {
+  const context: LoadContext = { options: options.context.options || {} };
+
+  const value = await options.context.load(context);
+
+  options.options.ttl = context.options.ttl ? context.options.ttl * 1000 : undefined;
+
+  return value;
+};
+
 /**
  * An in-memory cache implementation of a Least-Recently-Used cache eviction algorithm.
  *
@@ -41,7 +54,7 @@ export interface LocalLRUCacheOptions extends BaseCacheOptions {
  * Once the limit of items is reached, the least recently used items will be purged.
  */
 export class LocalLRUCache extends BaseLocalCache {
-  protected readonly cache: LRUCache<string, any, () => Promise<any>>;
+  protected readonly cache: LRUCache<string, any, LocalLRUCacheFetcherContext>;
   protected shouldUseFetch?: boolean;
 
   constructor(options: LocalLRUCacheOptions | ExistingLRUCacheOptions = {}) {
@@ -51,11 +64,11 @@ export class LocalLRUCache extends BaseLocalCache {
       this.cache = options.cache;
       this.shouldUseFetch = options.shouldUseFetch;
     } else {
-      this.cache = new LRUCache<string, any, () => Promise<any>>({
+      this.cache = new LRUCache<string, any, LocalLRUCacheFetcherContext>({
         ttl: options.ttl ? options.ttl * 1000 : undefined,
         max: options.max || 10_000,
         ttlAutopurge: false,
-        fetchMethod: (_key, _staleValue, options) => options.context(),
+        fetchMethod: LocalLRUCacheFetcher,
         disposeAfter: (value, key, reason) => this.onDispose(key, value, reason),
       });
       this.shouldUseFetch = true;
@@ -89,7 +102,7 @@ export class LocalLRUCache extends BaseLocalCache {
     this.cache.delete(key);
   }
 
-  override getOrLoad<T>(key: string, load: () => Promise<T>, options?: SetCacheOptions): Promise<T> {
+  override getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options?: SetCacheOptions): Promise<T> {
     if (!this.shouldUseFetch) {
       return super.getOrLoad(key, load, options);
     }
@@ -99,7 +112,7 @@ export class LocalLRUCache extends BaseLocalCache {
     const ttl = options?.ttl;
 
     return this.cache.fetch(key, {
-      context: load,
+      context: { load, options },
       ttl: ttl ? ttl * 1000 : undefined,
     });
   }

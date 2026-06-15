@@ -1,4 +1,4 @@
-import type { ICache, SetCacheOptions } from '../../types/cache.js';
+import type { ICache, LoadContext, SetCacheOptions } from '../../types/cache.js';
 
 interface BaseKeyTransformingCacheOptions {
   /**
@@ -60,7 +60,7 @@ export class KeyTransformingCache implements ICache {
     return this.cache.get<T>(this.transform(key));
   }
 
-  getOrLoad<T>(key: string, load: () => Promise<T>, options?: SetCacheOptions): Promise<T> {
+  getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options?: SetCacheOptions): Promise<T> {
     return this.cache.getOrLoad(this.transform(key), load, options);
   }
 

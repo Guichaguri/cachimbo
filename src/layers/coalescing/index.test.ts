@@ -100,7 +100,7 @@ describe('Coalescing Cache', () => {
       expect(mockedCache.get).toHaveBeenCalledWith('key1');
       expect(mockedCache.get).toHaveBeenCalledWith('key2');
       expect(mockedCache.set).toHaveBeenCalledTimes(1);
-      expect(mockedCache.set).toHaveBeenCalledWith('key1', 'value', undefined);
+      expect(mockedCache.set).toHaveBeenCalledWith('key1', 'value', {});
     });
   });
 

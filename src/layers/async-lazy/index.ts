@@ -1,4 +1,4 @@
-import type { ICache, SetCacheOptions } from '../../types/cache.js';
+import type { ICache, LoadContext, SetCacheOptions } from '../../types/cache.js';
 
 export interface AsyncLazyCacheOptions {
   /**
@@ -57,7 +57,7 @@ export class AsyncLazyCache implements ICache {
     return (await this.resolveCache()).get<T>(key);
   }
 
-  async getOrLoad<T>(key: string, load: () => Promise<T>, options?: SetCacheOptions): Promise<T> {
+  async getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options?: SetCacheOptions): Promise<T> {
     return (await this.resolveCache()).getOrLoad<T>(key, load, options);
   }
 

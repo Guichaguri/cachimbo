@@ -1,4 +1,4 @@
-import type { BaseCacheOptions, SetCacheOptions } from '../../types/cache.js';
+import type { BaseCacheOptions, LoadContext, SetCacheOptions } from '../../types/cache.js';
 import { BaseLocalCache, type LocalCacheInternal } from '../../base/local.js';
 
 export interface WeakCacheOptions extends BaseCacheOptions {
@@ -87,8 +87,8 @@ export class WeakCache extends BaseLocalCache {
     this.cacheInternal._deleteMany(keys);
   }
 
-  override async getOrLoad<T>(key: string, load: () => Promise<T>, options?: SetCacheOptions): Promise<T> {
-    const wrappedLoad = async () => this.wrapAndRegister(key, await load());
+  override async getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options?: SetCacheOptions): Promise<T> {
+    const wrappedLoad = async (ctx: LoadContext) => this.wrapAndRegister(key, await load(ctx));
 
     return this.unwrap<T>(await this.cache.getOrLoad<WeakValue>(key, wrappedLoad, options))!;
   }

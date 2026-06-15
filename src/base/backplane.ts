@@ -1,4 +1,4 @@
-import type { BaseCacheOptions, ICache, SetCacheOptions } from '../types/cache.js';
+import type { BaseCacheOptions, ICache, LoadContext, SetCacheOptions } from '../types/cache.js';
 import type { BaseLocalCache } from './local.js';
 import type { Logger } from '../types/logger.js';
 
@@ -57,9 +57,9 @@ export abstract class BaseBackplane implements ICache {
     return this.cache.get<T>(key);
   }
 
-  getOrLoad<T>(key: string, load: () => Promise<T>, options?: SetCacheOptions): Promise<T> {
-    const loadWrapped = async (): Promise<T> => {
-      const data = await load();
+  getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options?: SetCacheOptions): Promise<T> {
+    const loadWrapped = async (ctx: LoadContext): Promise<T> => {
+      const data = await load(ctx);
 
       if (this.mode === 'active') {
         await this.emit({ action: 'set', key, data, options });

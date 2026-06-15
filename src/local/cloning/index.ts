@@ -1,5 +1,5 @@
 import { BaseLocalCache, type LocalCacheInternal } from '../../base/local.js';
-import type { BaseCacheOptions, SetCacheOptions } from '../../types/cache.js';
+import type { BaseCacheOptions, LoadContext, SetCacheOptions } from '../../types/cache.js';
 
 export interface DeepCloningCacheOptions extends BaseCacheOptions {
   /**
@@ -79,8 +79,8 @@ export class DeepCloningCache extends BaseLocalCache {
     this.cacheInternal._addDisposeListener(listener);
   }
 
-  override async getOrLoad<T>(key: string, load: () => Promise<T>, options?: SetCacheOptions): Promise<T> {
-    const loadWrapped = async () => this.deepClone(await load());
+  override async getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options?: SetCacheOptions): Promise<T> {
+    const loadWrapped = async (ctx: LoadContext) => this.deepClone(await load(ctx));
 
     return this.deepClone(await this.cache.getOrLoad(key, loadWrapped, options));
   }
