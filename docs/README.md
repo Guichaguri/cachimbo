@@ -22,7 +22,7 @@ npm install cachimbo
 - [Cloudflare Workers KV](./stores/cloudflare-workers-kv.md)
 - [Hazelcast](./stores/hazelcast.md)
 - [NATS](./stores/nats.md)
-- [Keyv](./stores/keyv.md)
+- [Keyv](./stores/keyv.md) (SQLite, PostgreSQL, MongoDB, etc.)
 - [IndexedDB](./stores/indexeddb.md) (for browsers)
 
 ## Cache Layers

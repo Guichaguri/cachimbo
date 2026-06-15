@@ -43,6 +43,8 @@ cache = new SWRCache({
 You can also use other cache stores such as Redis, Memcached or Valkey, Cloudflare Workers KV, or even Keyv as the underlying storage.
 Check [all available cache stores and layers](../README.md), you also might need help to [choose the right combination of layers](./choosing-layers.md).
 
+The `ICache` interface is the common interface for all cache implementations, so you can easily swap out the underlying cache store or layers without changing your application code.
+
 ### Reading and writing data
 
 You can now read and write data from cache in various ways:
@@ -54,6 +56,26 @@ You can now read and write data from cache in various ways:
 const data = await cache.getOrLoad<MyData>(
   "mykey", // the cache key
   () => loadData(), // function to load data if not in cache
+  { ttl: 60 * 3 }, // cache for 3 minutes
+);
+```
+
+You can also use the `context` parameter to set options dynamically based on the load result:
+
+```ts
+// Get or fetch data
+const data = await cache.getOrLoad<MyData>(
+  "mykey", // the cache key
+  async (context: LoadContext) => {
+    const value = await loadData();
+    
+    if (value.category === 'finance') {
+      // We can set a different TTL for this entry
+      context.options.ttl = 60; // cache for only 1 minute
+    }
+    
+    return value;
+  },
   { ttl: 60 * 3 }, // cache for 3 minutes
 );
 ```

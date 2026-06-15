@@ -106,7 +106,7 @@ const amqpConnection = await connect('amqp://rabbitmq:rabbitmq@localhost:5672');
 const cacheWithBackplane = new AmqpBackplane({
   connection: amqpConnection,
   mode: 'active', // or 'lazy', depending on your needs
-  exchange: 'sample-backplane', // this should be unique across your organization to avoid collisions with other applications using the same RabbitMQ instance. You can also use a topic exchange and set a routing key if you want to have more control over which instances receive which events.
+  exchange: 'sample-backplane', // this should be unique across your organization to avoid collisions with other applications using the same RabbitMQ instance
   cache: new LocalTTLCache(), // this can be any in-memory cache
 });
 ```

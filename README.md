@@ -18,7 +18,7 @@ Cachimbo is a composable caching library that allows layering different strategi
   - Cloudflare Workers KV
   - Hazelcast
   - NATS
-  - Keyv
+  - Keyv (SQLite, PostgreSQL, MongoDB, etc.)
   - IndexedDB (for browsers)
 - Supports in-memory cache stores
   - Least Recently Used (LRU) eviction
@@ -86,7 +86,7 @@ External caches (like Redis, Memcached, etc.) provide fast, scalable, shared sto
 - [Cloudflare Workers KV](/docs/stores/cloudflare-workers-kv.md)
 - [Hazelcast](/docs/stores/hazelcast.md)
 - [NATS](/docs/stores/nats.md)
-- [Keyv](/docs/stores/keyv.md)
+- [Keyv](/docs/stores/keyv.md) (SQLite, PostgreSQL, MongoDB, etc.)
 - [IndexedDB](/docs/stores/indexeddb.md) (for browsers)
 
 ## Cache Layers
