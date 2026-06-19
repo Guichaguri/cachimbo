@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BaseBackplane } from './backplane.js';
 import type { BaseLocalCache } from './local.js';
 import type { Logger } from '../types/logger.js';
@@ -32,6 +32,10 @@ describe('BaseBackplane', () => {
   const backplane = new MockBackplane({ cache: mockCache as any, logger: mockLogger });
   const testableBackplane = new TestableBackplane({ cache: mockCache as any, logger: mockLogger });
   const lazyBackplane = new MockBackplane({ cache: mockCache as any, logger: mockLogger, mode: 'lazy' });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('should call cache.get on get', async () => {
     mockCache.get.mockResolvedValueOnce('value');
@@ -94,29 +98,41 @@ describe('BaseBackplane', () => {
 
   it('should call cache.getOrLoad with loadWrapped', async () => {
     const load = vi.fn().mockResolvedValue('loaded-data');
-    mockCache.getOrLoad.mockResolvedValueOnce('cached-data');
+    mockCache.getOrLoad.mockImplementationOnce(async (_, load) => load());
     const emitSpy = vi.spyOn(backplane, 'emit');
 
-    const result = await backplane.getOrLoad('key', load, { ttl: 100 });
+    const result = await backplane.getOrLoad('key2', load, { ttl: 100 });
+
+    expect(mockCache.getOrLoad).toHaveBeenCalledWith(
+      'key2',
+      expect.any(Function),
+      { ttl: 100 }
+    );
+    expect(result).toBe('loaded-data');
+    expect(load).toHaveBeenCalled();
+    expect(emitSpy).toHaveBeenCalledWith({ action: 'set', key: 'key2', data: 'loaded-data', options: { ttl: 100 } });
+  });
+
+  it('should call cache.getOrLoad with loadWrapped in lazy mode', async () => {
+    const load = vi.fn().mockResolvedValue('loaded-data');
+    mockCache.getOrLoad.mockImplementationOnce(async (_, load) => load());
+    const emitSpy = vi.spyOn(lazyBackplane, 'emit');
+
+    const result = await lazyBackplane.getOrLoad('key', load, { ttl: 100 });
 
     expect(mockCache.getOrLoad).toHaveBeenCalledWith(
       'key',
       expect.any(Function),
       { ttl: 100 }
     );
-    expect(result).toBe('cached-data');
-
-    const loadWrapped = mockCache.getOrLoad.mock.calls[mockCache.getOrLoad.mock.calls.length - 1][1] as () => Promise<any>;
-    const loadResult = await loadWrapped();
-
+    expect(result).toBe('loaded-data');
     expect(load).toHaveBeenCalled();
-    expect(emitSpy).toHaveBeenCalledWith({ action: 'set', key: 'key', data: 'loaded-data', options: { ttl: 100 } });
-    expect(loadResult).toBe('loaded-data');
+    expect(emitSpy).toHaveBeenCalledWith({ action: 'delete', key: 'key' });
   });
 
-  it('should call cache.getOrLoad with loadWrapped in lazy mode', async () => {
+  it('should call cache.getOrLoad with cached data', async () => {
     const load = vi.fn().mockResolvedValue('loaded-data');
-    mockCache.getOrLoad.mockResolvedValueOnce('cached-data');
+    mockCache.getOrLoad.mockResolvedValue('cached-data');
     const emitSpy = vi.spyOn(lazyBackplane, 'emit');
 
     const result = await lazyBackplane.getOrLoad('key', load, { ttl: 100 });
@@ -127,13 +143,8 @@ describe('BaseBackplane', () => {
       { ttl: 100 }
     );
     expect(result).toBe('cached-data');
-
-    const loadWrapped = mockCache.getOrLoad.mock.calls[mockCache.getOrLoad.mock.calls.length - 1][1] as () => Promise<any>;
-    const loadResult = await loadWrapped();
-
-    expect(load).toHaveBeenCalled();
-    expect(emitSpy).toHaveBeenCalledWith({ action: 'delete', key: 'key' });
-    expect(loadResult).toBe('loaded-data');
+    expect(load).not.toHaveBeenCalled();
+    expect(emitSpy).not.toHaveBeenCalled();
   });
 
   it('should handle delete event in receiveEvent', async () => {

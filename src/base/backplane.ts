@@ -57,20 +57,28 @@ export abstract class BaseBackplane implements ICache {
     return this.cache.get<T>(key);
   }
 
-  getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options?: SetCacheOptions): Promise<T> {
-    const loadWrapped = async (ctx: LoadContext): Promise<T> => {
-      const data = await load(ctx);
+  async getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options?: SetCacheOptions): Promise<T> {
+    let loaded = false;
 
+    const loadWrapped = async (ctx: LoadContext): Promise<T> => {
+      const result = await load(ctx);
+
+      loaded = true;
+
+      return result;
+    };
+
+    const data = await this.cache.getOrLoad(key, loadWrapped, options);
+
+    if (loaded) {
       if (this.mode === 'active') {
         await this.emit({ action: 'set', key, data, options });
       } else {
         await this.emit({ action: 'delete', key });
       }
+    }
 
-      return data;
-    };
-
-    return this.cache.getOrLoad(key, loadWrapped, options);
+    return data;
   }
 
   async set<T>(key: string, data: T, options?: SetCacheOptions): Promise<void> {
