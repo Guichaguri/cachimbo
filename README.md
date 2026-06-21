@@ -110,6 +110,7 @@ Each layer intercepts cache operations to add behavior. Layers can be stacked to
 - [Getting Started](/docs/guides/getting-started.md)
 - [Choosing the right combination of layers](/docs/guides/choosing-layers.md)
 - [Disabling cache](/docs/guides/disabling.md)
+- [Negative caching](/docs/guides/negative-caching.md)
 - [Testing](/docs/guides/testing.md)
 - [Extending](/docs/guides/extending.md)
 - [Design Principles](/docs/guides/design-principles.md)

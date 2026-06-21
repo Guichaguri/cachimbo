@@ -10,6 +10,7 @@ npm install cachimbo
 - [Getting Started](./guides/getting-started.md)
 - [Choosing the right combination of layers](./guides/choosing-layers.md)
 - [Disabling cache](./guides/disabling.md)
+- [Negative caching](./guides/negative-caching.md)
 - [Testing](./guides/testing.md)
 - [Extending](./guides/extending.md)
 - [Design Principles](./guides/design-principles.md)
