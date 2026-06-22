@@ -51,7 +51,7 @@ export class IndexedDBCache extends BaseCache {
   protected readonly storeName: string;
   protected readonly shouldAutoEvict: boolean;
   protected dbPromise: Promise<IDBDatabase> | null = null;
-  protected shouldEvict: boolean = false;
+  protected shouldEvict: boolean = true;
 
   constructor(options: IndexedDBCacheOptions) {
     super(options);
@@ -156,6 +156,9 @@ export class IndexedDBCache extends BaseCache {
     this.shouldEvict = false;
   }
 
+  /**
+   * Gets the IndexedDB database instance, creating it if it doesn't exist.
+   */
   protected getDatabase(): Promise<IDBDatabase> {
     if (this.dbPromise) {
       return this.dbPromise;
@@ -172,12 +175,21 @@ export class IndexedDBCache extends BaseCache {
     return this.dbPromise;
   }
 
+  /**
+   * Executes an IndexedDB transaction
+   * @param mode Whether the transaction is readonly or readwrite
+   * @param runner The function that will run the transaction
+   */
   protected async do<T>(mode: IDBTransactionMode, runner: (store: IDBObjectStore) => Promise<T>): Promise<T> {
     return this.getDatabase().then(
       db => runner(db.transaction(this.storeName, mode).objectStore(this.storeName))
     );
   }
 
+  /**
+   * Converts an IndexedDB request into a Promise that resolves with the result.
+   * @param request The request to convert
+   */
   protected promisifyRequest<T>(request: IDBRequest<T> | IDBTransaction): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       // @ts-ignore
@@ -187,6 +199,11 @@ export class IndexedDBCache extends BaseCache {
     });
   }
 
+  /**
+   * Loads an item from the database and validates the expiration time
+   * @param store The transaction store
+   * @param key The item key
+   */
   protected async storeGet<T>(store: IDBObjectStore, key: string): Promise<T | null> {
     const entry: IDBStoredEntry<T> | undefined = await this.promisifyRequest(store.get(key));
 
@@ -203,6 +220,9 @@ export class IndexedDBCache extends BaseCache {
     return entry.v;
   }
 
+  /**
+   * Automatically evicts if needed
+   */
   protected async autoEvict(): Promise<void> {
     if (this.shouldAutoEvict && this.shouldEvict) {
       await this.evict();
