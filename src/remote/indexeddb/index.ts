@@ -159,7 +159,7 @@ export class IndexedDBCache extends BaseCache {
   /**
    * Gets the IndexedDB database instance, creating it if it doesn't exist.
    */
-  protected getDatabase(): Promise<IDBDatabase> {
+  protected async getDatabase(): Promise<IDBDatabase> {
     if (this.dbPromise) {
       return this.dbPromise;
     }
@@ -170,7 +170,7 @@ export class IndexedDBCache extends BaseCache {
 
     this.dbPromise = this.promisifyRequest(request);
 
-    this.autoEvict();
+    await this.autoEvict();
 
     return this.dbPromise;
   }
