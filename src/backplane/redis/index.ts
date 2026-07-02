@@ -48,6 +48,7 @@ export class RedisBackplane extends BaseBackplane {
     this.channel = options.channel;
 
     this.subscriptionClient.subscribe(this.channel, this.onMessage, false);
+    this.nodeId = this.generateNodeId();
   }
 
   protected onMessage = (message: string) => {

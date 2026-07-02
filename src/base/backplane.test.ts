@@ -9,6 +9,12 @@ class MockBackplane extends BaseBackplane {
 }
 
 class TestableBackplane extends MockBackplane {
+  testSetNodeId(nodeId: string | undefined) {
+    this.nodeId = nodeId;
+  }
+  testGenerateNodeId() {
+    return this.generateNodeId();
+  }
   testReceiveEvent(event: any) {
     return this.receiveEvent(event);
   }
@@ -148,7 +154,9 @@ describe('BaseBackplane', () => {
   });
 
   it('should handle delete event in receiveEvent', async () => {
-    await testableBackplane.testReceiveEvent({ action: 'delete', key: 'key' });
+    testableBackplane.testSetNodeId('sample');
+
+    await testableBackplane.testReceiveEvent({ action: 'delete', key: 'key', nodeId: 'another' });
     expect(mockCache.delete).toHaveBeenCalledWith('key');
   });
 
@@ -177,5 +185,35 @@ describe('BaseBackplane', () => {
     await testableBackplane.testReceiveEvent(failingEvent);
 
     expect(mockLogger.debug).toHaveBeenCalled();
+  });
+
+  it('should not process events from the same node id in receiveEvent', async () => {
+    testableBackplane.testSetNodeId('sample');
+
+    const unknownEvent = { action: 'unknown', key: 'key', nodeId: 'sample' } as any;
+
+    await testableBackplane.testReceiveEvent(unknownEvent);
+
+    expect(mockCache.set).not.toHaveBeenCalledWith();
+    expect(mockCache.delete).not.toHaveBeenCalledWith();
+    expect(mockCache.setMany).not.toHaveBeenCalledWith();
+    expect(mockCache.deleteMany).not.toHaveBeenCalledWith();
+    expect(mockLogger.debug).not.toHaveBeenCalled();
+  });
+
+  it('should generate a new node id with crypto', async () => {
+    global.crypto.randomUUID = vi.fn().mockReturnValue('uuid-from-crypto');
+
+    const nodeId = testableBackplane.testGenerateNodeId();
+
+    expect(nodeId).toBe('uuid-from-crypto');
+  });
+
+  it('should generate a new node id with math', async () => {
+    global.crypto.randomUUID = undefined as any;
+
+    const nodeId = testableBackplane.testGenerateNodeId();
+
+    expect(nodeId).toBeDefined();
   });
 });

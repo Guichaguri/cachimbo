@@ -46,6 +46,7 @@ export class IORedisBackplane extends BaseBackplane {
 
     this.subscriptionClient.subscribe(this.channel);
     this.subscriptionClient.on('message', this.onMessage);
+    this.nodeId = this.generateNodeId();
   }
 
   protected onMessage = (channel: string, message: string) => {

@@ -46,6 +46,7 @@ export class AmqpBackplane extends BaseBackplane {
       await channel.bindQueue(queue, this.exchange, '');
 
       this.consumerTag = consumerTag;
+      this.nodeId = consumerTag;
     } catch (error) {
       this.logger?.debug(this.name, '[initialize] Failed to initialize the pub/sub.',
         'error = ', error);

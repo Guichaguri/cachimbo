@@ -33,6 +33,7 @@ export class NatsBackplane extends BaseBackplane {
     this.subject = options.subject;
 
     this.subscription = this.nats.subscribe(this.subject, { callback: this.onMessage });
+    this.nodeId = this.generateNodeId();
   }
 
   protected onMessage = (err: Error | null, msg: Msg) => {

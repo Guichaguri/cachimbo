@@ -32,6 +32,7 @@ export class HazelcastBackplane extends BaseBackplane {
     this.topic = options.topic;
 
     this.listenerId = this.topic.addMessageListener(this.onMessage);
+    this.nodeId = this.listenerId;
   }
 
   protected onMessage = (event: Message<BackplaneEvent>) => {

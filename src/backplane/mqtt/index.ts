@@ -33,6 +33,7 @@ export class MqttBackplane extends BaseBackplane {
 
     this.client.subscribe(this.topic);
     this.client.on('message', this.onMessage);
+    this.nodeId = this.generateNodeId();
   }
 
   protected onMessage = (topic: string, event: Buffer) => {

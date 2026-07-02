@@ -7,16 +7,20 @@ export type BackplaneEvent = {
   key: string,
   data: any,
   options?: SetCacheOptions,
+  nodeId?: string,
 } | {
   action: 'delete',
   key: string,
+  nodeId?: string,
 } | {
   action: 'setMany',
   data: Record<string, any>;
   options?: SetCacheOptions,
+  nodeId?: string,
 } | {
   action: 'deleteMany',
   keys: string[],
+  nodeId?: string,
 };
 
 export interface BaseBackplaneOptions extends BaseCacheOptions {
@@ -45,12 +49,21 @@ export abstract class BaseBackplane implements ICache {
   protected readonly mode: 'active' | 'lazy';
   protected readonly logger?: Logger;
   protected readonly name?: string;
+  protected nodeId?: string;
 
   constructor(options: BaseBackplaneOptions) {
     this.cache = options.cache;
     this.mode = options.mode || 'active';
     this.logger = options.logger;
     this.name = options.name;
+  }
+
+  protected generateNodeId(): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+
+    return Math.random().toString(36).substring(2, 15);
   }
 
   get<T>(key: string): Promise<T | null> {
@@ -72,9 +85,9 @@ export abstract class BaseBackplane implements ICache {
 
     if (loaded) {
       if (this.mode === 'active') {
-        await this.emit({ action: 'set', key, data, options });
+        await this.emit({ action: 'set', key, data, options, nodeId: this.nodeId });
       } else {
-        await this.emit({ action: 'delete', key });
+        await this.emit({ action: 'delete', key, nodeId: this.nodeId });
       }
     }
 
@@ -85,15 +98,15 @@ export abstract class BaseBackplane implements ICache {
     await this.cache.set<T>(key, data, options);
 
     if (this.mode === 'active') {
-      await this.emit({ action: 'set', key, data, options });
+      await this.emit({ action: 'set', key, data, options, nodeId: this.nodeId });
     } else {
-      await this.emit({ action: 'delete', key });
+      await this.emit({ action: 'delete', key, nodeId: this.nodeId });
     }
   }
 
   async delete(key: string): Promise<void> {
     await this.cache.delete(key);
-    await this.emit({ action: 'delete', key });
+    await this.emit({ action: 'delete', key, nodeId: this.nodeId });
   }
 
   getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
@@ -104,15 +117,15 @@ export abstract class BaseBackplane implements ICache {
     await this.cache.setMany<T>(data, options);
 
     if (this.mode === 'active') {
-      await this.emit({ action: 'setMany', data, options });
+      await this.emit({ action: 'setMany', data, options, nodeId: this.nodeId });
     } else {
-      await this.emit({ action: 'deleteMany', keys: Object.keys(data) });
+      await this.emit({ action: 'deleteMany', keys: Object.keys(data), nodeId: this.nodeId });
     }
   }
 
   async deleteMany(keys: string[]): Promise<void> {
     await this.cache.deleteMany(keys);
-    await this.emit({ action: 'deleteMany', keys });
+    await this.emit({ action: 'deleteMany', keys, nodeId: this.nodeId });
   }
 
   /**
@@ -121,6 +134,11 @@ export abstract class BaseBackplane implements ICache {
    * @param event The event data
    */
   protected async receiveEvent(event: BackplaneEvent): Promise<void> {
+    // In case the event came from this exact node, we don't need to process it again
+    if (event.nodeId && event.nodeId === this.nodeId) {
+      return;
+    }
+
     try {
       switch (event.action) {
         case "set":
