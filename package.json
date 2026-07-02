@@ -29,7 +29,8 @@
     "sample:mqtt-backplane-cache": "tsx ./samples/12-mqtt-backplane-cache.ts",
     "sample:nats-cache": "tsx ./samples/13-nats-cache.ts",
     "sample:nats-backplane-cache": "tsx ./samples/14-nats-backplane-cache.ts",
-    "sample:amqp-backplane-cache": "tsx ./samples/15-amqp-backplane-cache.ts"
+    "sample:amqp-backplane-cache": "tsx ./samples/15-amqp-backplane-cache.ts",
+    "sample:hazelcast-backplane-cache": "tsx ./samples/16-hazelcast-backplane-cache.ts"
   },
   "keywords": [
     "cache",

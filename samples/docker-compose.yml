@@ -34,3 +34,9 @@ services:
       - "5672:5672"
     labels:
       NAME: "rabbit-cachimbo"
+  hazelcast:
+    image: hazelcast/hazelcast:5.7
+    ports:
+      - "5701:5701"
+    environment:
+      HZ_CLUSTERNAME: "dev"
