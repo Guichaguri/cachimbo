@@ -1,6 +1,5 @@
 import { BaseCache } from '../../base/index.js';
 import type { BaseCacheOptions, SetCacheOptions } from '../../types/cache.js';
-import { IDBKeyRange } from 'fake-indexeddb';
 
 export interface IndexedDBCacheOptions extends BaseCacheOptions {
   /**
