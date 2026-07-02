@@ -36,7 +36,7 @@ describe('WeakCache', () => {
     await weakCache.set('test123', { data: 'value2' });
 
     // Simulate weak reference already cleared
-    await underlyingCache.set('test123', { v: { deref: () => null }, w: true });
+    await underlyingCache.set('test123', { v: { deref: () => undefined }, w: true });
 
     expect(await weakCache.get('test123')).toBeNull();
   });
@@ -64,6 +64,16 @@ describe('WeakCache', () => {
       key4: null,
       key5: null,
     });
+  });
+
+  test('should delete garbage collected value', async () => {
+    await weakCache.set('key3', { data: 'value3' });
+
+    // Simulate weak reference already cleared
+    await underlyingCache.set('key3', { v: { deref: () => undefined }, w: true });
+
+    await weakCache.delete('key3');
+    expect(await weakCache.get('key3')).toBeNull();
   });
 
   test('should load values using getOrLoad', async () => {

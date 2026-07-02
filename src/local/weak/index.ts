@@ -137,7 +137,11 @@ export class WeakCache extends BaseLocalCache {
    */
   protected unregister(value: WeakValue | null): void {
     if (value && value.w) {
-      this.registry.unregister(value.v);
+      const obj = value.v.deref();
+
+      if (obj !== undefined) {
+        this.registry.unregister(obj);
+      }
     }
   }
 
