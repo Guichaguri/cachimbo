@@ -2,7 +2,7 @@
 
 [NATS](https://nats.io/) is an open source, distributed, lightweight messaging system and key-value store.
 
-The library has built-in support for the [nats.js](https://github.com/nats-io/nats.js#readme) client through the `NATSCache` class.
+The library has built-in support for the [nats.js](https://github.com/nats-io/nats.js#readme) client through the `NatsCache` class.
 
 ```sh
 npm install @nats-io/kv @nats-io/transport-node
@@ -27,3 +27,4 @@ const cache = new NatsCache({ kv: cacheKv });
 
 - NATS KV does not support per-item TTL, so the TTL is set at the bucket level. This means that all items in the cache will have the same TTL, which may not be ideal for all use cases.
 - NATS KV does not support batch operations, so methods like `getMany`, `setMany` and `deleteMany` will operate on keys one by one, which may have performance implications for large batches.
+- NATS KV only supports `[-/_=.a-zA-Z0-9]` characters in keys, so you may need to encode/decode keys if you want to use other characters.

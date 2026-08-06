@@ -2,12 +2,12 @@
 
 When caching resources at the same time, they will also expire at the same time. This can lead to cache stampedes and thundering herds, where many requests hit the backend simultaneously to refresh the cache.
 
-To solve this issue, you can add the `JitterCache` layer, which adds a random jitter to the TTL of cached items. This spreads out the expiration times, reducing the likelihood of simultaneous cache misses.
+To solve this issue, you can add the `JitteringCache` layer, which adds a random jitter to the TTL of cached items. This spreads out the expiration times, reducing the likelihood of simultaneous cache misses.
 
 ```ts
-import { JitterCache } from 'cachimbo';
+import { JitteringCache } from 'cachimbo';
 
-const jitterCache = new JitterCache({
+const jitterCache = new JitteringCache({
   cache: anotherCache,
   defaultTTL: 120, // Default expiration when no TTL is defined
   maxJitterTTL: 30, // Maximum jitter time to add to the TTL

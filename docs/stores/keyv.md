@@ -17,7 +17,7 @@ import KeyvSqlite from '@keyv/sqlite';
 const keyv = new Keyv(new KeyvSqlite('sqlite://path/to/database.sqlite'));
 
 const keyvCache = new KeyvCache({
-  store: keyv,
+  keyv: keyv,
 });
 ```
 

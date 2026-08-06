@@ -93,6 +93,8 @@ export async function createCache(): Promise<ICache> {
   const redisClient = await createClient({
     url: process.env.REDIS_URL,
   });
+  
+  await redisClient.connect();
 
   return new SWRCache({
     cache: new RedisCache({
@@ -113,7 +115,7 @@ jest.mock("@redis/client", () => ({
   createClient: jest.fn().mockResolvedValue({ connect: jest.fn() }),
 }));
 
-test("should create NoOpCache when caching is disabled", async () => {)
+test("should create NoOpCache when caching is disabled", async () => {
   process.env.CACHE_DISABLED = 'true';
 
   const cache = await createCache();
@@ -122,7 +124,7 @@ test("should create NoOpCache when caching is disabled", async () => {)
   expect(createClient).not.toHaveBeenCalled();
 });
 
-test("should create SWRCache with RedisCache when caching is enabled", async () => {)
+test("should create SWRCache with RedisCache when caching is enabled", async () => {
   process.env.CACHE_DISABLED = 'false';
   process.env.REDIS_URL = 'redis://localhost:6379';
 

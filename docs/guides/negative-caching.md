@@ -39,6 +39,10 @@ if (data.status === 'success') {
 You can also cache internal errors to prevent repeated attempts to load a resource that is currently experiencing issues. For example, if your database is down, you can cache an error response for a short period of time to avoid overwhelming the database with requests.
 
 ```ts
+type BlogPostResult =
+  | { status: 'success'; value: BlogPost } // Represents a successful load with the cached value
+  | { status: 'internal-error'; error: string }; // Represents an internal error
+
 const data = await cache.getOrLoad<BlogPostResult>(
   `blog-post-${id}`,
   async (context) => {

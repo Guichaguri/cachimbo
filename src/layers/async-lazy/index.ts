@@ -26,7 +26,7 @@ export interface AsyncLazyCacheOptions {
  *
  * @example
  * ```ts
- * const cache = new AsyncCache({
+ * const cache = new AsyncLazyCache({
  *   factory: async () => {
  *     const redisClient = await createClient({
  *       url: "redis://user:password@localhost:6380",
