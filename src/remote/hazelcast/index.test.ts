@@ -37,14 +37,22 @@ describe('HazelcastCache', () => {
     expect(result).toBeUndefined();
   });
 
-  test('should set a value with a key', async () => {
+  test('should set a value with a key and a TTL', async () => {
     const key = 'test-key';
     const value = 'test-value';
-    const ttl = 1000;
 
-    await cache.set(key, value, { ttl });
+    await cache.set(key, value, { ttl: 10 });
 
-    expect(mockMap.set).toHaveBeenCalledWith(key, value, ttl);
+    expect(mockMap.set).toHaveBeenCalledWith(key, value, 10_000);
+  });
+
+  test('should set a value with a key without a TTL', async () => {
+    const key = 'test-key';
+    const value = 'test-value';
+
+    await cache.set(key, value);
+
+    expect(mockMap.set).toHaveBeenCalledWith(key, value, undefined);
   });
 
   test('should delete a value by key', async () => {

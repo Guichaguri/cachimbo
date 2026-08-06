@@ -37,8 +37,8 @@ export class HazelcastCache extends BaseCache {
     return value === null ? undefined : value;
   }
 
-  set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {
-    return this.map.set(key, value, options?.ttl);
+  set<T>(key: string, value: T, options: SetCacheOptions = {}): Promise<void> {
+    return this.map.set(key, value, options.ttl ? options.ttl * 1000 : undefined);
   }
 
   delete(key: string): Promise<void> {
