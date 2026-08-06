@@ -32,6 +32,7 @@ export * from './backplane/mqtt/index.js';
 export * from './backplane/hazelcast/index.js';
 export * from './backplane/nats/index.js';
 export * from './backplane/amqp/index.js';
+export * from './backplane/broadcast-channel/index.js';
 
 // Layers
 export * from './layers/async-lazy/index.js';
