@@ -41,7 +41,7 @@ describe('KeyvCache', () => {
     test('stores the value with the specified TTL', async () => {
       const cache = new KeyvCache({ keyv: mockKeyv });
 
-      await cache.set('key', 'value', { ttl: 5000 });
+      await cache.set('key', 'value', { ttl: 5 });
 
       expect(mockKeyv.set).toHaveBeenCalledWith('key', 'value', 5000);
     });
@@ -82,12 +82,26 @@ describe('KeyvCache', () => {
       const cache = new KeyvCache({ keyv: mockKeyv });
       const data = { key1: 'value1', key2: 'value2' };
 
-      await cache.setMany(data, { ttl: 10000 });
+      await cache.setMany(data, { ttl: 10 });
 
       expect(mockKeyv.setMany).toHaveBeenCalledWith(
         [
           { key: 'key1', value: 'value1', ttl: 10000 },
           { key: 'key2', value: 'value2', ttl: 10000 },
+        ],
+      );
+    });
+
+    test('stores multiple values with no TTL', async () => {
+      const cache = new KeyvCache({ keyv: mockKeyv });
+      const data = { key1: 'value1', key2: 'value2' };
+
+      await cache.setMany(data);
+
+      expect(mockKeyv.setMany).toHaveBeenCalledWith(
+        [
+          { key: 'key1', value: 'value1', ttl: undefined },
+          { key: 'key2', value: 'value2', ttl: undefined },
         ],
       );
     });
