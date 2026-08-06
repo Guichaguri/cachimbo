@@ -71,6 +71,21 @@ describe('BaseBackplane', () => {
     expect(emitSpy).toHaveBeenCalledWith({ action: 'delete', key: 'key' });
   });
 
+  it('should not fail the cache operation when publishing to the backplane fails', async () => {
+    backplane.emit.mockRejectedValueOnce(new Error('backplane is down'));
+
+    // The local cache has already been updated, so the operation must still succeed
+    await expect(backplane.set('key', 'value')).resolves.toBeUndefined();
+
+    expect(mockCache.set).toHaveBeenCalledWith('key', 'value', undefined);
+    expect(mockLogger.debug).toHaveBeenCalledWith(
+      undefined,
+      '[publish] Failed to publish the event to the backplane.',
+      'data =', expect.any(Object),
+      'error =', expect.any(Error),
+    );
+  });
+
   it('should call cache.getMany on getMany', async () => {
     mockCache.getMany.mockResolvedValueOnce({ key1: 'value1', key2: 'value2' });
     const result = await backplane.getMany(['key1', 'key2']);

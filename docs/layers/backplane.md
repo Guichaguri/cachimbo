@@ -177,4 +177,5 @@ await cacheWithBackplane.set("key", "value");
 
 - There might be a slight delay between the time an entry is invalidated in one instance and the time other instances receive the invalidation event, depending on the backplane server's performance. Keep in mind that in this short period of time, different instances might have inconsistent cache states.
 - Make sure to handle potential connection issues with the backplane store gracefully to avoid losing invalidation events.
+- A failure to publish an event does **not** fail the cache operation. The local cache has already been updated at that point, so failing the whole operation would make the cache less reliable than not having a backplane at all. The failure is reported through the `logger`, and the nodes may hold different values until the next update of that key. Pass a `logger` to detect it.
 - A Redis client can only be used for either pub-sub or regular cache operations, but not both. If you're using Redis as your backplane, you will have to create separate clients for publishing and subscribing.

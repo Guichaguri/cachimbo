@@ -85,9 +85,9 @@ export abstract class BaseBackplane implements ICache {
 
     if (loaded) {
       if (this.mode === 'active') {
-        await this.emit({ action: 'set', key, data, options, nodeId: this.nodeId });
+        await this.publish({ action: 'set', key, data, options, nodeId: this.nodeId });
       } else {
-        await this.emit({ action: 'delete', key, nodeId: this.nodeId });
+        await this.publish({ action: 'delete', key, nodeId: this.nodeId });
       }
     }
 
@@ -98,15 +98,15 @@ export abstract class BaseBackplane implements ICache {
     await this.cache.set<T>(key, data, options);
 
     if (this.mode === 'active') {
-      await this.emit({ action: 'set', key, data, options, nodeId: this.nodeId });
+      await this.publish({ action: 'set', key, data, options, nodeId: this.nodeId });
     } else {
-      await this.emit({ action: 'delete', key, nodeId: this.nodeId });
+      await this.publish({ action: 'delete', key, nodeId: this.nodeId });
     }
   }
 
   async delete(key: string): Promise<void> {
     await this.cache.delete(key);
-    await this.emit({ action: 'delete', key, nodeId: this.nodeId });
+    await this.publish({ action: 'delete', key, nodeId: this.nodeId });
   }
 
   getMany<T>(keys: string[]): Promise<Record<string, T>> {
@@ -117,15 +117,15 @@ export abstract class BaseBackplane implements ICache {
     await this.cache.setMany<T>(data, options);
 
     if (this.mode === 'active') {
-      await this.emit({ action: 'setMany', data, options, nodeId: this.nodeId });
+      await this.publish({ action: 'setMany', data, options, nodeId: this.nodeId });
     } else {
-      await this.emit({ action: 'deleteMany', keys: Object.keys(data), nodeId: this.nodeId });
+      await this.publish({ action: 'deleteMany', keys: Object.keys(data), nodeId: this.nodeId });
     }
   }
 
   async deleteMany(keys: string[]): Promise<void> {
     await this.cache.deleteMany(keys);
-    await this.emit({ action: 'deleteMany', keys, nodeId: this.nodeId });
+    await this.publish({ action: 'deleteMany', keys, nodeId: this.nodeId });
   }
 
   /**
@@ -155,6 +155,26 @@ export abstract class BaseBackplane implements ICache {
     } catch (error) {
       this.logger?.debug(this.name, '[receiveEvent] Error processing received event.',
         'event = ', event, 'error = ', error);
+    }
+  }
+
+  /**
+   * Publishes an event to other backplane nodes, without letting a failure
+   * propagate to the cache operation that triggered it.
+   *
+   * The local cache has already been updated at this point, so failing the whole operation
+   * would make the cache less reliable than not having a backplane at all.
+   * The nodes may diverge until the next update of the key, which is the same trade-off
+   * documented for a delayed delivery.
+   *
+   * @param data The event data
+   */
+  protected async publish(data: BackplaneEvent): Promise<void> {
+    try {
+      await this.emit(data);
+    } catch (error) {
+      this.logger?.debug(this.name, '[publish] Failed to publish the event to the backplane.',
+        'data =', data, 'error =', error);
     }
   }
 
