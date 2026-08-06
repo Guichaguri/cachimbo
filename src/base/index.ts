@@ -33,11 +33,13 @@ export abstract class BaseCache implements ICache {
 
     this.logger?.debug(this.name, '[getOrLoad] Refreshing the cache...', 'key =', key);
 
-    const context: LoadContext = { options: options || {} };
+    const context: LoadContext = { options: options ? { ...options } : {} };
 
     data = await load(context);
 
-    await this.set(key, data, context.options);
+    if (data !== undefined) {
+      await this.set(key, data, context.options);
+    }
 
     return data;
   }

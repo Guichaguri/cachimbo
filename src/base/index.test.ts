@@ -52,6 +52,30 @@ describe('BaseCache', () => {
       expect(cache.get).toHaveBeenCalledWith('sample');
       expect(cache.set).toHaveBeenCalledWith('sample', 'result', { ttl: 50 });
     });
+
+    test('should not change the options object passed by the caller', async () => {
+      const cache = new MockedCache();
+      const load = vi.fn(async (ctx: LoadContext) => {
+        ctx.options.ttl = 50;
+        return 'result';
+      });
+      const options = { ttl: 30 };
+
+      await cache.getOrLoad('sample', load, options);
+
+      expect(options).toStrictEqual({ ttl: 30 });
+    });
+
+    test('should not save when the load returns undefined', async () => {
+      const cache = new MockedCache();
+      const load = vi.fn().mockReturnValue(undefined);
+
+      const result = await cache.getOrLoad('sample', load, { ttl: 30 });
+
+      expect(result).toBeUndefined();
+      expect(load).toHaveBeenCalled();
+      expect(cache.set).not.toHaveBeenCalled();
+    });
   });
 
   describe('getMany', () => {
