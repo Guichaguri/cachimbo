@@ -31,7 +31,13 @@ export class MqttBackplane extends BaseBackplane {
     this.client = options.client;
     this.topic = options.topic;
 
-    this.client.subscribe(this.topic);
+    // mqtt does not return a promise here, the failure is only reported through the callback
+    this.client.subscribe(this.topic, error => {
+      if (error) {
+        this.logger?.debug(this.name, '[constructor] Failed to subscribe to the MQTT topic.',
+          'topic =', this.topic, 'error =', error);
+      }
+    });
     this.client.on('message', this.onMessage);
     this.nodeId = this.generateNodeId();
   }

@@ -38,8 +38,38 @@ describe('MqttBackplane', () => {
       cache: new LocalMapCache(),
     });
 
-    expect(mockClient.subscribe).toHaveBeenCalledWith('sample-topic');
+    expect(mockClient.subscribe).toHaveBeenCalledWith('sample-topic', expect.any(Function));
     expect(mockClient.on).toHaveBeenCalledWith('message', expect.any(Function));
+  });
+
+  it('should log an error when the subscription fails', () => {
+    new MqttBackplane({
+      client: mockClient as any,
+      topic: 'failing-topic',
+      cache: new LocalMapCache(),
+      logger: mockLogger,
+    });
+
+    const onSubscribed = mockClient.subscribe.mock.calls[0]![1] as (error?: Error) => void;
+
+    onSubscribed(new Error('connection refused'));
+
+    expect(mockLogger.debug).toHaveBeenCalled();
+  });
+
+  it('should not log when the subscription succeeds', () => {
+    new MqttBackplane({
+      client: mockClient as any,
+      topic: 'ok-topic',
+      cache: new LocalMapCache(),
+      logger: mockLogger,
+    });
+
+    const onSubscribed = mockClient.subscribe.mock.calls[0]![1] as (error?: Error) => void;
+
+    onSubscribed(undefined);
+
+    expect(mockLogger.debug).not.toHaveBeenCalled();
   });
 
   it('should unsubscribe and remove listeners on dispose', () => {
