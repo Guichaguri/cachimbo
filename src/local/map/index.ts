@@ -72,7 +72,7 @@ export class LocalMapCache extends BaseLocalCache {
     this.onDispose(key, previousValue, 'delete');
   }
 
-  override async setMany(data: Record<string, any>, options?: SetCacheOptions): Promise<void> {
+  override _setMany(data: Record<string, any>, options?: SetCacheOptions): void {
     this.logger?.debug(this.name, '[setMany]', 'data =', data);
 
     const entries = Object.entries(data);
@@ -116,7 +116,7 @@ export class LocalMapCache extends BaseLocalCache {
         break;
       }
 
-      this.logger?.debug(this.name, '[evict]', 'key = ', key);
+      this.logger?.debug(this.name, '[evict]', 'key = ', key.value);
 
       const previousValue = this.map.get(key.value);
       this.map.delete(key.value);
