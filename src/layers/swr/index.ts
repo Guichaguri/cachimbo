@@ -60,30 +60,35 @@ export class SWRCache implements ICache {
   async getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options: SetCacheOptions = {}): Promise<T> {
     this.logger?.debug(this.name, '[getOrLoad]', 'key =', key);
 
-    const ttl = options.ttl || this.defaultTTL;
-    const cacheOptions = {
-      ...options,
-      ttl: ttl + this.staleTTL,
+    const loadItem = async (ctx: LoadContext): Promise<CachedItem<T>> => {
+      const data = await load(ctx);
+      const ttl = ctx.options.ttl || this.defaultTTL;
+
+      ctx.options.ttl = ttl + this.staleTTL;
+
+      return {
+        data,
+        expiresAt: Date.now() + ttl * 1000,
+      };
     };
 
-    const loadItem = async (ctx: LoadContext): Promise<CachedItem<T>> => ({
-      data: await load(ctx),
-      expiresAt: Date.now() + ttl * 1000,
-    });
-
-    const item = await this.cache.getOrLoad<CachedItem<T>>(key, loadItem, cacheOptions);
+    const item = await this.cache.getOrLoad<CachedItem<T>>(key, loadItem, options);
 
     // The item is stale, we'll revalidate in background
     if (item && item.expiresAt < Date.now() && !this.revalidating.has(key)) {
       this.logger?.debug(this.name, '[getOrLoad] Refreshing stale resource in background...', 'key =', key);
 
-      const context: LoadContext = { options: cacheOptions };
+      const context: LoadContext = { options: { ...options } };
 
       const promise = loadItem(context)
         .then(newItem => this.cache.set(key, newItem, context.options))
         .finally(() => this.revalidating.delete(key));
 
       this.revalidating.set(key, promise);
+
+      promise.catch(error =>
+        this.logger?.debug(this.name, '[getOrLoad] Failed to refresh in background.', 'key =', key, 'error =', error)
+      );
     }
 
     return item.data;
@@ -115,7 +120,7 @@ export class SWRCache implements ICache {
     this.logger?.debug(this.name, '[getMany]', 'keys =', keys);
 
     const data = await this.cache.getMany<CachedItem<T>>(keys);
-    const items: Record<string, T> = {};
+    const items: Record<string, T> = Object.create(null);
 
     for (const [key, value] of Object.entries(data)) {
       items[key] = value.data;
@@ -128,7 +133,7 @@ export class SWRCache implements ICache {
     this.logger?.debug(this.name, '[setMany]', 'data =', data);
 
     const ttl = options.ttl || this.defaultTTL;
-    const items: Record<string, CachedItem<T>> = {};
+    const items: Record<string, CachedItem<T>> = Object.create(null);
 
     for (const [key, value] of Object.entries(data)) {
       items[key] = {

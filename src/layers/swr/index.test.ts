@@ -1,12 +1,30 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import type { ICache } from '../../types/cache.js';
+import type { ICache, LoadContext, SetCacheOptions } from '../../types/cache.js';
 import { SWRCache } from './index.js';
+
+/**
+ * The options each loader left behind in its {@link LoadContext}.
+ *
+ * The SWR layer adds the stale TTL by mutating the context during the load,
+ * so this is what an underlying cache would actually store the entry with.
+ */
+const storedOptions: SetCacheOptions[] = [];
 
 const mockedCache = {
   get: vi.fn().mockReturnValue(undefined),
   set: vi.fn(),
   delete: vi.fn(),
-  getOrLoad: vi.fn((_, load) => load()),
+  // Mirrors BaseCache#getOrLoad: the loader gets a copy of the options,
+  // and whatever it leaves in the context is used to save the entry
+  getOrLoad: vi.fn(async (_, load, options?: SetCacheOptions) => {
+    const context: LoadContext = { options: options ? { ...options } : {} };
+
+    const data = await load(context);
+
+    storedOptions.push(context.options);
+
+    return data;
+  }),
   getMany: vi.fn().mockReturnValue({}),
   setMany: vi.fn(),
   deleteMany: vi.fn(),
@@ -25,6 +43,7 @@ const waitFor = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms)
 describe('SWR Cache', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    storedOptions.length = 0;
   });
 
   describe('get', () => {
@@ -54,8 +73,22 @@ describe('SWR Cache', () => {
       const result = await swrCache.getOrLoad('key1', load, { ttl: 120 });
 
       expect(result).toBe('value');
-      expect(mockedCache.getOrLoad).toHaveBeenCalledWith('key1', expect.any(Function), { ttl: 120 + 60 });
+      expect(mockedCache.getOrLoad).toHaveBeenCalledWith('key1', expect.any(Function), { ttl: 120 });
+      expect(storedOptions).toStrictEqual([{ ttl: 120 + 60 }]);
       expect(load).toHaveBeenCalled();
+    });
+
+    test('should add the stale TTL on top of the TTL set by the loader', async () => {
+      dateNow.mockReturnValue(2000);
+      const load = vi.fn(async (ctx: LoadContext) => {
+        ctx.options.ttl = 30;
+        return 'value';
+      });
+
+      const result = await swrCache.getOrLoad('key1', load, { ttl: 120 });
+
+      expect(result).toBe('value');
+      expect(storedOptions).toStrictEqual([{ ttl: 30 + 60 }]);
     });
 
     test('should load from source and return when cache is stale', async () => {
@@ -68,12 +101,34 @@ describe('SWR Cache', () => {
       await waitFor(1); // Wait for async set
 
       expect(result).toBe('value');
-      expect(mockedCache.getOrLoad).toHaveBeenCalledWith('key1', expect.any(Function), { ttl: 240 + 60 });
+      expect(mockedCache.getOrLoad).toHaveBeenCalledWith('key1', expect.any(Function), {});
       expect(load).toHaveBeenCalled();
       expect(mockedCache.set).toHaveBeenCalledWith(
         'key1',
         { data: 'fresh-value', expiresAt: 5000 + 240_000 },
         { ttl: 240 + 60 },
+      );
+    });
+
+    test('should log an error when the background revalidation fails', async () => {
+      const logger = { debug: vi.fn() };
+      const loggedCache = new SWRCache({ cache: mockedCache, defaultTTL: 240, staleTTL: 60, logger });
+
+      dateNow.mockReturnValue(5000);
+      mockedCache.getOrLoad.mockResolvedValueOnce({ data: 'value', expiresAt: 1000 });
+      const load = vi.fn().mockRejectedValue(new Error('origin is down'));
+
+      const result = await loggedCache.getOrLoad('key1', load);
+
+      await waitFor(1); // Wait for the background revalidation
+
+      expect(result).toBe('value');
+      expect(mockedCache.set).not.toHaveBeenCalled();
+      expect(logger.debug).toHaveBeenCalledWith(
+        undefined,
+        '[getOrLoad] Failed to refresh in background.',
+        'key =', 'key1',
+        'error =', expect.any(Error),
       );
     });
 
@@ -95,8 +150,8 @@ describe('SWR Cache', () => {
       expect(res2).toBe('value');
       expect(res3).toBe('value');
       expect(mockedCache.getOrLoad).toHaveBeenCalledTimes(3);
-      expect(mockedCache.getOrLoad).toHaveBeenCalledWith('key1', expect.any(Function), { ttl: 240 + 60 });
-      expect(mockedCache.getOrLoad).toHaveBeenCalledWith('key2', expect.any(Function), { ttl: 240 + 60 });
+      expect(mockedCache.getOrLoad).toHaveBeenCalledWith('key1', expect.any(Function), {});
+      expect(mockedCache.getOrLoad).toHaveBeenCalledWith('key2', expect.any(Function), {});
       expect(load).toHaveBeenCalledTimes(1);
       expect(load2).toHaveBeenCalledTimes(1);
       expect(mockedCache.set).toHaveBeenCalledTimes(2);
@@ -156,7 +211,7 @@ describe('SWR Cache', () => {
 
       const result = await swrCache.getMany(['key1', 'key2', 'key3']);
 
-      expect(result).toStrictEqual({
+      expect(result).toEqual({
         key1: 'value1',
         key2: 'value2',
       });
