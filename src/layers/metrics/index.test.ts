@@ -103,6 +103,18 @@ describe('MetricsCollectingCache', () => {
       expect(cache.getMetrics().hitCount).toBe(2);
       expect(cache.getMetrics().missCount).toBe(1);
     });
+
+    test('does not collect metrics for an empty list of keys', async () => {
+      const cache = new MetricsCollectingCache({ cache: mockCache });
+
+      const result = await cache.getMany([]);
+
+      expect(result).toStrictEqual({});
+      expect(mockCache.getMany).not.toHaveBeenCalled();
+      // Dividing the elapsed time by zero keys would turn the metrics into NaN
+      expect(cache.getMetrics().missTime).toBe(0);
+      expect(cache.getMetrics().hitTime).toBe(0);
+    });
   });
 
   describe('setMany', () => {

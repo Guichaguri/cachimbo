@@ -121,7 +121,7 @@ export class MetricsCollectingCache implements ICache {
       });
     };
 
-    let startAt = performance.now();
+    const startAt = performance.now();
 
     const data = await this.cache.getOrLoad<T>(key, loadMiddleware, options);
 
@@ -169,6 +169,10 @@ export class MetricsCollectingCache implements ICache {
   }
 
   async getMany<T>(keys: string[]): Promise<Record<string, T>> {
+    if (keys.length === 0) {
+      return {};
+    }
+
     const startAt = performance.now();
 
     const data = await this.cache.getMany<T>(keys);
