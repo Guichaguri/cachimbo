@@ -1,6 +1,7 @@
 # Local
 node_modules
 .idea
+*.local.json
 
 # Build
 dist
