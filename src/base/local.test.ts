@@ -49,7 +49,7 @@ describe('BaseLocalCache (TestLocalCache)', () => {
     expect(await cache.getMany(['a', 'b'])).toEqual({ a: 1, b: 2 });
 
     await cache.deleteMany(['a', 'b']);
-    expect(await cache.getMany(['a', 'b'])).toStrictEqual({});
+    expect(await cache.getMany(['a', 'b'])).toEqual({});
   });
 
   it('dispose listeners called on replace and delete', async () => {

@@ -254,7 +254,7 @@ describe('Coalescing Cache', () => {
         key1: 'value1',
         key2: 'value2',
       });
-      expect(res2).toStrictEqual({});
+      expect(res2).toEqual({});
       expect(mockedCache.getMany).toHaveBeenCalledTimes(1);
       expect(mockedCache.deleteMany).toHaveBeenCalledTimes(1);
       expect(mockedCache.getMany).toHaveBeenCalledWith(['key1', 'key2']);

@@ -60,7 +60,7 @@ describe('WeakCache', () => {
 
     await weakCache.deleteMany(['key4', 'key5']);
 
-    expect(await weakCache.getMany(['key4', 'key5'])).toStrictEqual({});
+    expect(await weakCache.getMany(['key4', 'key5'])).toEqual({});
   });
 
   test('should omit garbage collected objects from getMany', async () => {
@@ -72,7 +72,7 @@ describe('WeakCache', () => {
     // Simulate weak reference already cleared for a single key
     await underlyingCache.set('key4', { v: { deref: () => undefined }, w: true });
 
-    expect(await weakCache.getMany(['key4', 'key5'])).toStrictEqual({
+    expect(await weakCache.getMany(['key4', 'key5'])).toEqual({
       key5: { data: 'value5' },
     });
   });

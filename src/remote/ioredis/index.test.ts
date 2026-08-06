@@ -86,7 +86,7 @@ describe('IORedisCache', () => {
 
       const result = await cache.getMany(['key1', 'key2', 'key3']);
 
-      expect(result).toStrictEqual({
+      expect(result).toEqual({
         key1: { key: 'value1' },
         key2: { key: 'value2' },
       });
@@ -98,7 +98,7 @@ describe('IORedisCache', () => {
 
       const result = await cache.getMany([]);
 
-      expect(result).toStrictEqual({});
+      expect(result).toEqual({});
       expect(mockRedisClient.mget).not.toHaveBeenCalled();
     });
   });

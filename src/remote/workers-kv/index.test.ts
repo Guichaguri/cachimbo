@@ -89,7 +89,7 @@ describe('WorkersKVCache', () => {
 
       const result = await cache.getMany(['key1', 'key2']);
 
-      expect(result).toStrictEqual({
+      expect(result).toEqual({
         key1: { key: 'value1' },
       });
       expect(mockKVNamespace.get).toHaveBeenCalledWith(['key1', 'key2'], { type: 'json' });

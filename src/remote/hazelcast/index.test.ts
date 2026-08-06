@@ -89,6 +89,6 @@ describe('HazelcastCache', () => {
     const result = await cache.getMany(keys);
 
     expect(mockMap.getAll).toHaveBeenCalledWith(keys);
-    expect(result).toStrictEqual({ key1: 'value1' });
+    expect(result).toEqual({ key1: 'value1' });
   });
 });

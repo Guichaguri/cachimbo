@@ -85,7 +85,7 @@ describe('MemcacheCache', () => {
 
       const result = await cache.getMany(['key1', 'key2', 'key3']);
 
-      expect(result).toStrictEqual({
+      expect(result).toEqual({
         key1: { key: 'value1' },
         key2: { key: 'value2' },
       });

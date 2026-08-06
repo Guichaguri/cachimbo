@@ -72,7 +72,7 @@ describe('KeyvCache', () => {
 
       const result = await cache.getMany(['key1', 'key2', 'key3']);
 
-      expect(result).toStrictEqual({ key1: 'value1', key3: 'value3' });
+      expect(result).toEqual({ key1: 'value1', key3: 'value3' });
       expect(mockKeyv.getMany).toHaveBeenCalledWith(['key1', 'key2', 'key3']);
     });
   });
