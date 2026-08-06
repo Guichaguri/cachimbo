@@ -9,6 +9,7 @@
     "url": "git://github.com/Guichaguri/cachimbo.git"
   },
   "type": "module",
+  "sideEffects": false,
   "scripts": {
     "build": "tsdown",
     "test": "vitest",
