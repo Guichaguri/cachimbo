@@ -67,7 +67,7 @@ export class JitteringCache implements ICache {
 
     return {
       ...options,
-      ttl: ttl + jitter,
+      ttl: Math.floor(ttl + jitter),
     };
   }
 }
