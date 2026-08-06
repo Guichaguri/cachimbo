@@ -150,6 +150,27 @@ describe('AmqpBackplane', () => {
     expect(mockChannel.close).toHaveBeenCalled();
   });
 
+  it('should log an error when closing the channel fails on dispose', async () => {
+    const backplane = new AmqpBackplane({
+      connection: mockConnection as any,
+      exchange: 'test-exchange',
+      cache: mockCache as any,
+      logger: mockLogger,
+    });
+
+    await sleep();
+
+    mockChannel.close.mockRejectedValueOnce(new Error('channel already closed'));
+
+    backplane.dispose();
+
+    await vi.waitFor(() => expect(mockLogger.debug).toHaveBeenCalledWith(
+      undefined,
+      '[dispose] Failed to close the channel.',
+      'error =', expect.any(Error),
+    ));
+  });
+
   it('should do nothing if dispose is called without channel initialized', async () => {
     let resolveChannel: any;
     mockConnection.createChannel.mockReturnValue(new Promise(res => { resolveChannel = res; }));

@@ -88,6 +88,8 @@ export class AmqpBackplane extends BaseBackplane {
   }
 
   override dispose(): void {
-    this.close();
+    this.close().catch(error =>
+      this.logger?.debug(this.name, '[dispose] Failed to close the channel.', 'error =', error)
+    );
   }
 }

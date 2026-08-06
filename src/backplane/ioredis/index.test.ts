@@ -7,7 +7,7 @@ import { LocalMapCache } from '../../local/map/index.js';
 
 describe('IORedisBackplane', () => {
   const mockClient = {
-    subscribe: vi.fn(),
+    subscribe: vi.fn().mockResolvedValue(undefined),
     unsubscribe: vi.fn(),
     on: vi.fn(),
     off: vi.fn(),
@@ -42,6 +42,20 @@ describe('IORedisBackplane', () => {
 
     expect(mockClient.subscribe).toHaveBeenCalledWith('sample-channel');
     expect(mockClient.on).toHaveBeenCalledWith('message', expect.any(Function));
+  });
+
+  it('should log an error when the subscription fails', async () => {
+    mockClient.subscribe.mockRejectedValueOnce(new Error('connection refused'));
+
+    new IORedisBackplane({
+      publishClient: mockClient as any,
+      subscriptionClient: mockClient as any,
+      channel: 'failing-channel',
+      cache: new LocalMapCache(),
+      logger: mockLogger,
+    });
+
+    await vi.waitFor(() => expect(mockLogger.debug).toHaveBeenCalled());
   });
 
   it('should unsubscribe and remove listeners on dispose', () => {

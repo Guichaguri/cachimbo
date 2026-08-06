@@ -7,7 +7,8 @@ import { LocalMapCache } from '../../local/map/index.js';
 
 describe('RedisBackplane', () => {
   const mockClient = {
-    subscribe: vi.fn(),
+    // node-redis resolves a promise once the subscription is acknowledged
+    subscribe: vi.fn().mockResolvedValue(undefined),
     unsubscribe: vi.fn(),
     publish: vi.fn(),
   } satisfies Partial<RedisClientType>;
@@ -39,6 +40,20 @@ describe('RedisBackplane', () => {
     });
 
     expect(mockClient.subscribe).toHaveBeenCalledWith('sample-channel', expect.any(Function), false);
+  });
+
+  it('should log an error when the subscription fails', async () => {
+    mockClient.subscribe.mockRejectedValueOnce(new Error('connection refused'));
+
+    new RedisBackplane({
+      publishClient: mockClient as any,
+      subscriptionClient: mockClient as any,
+      channel: 'failing-channel',
+      cache: new LocalMapCache(),
+      logger: mockLogger,
+    });
+
+    await vi.waitFor(() => expect(mockLogger.debug).toHaveBeenCalled());
   });
 
   it('should unsubscribe on dispose', () => {

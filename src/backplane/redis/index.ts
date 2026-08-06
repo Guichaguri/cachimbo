@@ -47,7 +47,9 @@ export class RedisBackplane extends BaseBackplane {
     this.subscriptionClient = options.subscriptionClient;
     this.channel = options.channel;
 
-    this.subscriptionClient.subscribe(this.channel, this.onMessage, false);
+    this.subscriptionClient.subscribe(this.channel, this.onMessage, false).catch(error =>
+      this.logger?.debug(this.name, '[constructor] Failed to subscribe to Redis channel.', 'channel =', this.channel, 'error =', error)
+    );
     this.nodeId = this.generateNodeId();
   }
 
