@@ -94,11 +94,22 @@ describe('RedisCache', () => {
 
       const result = await cache.getMany(['key1', 'key2', 'key3']);
 
-      expect(result).toStrictEqual({
+      // The record has a null prototype, so `toStrictEqual` would not match a plain object
+      expect(Object.getPrototypeOf(result)).toBeNull();
+      expect(result).toEqual({
         key1: { key: 'value1' },
         key2: { key: 'value2' },
       });
       expect(mockRedisClient.mGet).toHaveBeenCalledWith(['key1', 'key2', 'key3']);
+    });
+
+    test('does not run MGET for an empty list of keys', async () => {
+      const cache = new RedisCache({ client: mockRedisClient });
+
+      const result = await cache.getMany([]);
+
+      expect(result).toStrictEqual({});
+      expect(mockRedisClient.mGet).not.toHaveBeenCalled();
     });
   });
 
@@ -141,6 +152,14 @@ describe('RedisCache', () => {
 
       expect(mockRedisClient.mSetEx).not.toHaveBeenCalled();
     });
+
+    test('does not run MSETEX for an empty set of entries', async () => {
+      const cache = new RedisCache({ client: mockRedisClient, isMSETEXSupported: true });
+
+      await cache.setMany({});
+
+      expect(mockRedisClient.mSetEx).not.toHaveBeenCalled();
+    });
   });
 
   describe('deleteMany', () => {
@@ -158,6 +177,15 @@ describe('RedisCache', () => {
       await cache.deleteMany(['key1', 'key2']);
 
       expect(mockRedisClient.del).toHaveBeenCalledWith(['key1', 'key2']);
+    });
+
+    test('does not run any command for an empty list of keys', async () => {
+      const cache = new RedisCache({ client: mockRedisClient });
+
+      await cache.deleteMany([]);
+
+      expect(mockRedisClient.unlink).not.toHaveBeenCalled();
+      expect(mockRedisClient.del).not.toHaveBeenCalled();
     });
   });
 });

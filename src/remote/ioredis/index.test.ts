@@ -92,6 +92,15 @@ describe('IORedisCache', () => {
       });
       expect(mockRedisClient.mget).toHaveBeenCalledWith(['key1', 'key2', 'key3']);
     });
+
+    test('does not run MGET for an empty list of keys', async () => {
+      const cache = new IORedisCache({ client: mockRedisClient });
+
+      const result = await cache.getMany([]);
+
+      expect(result).toStrictEqual({});
+      expect(mockRedisClient.mget).not.toHaveBeenCalled();
+    });
   });
 
   describe('setMany', () => {
@@ -137,6 +146,14 @@ describe('IORedisCache', () => {
 
       expect(mockRedisClient.call).not.toHaveBeenCalled();
     });
+
+    test('does not run MSETEX for an empty set of entries', async () => {
+      const cache = new IORedisCache({ client: mockRedisClient, isMSETEXSupported: true });
+
+      await cache.setMany({});
+
+      expect(mockRedisClient.call).not.toHaveBeenCalled();
+    });
   });
 
   describe('deleteMany', () => {
@@ -154,6 +171,15 @@ describe('IORedisCache', () => {
       await cache.deleteMany(['key1', 'key2']);
 
       expect(mockRedisClient.del).toHaveBeenCalledWith(['key1', 'key2']);
+    });
+
+    test('does not run any command for an empty list of keys', async () => {
+      const cache = new IORedisCache({ client: mockRedisClient });
+
+      await cache.deleteMany([]);
+
+      expect(mockRedisClient.unlink).not.toHaveBeenCalled();
+      expect(mockRedisClient.del).not.toHaveBeenCalled();
     });
   });
 });

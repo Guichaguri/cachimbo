@@ -90,11 +90,15 @@ export class IORedisCache extends BaseCache {
   }
 
   override async getMany<T>(keys: string[]): Promise<Record<string, T>> {
+    if (keys.length === 0) {
+      return {};
+    }
+
     this.logger?.debug(this.name, '[getMany] Running "MGET" command...', 'keys =', keys);
 
     const values = await this.client.mget(keys);
 
-    const data: Record<string, T> = {};
+    const data: Record<string, T> = Object.create(null);
 
     for (let i = 0; i < keys.length; i++) {
       const value = values[i];
@@ -112,8 +116,6 @@ export class IORedisCache extends BaseCache {
       return super.setMany(data, options);
     }
 
-    this.logger?.debug(this.name, '[setMany] Running "MSETEX" command...', 'data =', data);
-
     const entries = Object.entries(data);
     const ttl = options?.ttl ?? this.defaultTTL;
 
@@ -122,10 +124,20 @@ export class IORedisCache extends BaseCache {
       JSON.stringify(value),
     ]);
 
+    if (raw.length === 0) {
+      return;
+    }
+
+    this.logger?.debug(this.name, '[setMany] Running "MSETEX" command...', 'data =', data);
+
     await this.client.call('MSETEX', entries.length, ...raw, ...(ttl ? ['EX', ttl] : []));
   }
 
   override async deleteMany(keys: string[]): Promise<void> {
+    if (keys.length === 0) {
+      return;
+    }
+
     if (this.isUNLINKSupported) {
       this.logger?.debug(this.name, '[deleteMany] Running "UNLINK" command...', 'keys =', keys);
 

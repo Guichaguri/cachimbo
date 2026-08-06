@@ -94,11 +94,22 @@ describe('ValkeyGlideCache', () => {
 
       const result = await cache.getMany(['key1', 'key2', 'key3']);
 
-      expect(result).toStrictEqual({
+      // The record has a null prototype, so `toStrictEqual` would not match a plain object
+      expect(Object.getPrototypeOf(result)).toBeNull();
+      expect(result).toEqual({
         key1: { foo: 'bar' },
         key3: { baz: 'qux' },
       });
       expect(mockClient.mget).toHaveBeenCalledWith(['key1', 'key2', 'key3']);
+    });
+
+    test('does not run MGET for an empty list of keys', async () => {
+      const cache = new ValkeyGlideCache({ client: mockClient });
+
+      const result = await cache.getMany([]);
+
+      expect(result).toStrictEqual({});
+      expect(mockClient.mget).not.toHaveBeenCalled();
     });
   });
 
@@ -109,6 +120,14 @@ describe('ValkeyGlideCache', () => {
       await cache.deleteMany(['key1', 'key2']);
 
       expect(mockClient.unlink).toHaveBeenCalledWith(['key1', 'key2']);
+    });
+
+    test('does not run UNLINK for an empty list of keys', async () => {
+      const cache = new ValkeyGlideCache({ client: mockClient });
+
+      await cache.deleteMany([]);
+
+      expect(mockClient.unlink).not.toHaveBeenCalled();
     });
   });
 });
