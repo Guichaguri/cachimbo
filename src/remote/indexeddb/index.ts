@@ -40,7 +40,7 @@ interface IDBStoredEntry<T> {
 }
 
 /**
- * An IndexedDB cache store. It doesn't support TTL
+ * An IndexedDB cache store.
  *
  * This implementation was mostly based on idb-keyval.
  */
@@ -87,7 +87,7 @@ export class IndexedDBCache extends BaseCache {
 
   override getMany<T>(keys: string[]): Promise<Record<string, T>> {
     return this.do('readonly', async store => {
-      const data: Record<string, T> = {};
+      const data: Record<string, T> = Object.create(null);
 
       await Promise.all(keys.map(async key => {
         const value = await this.storeGet<T>(store, key);

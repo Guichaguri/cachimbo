@@ -39,7 +39,7 @@ export abstract class BaseLocalCache extends BaseCache {
    * Reads cached resources by their keys. (synchronous version)
    */
   protected _getMany<T>(keys: string[]): Record<string, T> {
-    const data: Record<string, T> = {};
+    const data: Record<string, T> = Object.create(null);
 
     for (const key of keys) {
       const value = this._get<T>(key);

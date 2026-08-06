@@ -47,7 +47,7 @@ export class WorkersKVCache extends BaseCache {
 
   override async getMany<T>(keys: string[]): Promise<Record<string, T>> {
     const values = await this.kv.get<T>(keys, { type: 'json', cacheTtl: this.edgeCacheTTL });
-    const data: Record<string, T> = {};
+    const data: Record<string, T> = Object.create(null);
 
     for (const [key, value] of values) {
       if (value !== null) {

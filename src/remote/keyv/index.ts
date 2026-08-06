@@ -31,7 +31,7 @@ export class KeyvCache extends BaseCache {
 
   override async getMany<T>(keys: string[]): Promise<Record<string, T>> {
     const data = await this.keyv.getMany<T>(keys);
-    const result: Record<string, T> = {};
+    const result: Record<string, T> = Object.create(null);
 
     for (let i = 0; i < keys.length; i++) {
       const value = data[i];

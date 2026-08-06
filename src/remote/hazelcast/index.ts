@@ -47,7 +47,7 @@ export class HazelcastCache extends BaseCache {
 
   override async getMany<T>(keys: string[]): Promise<Record<string, T>> {
     const entries = await this.map.getAll(keys);
-    const data: Record<string, T> = {};
+    const data: Record<string, T> = Object.create(null);
 
     for (const [key, value] of entries) {
       if (value !== null && value !== undefined) {

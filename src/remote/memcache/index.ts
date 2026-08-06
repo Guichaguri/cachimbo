@@ -55,7 +55,7 @@ export class MemcacheCache extends BaseCache {
     this.logger?.debug(this.name, '[getMany] Running "get" command...', 'keys =', keys);
 
     const raw = await this.client.gets(keys);
-    const data: Record<string, T> = {};
+    const data: Record<string, T> = Object.create(null);
 
     raw.forEach((value, key) => {
       if (value) {

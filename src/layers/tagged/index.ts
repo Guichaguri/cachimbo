@@ -88,7 +88,7 @@ export class TaggedCache implements ICache {
 
   async getMany<T>(keys: string[]): Promise<Record<string, T>> {
     const data = await this.cache.getMany<TaggedValue<T>>(keys);
-    const items: Record<string, T> = {};
+    const items: Record<string, T> = Object.create(null);
 
     await Promise.all(
       Object.entries(data).map(async ([key, value]) => {
@@ -108,7 +108,7 @@ export class TaggedCache implements ICache {
   }
 
   async setMany<T>(data: Record<string, T>, options: SetTaggedCacheOptions = {}): Promise<void> {
-    const taggedData: Record<string, TaggedValue<T>> = {};
+    const taggedData: Record<string, TaggedValue<T>> = Object.create(null);
     const tags = options.tags || [];
     const now = Date.now();
 
@@ -177,7 +177,7 @@ export class TaggedCache implements ICache {
   invalidateTags(tags: string[]): Promise<void> {
     this.logger?.debug(this.name, '[invalidateTags] Invalidating a list of tags.', 'tags =', tags);
 
-    const data: Record<string, number> = {};
+    const data: Record<string, number> = Object.create(null);
     const now = Date.now();
 
     for (const tag of tags) {
@@ -203,7 +203,7 @@ export class TaggedCache implements ICache {
 
     const keys = tags.map(tag => this.tagPrefix + tag);
     const currentTimestamps = await this.cache.getMany<number>(keys);
-    const newTimestamps: Record<string, number> = {};
+    const newTimestamps: Record<string, number> = Object.create(null);
 
     for (const key of keys) {
       newTimestamps[key] = currentTimestamps[key] || timestamp;

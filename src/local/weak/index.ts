@@ -59,7 +59,7 @@ export class WeakCache extends BaseLocalCache {
   /** @internal */
   override _getMany<T>(keys: string[]): Record<string, T> {
     const data = this.cacheInternal._getMany<WeakValue>(keys);
-    const items: Record<string, T> = {};
+    const items: Record<string, T> = Object.create(null);
 
     for (const [key, value] of Object.entries(data)) {
       const unwrapped = this.unwrap<T>(value);
@@ -77,7 +77,7 @@ export class WeakCache extends BaseLocalCache {
   override _setMany<T>(data: Record<string, T>, options?: SetCacheOptions): void {
     Object.keys(data).forEach(key => this.unregisterByKey(key));
 
-    const wrappedData: Record<string, WeakValue> = {};
+    const wrappedData: Record<string, WeakValue> = Object.create(null);
 
     for (const [key, value] of Object.entries(data)) {
       wrappedData[key] = this.wrapAndRegister(key, value);
