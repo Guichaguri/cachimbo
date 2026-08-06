@@ -44,12 +44,10 @@ export class LocalTTLCache extends BaseLocalCache {
   }
 
   /** @internal */
-  _get<T>(key: string): T | null {
+  _get<T>(key: string): T | undefined {
     this.logger?.debug(this.name, '[get]', 'key =', key);
 
-    const data = this.cache.get(key);
-
-    return data === undefined ? null : data;
+    return this.cache.get(key);
   }
 
   /** @internal */

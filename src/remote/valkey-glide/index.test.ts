@@ -24,13 +24,13 @@ describe('ValkeyGlideCache', () => {
       expect(mockClient.get).toHaveBeenCalledWith('key');
     });
 
-    test('returns null for a non-existing key', async () => {
+    test('returns undefined for a non-existing key', async () => {
       const cache = new ValkeyGlideCache({ client: mockClient });
       mockClient.get.mockResolvedValueOnce(null);
 
       const result = await cache.get('key');
 
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
       expect(mockClient.get).toHaveBeenCalledWith('key');
     });
   });
@@ -94,9 +94,8 @@ describe('ValkeyGlideCache', () => {
 
       const result = await cache.getMany(['key1', 'key2', 'key3']);
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         key1: { foo: 'bar' },
-        key2: null,
         key3: { baz: 'qux' },
       });
       expect(mockClient.mget).toHaveBeenCalledWith(['key1', 'key2', 'key3']);

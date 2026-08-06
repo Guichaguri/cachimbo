@@ -17,7 +17,7 @@ const taggedCache = new TaggedCache({
 
 await taggedCache.set('key1', 'value1', { tags: ['tagA', 'tagB'] });
 await taggedCache.invalidateTag('tagA');
-const value = await taggedCache.get('key1'); // === null
+const value = await taggedCache.get('key1'); // === undefined
 ```
 
 For instance, let's say you have a cache storing user profiles and their associated posts. When a user's profile is updated, you want to invalidate both the profile and all posts related to that user. By tagging the cache entries with the user's ID, you can easily invalidate all related entries in one go.

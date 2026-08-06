@@ -4,7 +4,7 @@ When a cache backend fails (e.g. connection failures, timeouts or even hardware 
 
 The [fail-safe](https://en.wikipedia.org/wiki/Fail-safe) cache layer provides [two policies](https://read.thecoder.cafe/p/fail-open-fail-closed) that can be applied to each cache operation:
 - **Fail-Open**: In this mode, when a cache operation fails (e.g., due to a connection error), the layer ignores the error.
-  - For `get` operations, it returns `null`, and for `getOrLoad`, it loads the data from the source function. This allows your application to continue functioning normally, albeit without the performance benefits of caching.
+  - For `get` operations, it returns `undefined`, and for `getOrLoad`, it loads the data from the source function. This allows your application to continue functioning normally, albeit without the performance benefits of caching.
 - **Fail-Closed**: In this mode, when a cache operation fails, the layer throws an error, propagating it up to the caller.
   - This is useful when you want to ensure that cache failures are explicitly handled by your application.
 
@@ -14,14 +14,14 @@ import { FailSafeCache } from 'cachimbo';
 const failSafeCache = new FailSafeCache({
   cache: anotherCache, // underlying cache store
   policy: {
-    get: 'fail-open', // returns null on get errors
+    get: 'fail-open', // returns undefined on get errors
     set: 'fail-open', // ignores set errors
     delete: 'fail-closed', // throws on delete errors
     getOrLoad: 'fail-open', // loads from source on errors
   }
 });
 
-await failSafeCache.get("mykey"); // returns null if anotherCache fails
+await failSafeCache.get("mykey"); // returns undefined if anotherCache fails
 await failSafeCache.set("mykey", "value"); // does nothing if anotherCache fails
 await failSafeCache.delete("mykey"); // throws if anotherCache fails
 await failSafeCache.getOrLoad("mykey", () => loadData()); // calls loadData() if anotherCache fails

@@ -12,7 +12,7 @@ export interface CoalescingCacheOptions extends BaseCacheOptions {
 }
 
 interface OngoingRequest {
-  promise: Promise<any | null>;
+  promise: Promise<any | undefined>;
   type: 'get' | 'getOrLoad';
 }
 
@@ -33,7 +33,7 @@ export class CoalescingCache implements ICache {
     this.logger = options.logger;
   }
 
-  get<T>(key: string): Promise<T | null> {
+  get<T>(key: string): Promise<T | undefined> {
     const ongoingRequest = this.ongoingRequests.get(key);
 
     if (ongoingRequest) {
@@ -69,7 +69,7 @@ export class CoalescingCache implements ICache {
     let request = await ongoingRequest.promise;
 
     // When the request is successful or the type is already getOrLoad, we'll just return it
-    if (request !== null || ongoingRequest.type === 'getOrLoad') {
+    if (request !== undefined || ongoingRequest.type === 'getOrLoad') {
       this.logger?.debug(this.name, '[getOrLoad] Read from an ongoing request.', 'key =', key);
 
       return request;
@@ -88,7 +88,7 @@ export class CoalescingCache implements ICache {
       request = await promise;
 
       // When the request is successful, we'll store it in cache
-      if (request !== null) {
+      if (request !== undefined) {
         await this.cache.set(key, request, context.options);
       }
     } finally {
@@ -118,7 +118,7 @@ export class CoalescingCache implements ICache {
     try {
       this.ongoingRequests.set(key, {
         type: 'get',
-        promise: Promise.resolve(null),
+        promise: Promise.resolve(undefined),
       });
 
       await this.cache.delete(key);
@@ -127,8 +127,8 @@ export class CoalescingCache implements ICache {
     }
   }
 
-  async getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
-    const items: [string, Promise<T | null>][] = [];
+  async getMany<T>(keys: string[]): Promise<Record<string, T>> {
+    const items: [string, Promise<T | undefined>][] = [];
     const remainingKeys: string[] = [];
 
     for (const key of keys) {
@@ -148,7 +148,7 @@ export class CoalescingCache implements ICache {
 
       for (const key of remainingKeys) {
         const itemPromise = promise
-          .then(data => data[key]!)
+          .then(data => data[key])
           .finally(() => this.ongoingRequests.delete(key));
 
         this.ongoingRequests.set(key, {
@@ -160,11 +160,19 @@ export class CoalescingCache implements ICache {
       }
     }
 
-    return Object.fromEntries(
-      await Promise.all(
-        items.map(async ([key, promise]) => [key, await promise])
-      ),
+    const data: Record<string, T> = {};
+
+    await Promise.all(
+      items.map(async ([key, promise]) => {
+        const value = await promise;
+
+        if (value !== undefined) {
+          data[key] = value;
+        }
+      }),
     );
+
+    return data;
   }
 
   setMany<T>(data: Record<string, T>, options?: SetCacheOptions): Promise<void> {
@@ -189,7 +197,7 @@ export class CoalescingCache implements ICache {
       for (const key of keys) {
         this.ongoingRequests.set(key, {
           type: 'get',
-          promise: Promise.resolve(null),
+          promise: Promise.resolve(undefined),
         });
       }
 

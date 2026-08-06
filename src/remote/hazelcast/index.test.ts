@@ -27,6 +27,16 @@ describe('HazelcastCache', () => {
     expect(result).toBe(value);
   });
 
+  test('should return undefined for a missing key', async () => {
+    const key = 'missing-key';
+    mockMap.get.mockResolvedValue(null);
+
+    const result = await cache.get(key);
+
+    expect(mockMap.get).toHaveBeenCalledWith(key);
+    expect(result).toBeUndefined();
+  });
+
   test('should set a value with a key', async () => {
     const key = 'test-key';
     const value = 'test-value';
@@ -57,5 +67,20 @@ describe('HazelcastCache', () => {
 
     expect(mockMap.getAll).toHaveBeenCalledWith(keys);
     expect(result).toEqual({ key1: 'value1', key2: 'value2' });
+  });
+
+  test('should omit missing keys from multiple values', async () => {
+    const keys = ['key1', 'key2', 'key3'];
+    const entries = new Map<string, any>([
+      ['key1', 'value1'],
+      ['key2', null],
+      ['key3', undefined],
+    ]);
+    mockMap.getAll.mockResolvedValue(entries);
+
+    const result = await cache.getMany(keys);
+
+    expect(mockMap.getAll).toHaveBeenCalledWith(keys);
+    expect(result).toStrictEqual({ key1: 'value1' });
   });
 });

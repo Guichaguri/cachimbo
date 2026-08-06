@@ -4,7 +4,7 @@ import { LocalMapCache } from '../../local/map/index.js';
 import { TaggedCache } from './index.js';
 
 const mockCache = {
-  get: vi.fn().mockResolvedValue(null),
+  get: vi.fn().mockResolvedValue(undefined),
   set: vi.fn(),
   delete: vi.fn(),
   getMany: vi.fn().mockResolvedValue({}),
@@ -78,7 +78,7 @@ describe('TaggedCache', () => {
     );
   });
 
-  test('should return null for invalidated tags in get', async () => {
+  test('should return undefined for invalidated tags in get', async () => {
     const taggingCache = new TaggedCache({ cache: new LocalMapCache() });
 
     await taggingCache.set('key1', 'value1', { tags: ['tag1'] });
@@ -92,12 +92,12 @@ describe('TaggedCache', () => {
     const value2 = await taggingCache.get<string>('key2');
     const value3 = await taggingCache.get<string>('key3');
 
-    expect(value1).toBeNull();
+    expect(value1).toBeUndefined();
     expect(value2).toBe('value2');
-    expect(value3).toBeNull();
+    expect(value3).toBeUndefined();
   });
 
-  test('should return null for invalidated tags in getMany', async () => {
+  test('should return undefined for invalidated tags in getMany', async () => {
     const taggingCache = new TaggedCache({ cache: new LocalMapCache() });
 
     await taggingCache.set('key1', 'value1', { tags: ['tag1'] });
@@ -109,12 +109,12 @@ describe('TaggedCache', () => {
 
     const { key1, key2, key3 } = await taggingCache.getMany<string>(['key1', 'key2', 'key3']);
 
-    expect(key1).toBeNull();
+    expect(key1).toBeUndefined();
     expect(key2).toBe('value2');
-    expect(key3).toBeNull();
+    expect(key3).toBeUndefined();
   });
 
-  test('should not return null for old invalidations', async () => {
+  test('should not return undefined for old invalidations', async () => {
     const taggingCache = new TaggedCache({ cache: new LocalMapCache() });
 
     await taggingCache.setMany({ key1: 'value1', key2: 'value2' }, { tags: ['tag1'] });
@@ -129,7 +129,7 @@ describe('TaggedCache', () => {
 
     const { key1, key2 } = await taggingCache.getMany<string>(['key1', 'key2']);
 
-    expect(key1).toBeNull();
+    expect(key1).toBeUndefined();
     expect(key2).toBe('value2');
   });
 
@@ -152,15 +152,15 @@ describe('TaggedCache', () => {
 
     expect(value1).toBe('value1');
     expect(value2).toBe('value4');
-    expect(value3).toBeNull();
+    expect(value3).toBeUndefined();
   });
 
-  test('should return null on missing key successfully', async () => {
+  test('should return undefined on missing key successfully', async () => {
     const taggingCache = new TaggedCache({ cache: new LocalMapCache() });
 
     const value = await taggingCache.get<string>('unknown');
 
-    expect(value).toBeNull();
+    expect(value).toBeUndefined();
   });
 
   test('should load from source if not in cache', async () => {

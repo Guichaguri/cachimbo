@@ -55,11 +55,11 @@ export class TaggedCache implements ICache {
     this.tagTTL = options.tagTTL ?? 86400;
   }
 
-  async get<T>(key: string): Promise<T | null> {
+  async get<T>(key: string): Promise<T | undefined> {
     const value = await this.cache.get<TaggedValue<T>>(key);
 
-    if (value === null) {
-      return null;
+    if (value === undefined) {
+      return undefined;
     }
 
     if (await this.isItemExpired(value.t, value.d)) {
@@ -67,7 +67,7 @@ export class TaggedCache implements ICache {
 
       await this.cache.delete(key);
 
-      return null;
+      return undefined;
     }
 
     return value.v;
@@ -86,28 +86,25 @@ export class TaggedCache implements ICache {
     return this.cache.delete(key);
   }
 
-  async getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
+  async getMany<T>(keys: string[]): Promise<Record<string, T>> {
     const data = await this.cache.getMany<TaggedValue<T>>(keys);
+    const items: Record<string, T> = {};
 
-    return Object.fromEntries(
-      await Promise.all(
-        Object.entries(data).map(async ([key, value]) => {
-          if (value === null) {
-            return [key, null];
-          }
+    await Promise.all(
+      Object.entries(data).map(async ([key, value]) => {
+        if (await this.isItemExpired(value.t, value.d)) {
+          this.logger?.debug(this.name, '[getMany] Item expired due to tag invalidation. Deleting...', 'key =', key);
 
-          if (await this.isItemExpired(value.t, value.d)) {
-            this.logger?.debug(this.name, '[getMany] Item expired due to tag invalidation. Deleting...', 'key =', key);
+          await this.cache.delete(key);
 
-            await this.cache.delete(key);
+          return;
+        }
 
-            return [key, null];
-          }
-
-          return [key, value.v];
-        }),
-      ),
+        items[key] = value.v;
+      }),
     );
+
+    return items;
   }
 
   async setMany<T>(data: Record<string, T>, options: SetTaggedCacheOptions = {}): Promise<void> {

@@ -8,10 +8,10 @@ type LocalCacheDisposeListener<T = any> = (key: string, value: T, reason?: strin
  * @experimental
  */
 export interface LocalCacheInternal {
-  _get<T>(key: string): T | null;
+  _get<T>(key: string): T | undefined;
   _set<T>(key: string, value: T, options?: SetCacheOptions): void;
   _delete(key: string): void;
-  _getMany<T>(keys: string[]): Record<string, T | null>;
+  _getMany<T>(keys: string[]): Record<string, T>;
   _setMany<T>(data: Record<string, T>, options?: SetCacheOptions): void;
   _deleteMany(keys: string[]): void;
   _addDisposeListener(listener: LocalCacheDisposeListener): void;
@@ -23,7 +23,7 @@ export abstract class BaseLocalCache extends BaseCache {
   /**
    * Reads the cached resource from a key (synchronous version)
    */
-  protected abstract _get<T>(key: string): T | null;
+  protected abstract _get<T>(key: string): T | undefined;
 
   /**
    * Writes a resource into cache (synchronous version)
@@ -38,10 +38,18 @@ export abstract class BaseLocalCache extends BaseCache {
   /**
    * Reads cached resources by their keys. (synchronous version)
    */
-  protected _getMany<T>(keys: string[]): Record<string, T | null> {
-    return Object.fromEntries(
-      keys.map(key => [key, this._get<T>(key)])
-    );
+  protected _getMany<T>(keys: string[]): Record<string, T> {
+    const data: Record<string, T> = {};
+
+    for (const key of keys) {
+      const value = this._get<T>(key);
+
+      if (value !== undefined) {
+        data[key] = value;
+      }
+    }
+
+    return data;
   }
 
   /**
@@ -80,7 +88,7 @@ export abstract class BaseLocalCache extends BaseCache {
   }
 
   /** @sealed **/
-  get<T>(key: string): Promise<T | null> {
+  get<T>(key: string): Promise<T | undefined> {
     return Promise.resolve(this._get<T>(key));
   }
 
@@ -97,7 +105,7 @@ export abstract class BaseLocalCache extends BaseCache {
   }
 
   /** @sealed **/
-  override getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
+  override getMany<T>(keys: string[]): Promise<Record<string, T>> {
     return Promise.resolve(this._getMany(keys));
   }
 

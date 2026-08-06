@@ -23,28 +23,28 @@ describe('WeakCache', () => {
     expect(await weakCache.get('key1')).toEqual('value1');
   });
 
-  test('should return null for finalized objects', async () => {
+  test('should return undefined for finalized objects', async () => {
     await weakCache.set('test123', { data: 'value2' });
 
     // Simulate garbage collection
     (weakCache as any).onGarbageCollect('test123');
 
-    expect(await weakCache.get('test123')).toBeNull();
+    expect(await weakCache.get('test123')).toBeUndefined();
   });
 
-  test('should return null for pre-finalized garbage collected objects', async () => {
+  test('should return undefined for pre-finalized garbage collected objects', async () => {
     await weakCache.set('test123', { data: 'value2' });
 
     // Simulate weak reference already cleared
     await underlyingCache.set('test123', { v: { deref: () => undefined }, w: true });
 
-    expect(await weakCache.get('test123')).toBeNull();
+    expect(await weakCache.get('test123')).toBeUndefined();
   });
 
   test('should delete values', async () => {
     await weakCache.set('key3', { data: 'value3' });
     await weakCache.delete('key3');
-    expect(await weakCache.get('key3')).toBeNull();
+    expect(await weakCache.get('key3')).toBeUndefined();
   });
 
   test('should handle multiple keys', async () => {
@@ -60,9 +60,20 @@ describe('WeakCache', () => {
 
     await weakCache.deleteMany(['key4', 'key5']);
 
-    expect(await weakCache.getMany(['key4', 'key5'])).toEqual({
-      key4: null,
-      key5: null,
+    expect(await weakCache.getMany(['key4', 'key5'])).toStrictEqual({});
+  });
+
+  test('should omit garbage collected objects from getMany', async () => {
+    await weakCache.setMany({
+      key4: { data: 'value4' },
+      key5: { data: 'value5' },
+    });
+
+    // Simulate weak reference already cleared for a single key
+    await underlyingCache.set('key4', { v: { deref: () => undefined }, w: true });
+
+    expect(await weakCache.getMany(['key4', 'key5'])).toStrictEqual({
+      key5: { data: 'value5' },
     });
   });
 
@@ -73,7 +84,7 @@ describe('WeakCache', () => {
     await underlyingCache.set('key3', { v: { deref: () => undefined }, w: true });
 
     await weakCache.delete('key3');
-    expect(await weakCache.get('key3')).toBeNull();
+    expect(await weakCache.get('key3')).toBeUndefined();
   });
 
   test('should load values using getOrLoad', async () => {

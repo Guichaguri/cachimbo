@@ -27,7 +27,7 @@ export interface ErrorPolicy {
   /**
    * Policy for when the {@link ICache#get} and {@link ICache#getMany} throw errors
    *
-   * - 'fail-open': return null on error
+   * - 'fail-open': return `undefined` on error
    * - 'fail-closed': throw on error
    *
    * @defaultValue 'fail-open'
@@ -88,11 +88,11 @@ export class FailSafeCache implements ICache {
     this.onError = options.onError;
   }
 
-  get<T>(key: string): Promise<T | null> {
-    return this.cache.get<T>(key).catch(error => this.handleError('get', error, null));
+  get<T>(key: string): Promise<T | undefined> {
+    return this.cache.get<T>(key).catch(error => this.handleError('get', error, undefined));
   }
 
-  getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
+  getMany<T>(keys: string[]): Promise<Record<string, T>> {
     return this.cache.getMany<T>(keys).catch(error => this.handleError('get', error, {}));
   }
 
@@ -137,7 +137,7 @@ export class FailSafeCache implements ICache {
       }
 
       // We let the errors be handled according to policy
-      await this.handleError('getOrLoad', error, null);
+      await this.handleError('getOrLoad', error, undefined);
 
       // In case handleError didn't throw, we load from origin
       return loadSuccessful ? loadResult! : await load({ options: options || {} });

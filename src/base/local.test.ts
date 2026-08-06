@@ -5,8 +5,8 @@ class TestLocalCache extends BaseLocalCache {
   constructor() { super({}); }
   private store = new Map<string, any>();
 
-  _get<T>(key: string): T | null {
-    return this.store.has(key) ? this.store.get(key) : null;
+  _get<T>(key: string): T | undefined {
+    return this.store.get(key);
   }
 
   _set<T>(key: string, value: T, options?: any): void {
@@ -35,13 +35,13 @@ describe('BaseLocalCache (TestLocalCache)', () => {
   });
 
   it('basic CRUD via promise wrappers', async () => {
-    expect(await cache.get('missing')).toBeNull();
+    expect(await cache.get('missing')).toBeUndefined();
 
     await cache.set('a', 1);
     expect(await cache.get('a')).toBe(1);
 
     await cache.delete('a');
-    expect(await cache.get('a')).toBeNull();
+    expect(await cache.get('a')).toBeUndefined();
   });
 
   it('getMany/setMany/deleteMany parity', async () => {
@@ -49,15 +49,15 @@ describe('BaseLocalCache (TestLocalCache)', () => {
     expect(await cache.getMany(['a', 'b'])).toEqual({ a: 1, b: 2 });
 
     await cache.deleteMany(['a', 'b']);
-    expect(await cache.getMany(['a', 'b'])).toEqual({ a: null, b: null });
+    expect(await cache.getMany(['a', 'b'])).toStrictEqual({});
   });
 
   it('dispose listeners called on replace and delete', async () => {
     const spy1 = vi.fn();
     const spy2 = vi.fn();
 
-    cache._addDisposeListener(spy1);
-    cache._addDisposeListener(spy2);
+    (cache as any)._addDisposeListener(spy1);
+    (cache as any)._addDisposeListener(spy2);
 
     // first set shouldn't dispose (no previous value)
     await cache.set('k', 1);

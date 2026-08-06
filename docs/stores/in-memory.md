@@ -105,7 +105,7 @@ await cache.set("key", { myCoolValue: 1234 });
 
 // Memory fills up, garbage collector runs
 
-const valueAfter = await cache.get("key"); // could be { myCoolValue: 1234 } or null
+const valueAfter = await cache.get("key"); // could be { myCoolValue: 1234 } or undefined
 ```
 
 You can combine the WeakCache with any local cache store (like `LocalMapCache`, `LocalTTLCache` or `LocalLRUCache`) to benefit from both caching strategies.

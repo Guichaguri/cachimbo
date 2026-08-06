@@ -17,10 +17,8 @@ export class KeyvCache extends BaseCache {
     this.keyv = options.keyv;
   }
 
-  async get<T>(key: string): Promise<T | null> {
-    const result = await this.keyv.get<T>(key);
-
-    return result === undefined ? null : result;
+  async get<T>(key: string): Promise<T | undefined> {
+    return this.keyv.get<T>(key);
   }
 
   async set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {
@@ -31,12 +29,16 @@ export class KeyvCache extends BaseCache {
     await this.keyv.delete(key);
   }
 
-  override async getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
-    const data = await this.keyv.getMany(keys);
-    const result: Record<string, T | null> = {};
+  override async getMany<T>(keys: string[]): Promise<Record<string, T>> {
+    const data = await this.keyv.getMany<T>(keys);
+    const result: Record<string, T> = {};
 
     for (let i = 0; i < keys.length; i++) {
-      result[keys[i]] = data[i] === undefined ? null : data[i];
+      const value = data[i];
+
+      if (value !== undefined) {
+        result[keys[i]] = value;
+      }
     }
 
     return result;

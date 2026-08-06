@@ -49,12 +49,12 @@ export class SWRCache implements ICache {
     this.staleTTL = options.staleTTL;
   }
 
-  async get<T>(key: string): Promise<T | null> {
+  async get<T>(key: string): Promise<T | undefined> {
     this.logger?.debug(this.name, '[get]', 'key =', key);
 
     const item = await this.cache.get<CachedItem<T>>(key);
 
-    return item ? item.data : null;
+    return item ? item.data : undefined;
   }
 
   async getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options: SetCacheOptions = {}): Promise<T> {
@@ -111,14 +111,14 @@ export class SWRCache implements ICache {
     return this.cache.delete(key);
   }
 
-  async getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
+  async getMany<T>(keys: string[]): Promise<Record<string, T>> {
     this.logger?.debug(this.name, '[getMany]', 'keys =', keys);
 
     const data = await this.cache.getMany<CachedItem<T>>(keys);
-    const items: Record<string, T | null> = {};
+    const items: Record<string, T> = {};
 
     for (const [key, value] of Object.entries(data)) {
-      items[key] = value ? value.data : null;
+      items[key] = value.data;
     }
 
     return items;

@@ -37,13 +37,13 @@ describe('LocalTTLCache', () => {
       expect(mockTTLCache.get).toHaveBeenCalledWith('existing-key');
     });
 
-    test('returns null for a non-existing key', async () => {
+    test('returns undefined for a non-existing key', async () => {
       const cache = new LocalTTLCache({ cache: mockTTLCache });
       mockTTLCache.get.mockReturnValueOnce(undefined);
 
       const result = await cache.get('non-existing-key');
 
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
       expect(mockTTLCache.get).toHaveBeenCalledWith('non-existing-key');
     });
   });
@@ -80,7 +80,7 @@ describe('LocalTTLCache', () => {
     test('calls dispose when deleting', async () => {
       const cache = new LocalTTLCache({ ttl: 60 });
       const onDispose = vi.fn();
-      cache._addDisposeListener(onDispose);
+      (cache as any)._addDisposeListener(onDispose);
 
       await cache.set('key', 'sample');
 

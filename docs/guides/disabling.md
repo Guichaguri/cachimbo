@@ -24,6 +24,6 @@ const cache = initializeCache();
 await cache.set('product:123', myProduct, { ttl: 30 });
 
 // Returns the cached product on an actual cache implementation
-// Always returns `null` on NoOpCache
+// Always returns `undefined` on NoOpCache
 await cache.get('product:123');
 ```

@@ -51,8 +51,11 @@ export class DeepCloningCache extends BaseLocalCache {
     }
   }
 
-  protected _get<T>(key: string): T | null {
-    return this.deepClone(this.cacheInternal._get(key));
+  protected _get<T>(key: string): T | undefined {
+    const data = this.cacheInternal._get<T>(key);
+
+    // `undefined` is not clonable by the JSON-based implementation, so we short-circuit cache misses
+    return data === undefined ? undefined : this.deepClone(data);
   }
 
   protected _set<T>(key: string, value: T, options?: SetCacheOptions): void {
@@ -63,7 +66,7 @@ export class DeepCloningCache extends BaseLocalCache {
     this.cacheInternal._delete(key);
   }
 
-  protected override _getMany<T>(keys: string[]): Record<string, T | null> {
+  protected override _getMany<T>(keys: string[]): Record<string, T> {
     return this.deepClone(this.cacheInternal._getMany<T>(keys));
   }
 

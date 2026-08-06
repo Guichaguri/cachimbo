@@ -75,14 +75,14 @@ export class MetricsCollectingCache implements ICache {
     this.name = options.name;
   }
 
-  async get<T>(key: string): Promise<T | null> {
+  async get<T>(key: string): Promise<T | undefined> {
     const startAt = performance.now();
 
     const data = await this.cache.get<T>(key);
 
     const time = performance.now() - startAt;
 
-    if (data === null) {
+    if (data === undefined) {
       this.countMetrics.missCount++;
       this.totalTimeMetrics.missTime += time;
 
@@ -168,7 +168,7 @@ export class MetricsCollectingCache implements ICache {
     this.logger?.debug(this.name, '[delete] Cache delete.', 'key =', key, 'timeMS =', time);
   }
 
-  async getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
+  async getMany<T>(keys: string[]): Promise<Record<string, T>> {
     const startAt = performance.now();
 
     const data = await this.cache.getMany<T>(keys);
@@ -176,7 +176,7 @@ export class MetricsCollectingCache implements ICache {
     const time = performance.now() - startAt;
     const timePerKey = time / keys.length;
 
-    const miss = keys.filter(key => data[key] === undefined || data[key] === null).length;
+    const miss = keys.filter(key => data[key] === undefined).length;
     const hits = keys.length - miss;
 
     this.countMetrics.missCount += miss;

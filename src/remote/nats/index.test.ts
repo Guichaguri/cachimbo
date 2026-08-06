@@ -27,33 +27,33 @@ describe('NatsCache', () => {
       expect(mockKv.get).toHaveBeenCalledWith('existing-key');
     });
 
-    test('returns null for a non-existing key', async () => {
+    test('returns undefined for a non-existing key', async () => {
       const cache = new NatsCache({ kv: mockKv });
       mockKv.get.mockResolvedValueOnce(null);
 
       const result = await cache.get('non-existing-key');
 
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
       expect(mockKv.get).toHaveBeenCalledWith('non-existing-key');
     });
 
-    test('returns null for a soft-deleted key', async () => {
+    test('returns undefined for a soft-deleted key', async () => {
       const cache = new NatsCache({ kv: mockKv });
       mockKv.get.mockResolvedValueOnce({ operation: 'DEL' });
 
       const result = await cache.get('deleted-key');
 
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
       expect(mockKv.get).toHaveBeenCalledWith('deleted-key');
     });
 
-    test('returns null for a purged key', async () => {
+    test('returns undefined for a purged key', async () => {
       const cache = new NatsCache({ kv: mockKv });
       mockKv.get.mockResolvedValueOnce({ operation: 'PURGE' });
 
       const result = await cache.get('purged-key');
 
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
       expect(mockKv.get).toHaveBeenCalledWith('purged-key');
     });
   });

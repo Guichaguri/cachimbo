@@ -54,10 +54,10 @@ export class NatsCache extends BaseCache {
     this.isHardDeleteEnabled = options.isHardDeleteEnabled ?? false;
   }
 
-  async get<T>(key: string): Promise<T | null> {
+  async get<T>(key: string): Promise<T | undefined> {
     const entry = await this.kv.get(key);
 
-    return entry === null || entry.operation === 'DEL' || entry.operation === 'PURGE' ? null : entry.json<T>();
+    return entry === null || entry.operation === 'DEL' || entry.operation === 'PURGE' ? undefined : entry.json<T>();
   }
 
   async set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {

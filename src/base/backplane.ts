@@ -66,7 +66,7 @@ export abstract class BaseBackplane implements ICache {
     return Math.random().toString(36).substring(2, 15);
   }
 
-  get<T>(key: string): Promise<T | null> {
+  get<T>(key: string): Promise<T | undefined> {
     return this.cache.get<T>(key);
   }
 
@@ -109,7 +109,7 @@ export abstract class BaseBackplane implements ICache {
     await this.emit({ action: 'delete', key, nodeId: this.nodeId });
   }
 
-  getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
+  getMany<T>(keys: string[]): Promise<Record<string, T>> {
     return this.cache.getMany<T>(keys);
   }
 

@@ -24,13 +24,13 @@ describe('MemcacheCache', () => {
       expect(mockMemcacheClient.get).toHaveBeenCalledWith('existing-key');
     });
 
-    test('returns null for a non-existing key', async () => {
+    test('returns undefined for a non-existing key', async () => {
       const cache = new MemcacheCache({ client: mockMemcacheClient });
       mockMemcacheClient.get.mockResolvedValueOnce(undefined);
 
       const result = await cache.get('non-existing-key');
 
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
       expect(mockMemcacheClient.get).toHaveBeenCalledWith('non-existing-key');
     });
   });
@@ -85,10 +85,9 @@ describe('MemcacheCache', () => {
 
       const result = await cache.getMany(['key1', 'key2', 'key3']);
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         key1: { key: 'value1' },
         key2: { key: 'value2' },
-        key3: null,
       });
       expect(mockMemcacheClient.gets).toHaveBeenCalledWith(['key1', 'key2', 'key3']);
     });

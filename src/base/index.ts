@@ -16,7 +16,7 @@ export abstract class BaseCache implements ICache {
     this.logger = options.logger;
   }
 
-  abstract get<T>(key: string): Promise<T | null>;
+  abstract get<T>(key: string): Promise<T | undefined>;
 
   abstract set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void>;
 
@@ -25,7 +25,7 @@ export abstract class BaseCache implements ICache {
   async getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options?: SetCacheOptions): Promise<T> {
     let data = await this.get<T>(key);
 
-    if (data !== null) {
+    if (data !== undefined) {
       this.logger?.debug(this.name, '[getOrLoad] Returning from cache.', 'key =', key);
 
       return data;
@@ -42,13 +42,15 @@ export abstract class BaseCache implements ICache {
     return data;
   }
 
-  async getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
+  async getMany<T>(keys: string[]): Promise<Record<string, T>> {
     this.logger?.debug(this.name, '[getMany] Reading all keys in parallel...', 'keys =', keys);
 
+    const entries = await Promise.all(
+      keys.map(async key => [key, await this.get<any>(key)] as const),
+    );
+
     return Object.fromEntries(
-      await Promise.all(
-        keys.map(async key => [key, await this.get<any>(key)]),
-      ),
+      entries.filter(([, value]) => value !== undefined),
     );
   }
 

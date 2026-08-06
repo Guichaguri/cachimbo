@@ -56,7 +56,7 @@ export class KeyTransformingCache implements ICache {
     }
   }
 
-  get<T>(key: string): Promise<T | null> {
+  get<T>(key: string): Promise<T | undefined> {
     return this.cache.get<T>(this.transform(key));
   }
 
@@ -72,7 +72,7 @@ export class KeyTransformingCache implements ICache {
     return this.cache.delete(this.transform(key));
   }
 
-  async getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
+  async getMany<T>(keys: string[]): Promise<Record<string, T>> {
     const transformedKeys = keys.map(key => this.transform(key));
     const data = await this.cache.getMany<T>(transformedKeys);
 

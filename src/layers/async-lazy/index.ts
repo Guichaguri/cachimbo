@@ -53,7 +53,7 @@ export class AsyncLazyCache implements ICache {
     }
   }
 
-  async get<T>(key: string): Promise<T | null> {
+  async get<T>(key: string): Promise<T | undefined> {
     return (await this.resolveCache()).get<T>(key);
   }
 
@@ -69,7 +69,7 @@ export class AsyncLazyCache implements ICache {
     return (await this.resolveCache()).delete(key);
   }
 
-  async getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
+  async getMany<T>(keys: string[]): Promise<Record<string, T>> {
     return (await this.resolveCache()).getMany<T>(keys);
   }
 

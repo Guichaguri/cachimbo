@@ -40,13 +40,13 @@ describe('LocalLRUCache', () => {
       expect(mockLRUCache.get).toHaveBeenCalledWith('existing-key');
     });
 
-    test('returns null for a non-existing key', async () => {
+    test('returns undefined for a non-existing key', async () => {
       const cache = new LocalLRUCache({ cache: mockLRUCache });
       mockLRUCache.get.mockReturnValueOnce(undefined);
 
       const result = await cache.get('non-existing-key');
 
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
       expect(mockLRUCache.get).toHaveBeenCalledWith('non-existing-key');
     });
   });
@@ -70,7 +70,7 @@ describe('LocalLRUCache', () => {
     test('uses BaseCache getOrLoad when shouldUseFetch is false', async () => {
       const cache = new LocalLRUCache({ cache: mockLRUCache, shouldUseFetch: false });
       const load = vi.fn().mockResolvedValue('loaded-value');
-      mockLRUCache.get.mockReturnValueOnce(null);
+      mockLRUCache.get.mockReturnValueOnce(undefined);
 
       const result = await cache.getOrLoad('key', load, { ttl: 30 });
 

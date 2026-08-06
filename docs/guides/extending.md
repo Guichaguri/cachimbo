@@ -6,7 +6,7 @@ Cachimbo is designed to be easily extendable. You can create your own caching st
 import { ICache } from 'cachimbo';
 
 class MyCache implements ICache {
-  async get<T>(key: string): Promise<T | null> {
+  async get<T>(key: string): Promise<T | undefined> {
     /* your implementation */
   }
   async getOrLoad<T>(key: string, load: () => Promise<T>, options?: SetCacheOptions): Promise<T> {
@@ -18,7 +18,7 @@ class MyCache implements ICache {
   async delete(key: string): Promise<void> {
     /* your implementation */
   }
-  async getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
+  async getMany<T>(keys: string[]): Promise<Record<string, T>> {
     /* your implementation */
   }
   async setMany<T>(data: Record<string, T>, options?: SetCacheOptions): Promise<void> {
@@ -40,7 +40,7 @@ class MyCache extends BaseCache {
     super(options);
   }
 
-  async get<T>(key: string): Promise<T | null> {
+  async get<T>(key: string): Promise<T | undefined> {
     /* your implementation */
   }
 
@@ -67,14 +67,14 @@ class MyLocalCache extends BaseLocalCache {
     super(options);
   }
 
-  _get<T>(key: string): T | null {
+  _get<T>(key: string): T | undefined {
     /* your implementation */
   }
 
   _set<T>(key: string, value: T, options?: SetCacheOptions): void {
     /* your implementation */
     
-    if (previousValue !== null) {
+    if (previousValue !== undefined) {
       // call onDispose for the previous value when an item is overwritten
       this.onDispose(key, previousValue, 'set');
     }
@@ -115,13 +115,13 @@ export class BrowserStorageCache extends BaseCache {
     this.storage = options.storage ?? localStorage;
   }
 
-  async get<T>(key: string): Promise<T | null> {
+  async get<T>(key: string): Promise<T | undefined> {
     try {
       const raw = this.storage.getItem(key);
 
-      return raw ? JSON.parse(raw) : null;
+      return raw ? JSON.parse(raw) : undefined;
     } catch (error) {
-      return null;
+      return undefined;
     }
   }
 

@@ -6,7 +6,7 @@ class MockedCache extends BaseCache {
   constructor() {
     super({ logger: { debug: vi.fn() } });
   }
-  get = vi.fn().mockReturnValue(null);
+  get = vi.fn().mockReturnValue(undefined);
   set = vi.fn();
   delete = vi.fn();
 }
@@ -62,14 +62,14 @@ describe('BaseCache', () => {
         'key2': 'sample',
         'key3': 'another',
       };
-      cache.get.mockImplementation((key) => items[key] ?? null);
+      cache.get.mockImplementation((key) => items[key]);
 
       const result = await cache.getMany(['key1', 'key2', 'key4']);
 
-      expect(result).toEqual({
+      // Missing keys are omitted from the result
+      expect(result).toStrictEqual({
         'key1': 'value1',
         'key2': 'sample',
-        'key4': null,
       });
       expect(cache.get).toHaveBeenCalledWith('key1');
       expect(cache.get).toHaveBeenCalledWith('key2');

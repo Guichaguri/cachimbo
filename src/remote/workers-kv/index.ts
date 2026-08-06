@@ -31,8 +31,10 @@ export class WorkersKVCache extends BaseCache {
     this.edgeCacheTTL = options.edgeCacheTTL;
   }
 
-  get<T>(key: string): Promise<T | null> {
-    return this.kv.get<T>(key, { type: 'json', cacheTtl: this.edgeCacheTTL });
+  async get<T>(key: string): Promise<T | undefined> {
+    const value = await this.kv.get<T>(key, { type: 'json', cacheTtl: this.edgeCacheTTL });
+
+    return value === null ? undefined : value;
   }
 
   set<T>(key: string, value: T, options: SetCacheOptions = {}): Promise<void> {
@@ -43,10 +45,17 @@ export class WorkersKVCache extends BaseCache {
     return this.kv.delete(key);
   }
 
-  override async getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
-    const data = await this.kv.get<T>(keys, { type: 'json', cacheTtl: this.edgeCacheTTL });
+  override async getMany<T>(keys: string[]): Promise<Record<string, T>> {
+    const values = await this.kv.get<T>(keys, { type: 'json', cacheTtl: this.edgeCacheTTL });
+    const data: Record<string, T> = {};
 
-    return Object.fromEntries(data);
+    for (const [key, value] of values) {
+      if (value !== null) {
+        data[key] = value;
+      }
+    }
+
+    return data;
   }
 
 }

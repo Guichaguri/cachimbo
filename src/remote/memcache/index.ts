@@ -27,12 +27,12 @@ export class MemcacheCache extends BaseCache {
     this.defaultTTL = options.defaultTTL;
   }
 
-  async get<T>(key: string): Promise<T | null> {
+  async get<T>(key: string): Promise<T | undefined> {
     this.logger?.debug(this.name, '[get] Running "get" command...', 'key =', key);
 
     const raw = await this.client.get(key);
 
-    return raw ? JSON.parse(raw) : null;
+    return raw ? JSON.parse(raw) : undefined;
   }
 
   async set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {
@@ -51,14 +51,16 @@ export class MemcacheCache extends BaseCache {
     await this.client.delete(key);
   }
 
-  override async getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
+  override async getMany<T>(keys: string[]): Promise<Record<string, T>> {
     this.logger?.debug(this.name, '[getMany] Running "get" command...', 'keys =', keys);
 
     const raw = await this.client.gets(keys);
-    const data: Record<string, T | null> = {};
+    const data: Record<string, T> = {};
 
     raw.forEach((value, key) => {
-      data[key] = value ? JSON.parse(value) : null;
+      if (value) {
+        data[key] = JSON.parse(value);
+      }
     });
 
     return data;

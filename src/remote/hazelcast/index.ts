@@ -31,8 +31,10 @@ export class HazelcastCache extends BaseCache {
     this.map = options.map;
   }
 
-  get<T>(key: string): Promise<T | null> {
-    return this.map.get(key);
+  async get<T>(key: string): Promise<T | undefined> {
+    const value = await this.map.get(key);
+
+    return value === null ? undefined : value;
   }
 
   set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {
@@ -43,12 +45,14 @@ export class HazelcastCache extends BaseCache {
     return this.map.delete(key);
   }
 
-  override async getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
+  override async getMany<T>(keys: string[]): Promise<Record<string, T>> {
     const entries = await this.map.getAll(keys);
-    const data: Record<string, T | null> = {};
+    const data: Record<string, T> = {};
 
     for (const [key, value] of entries) {
-      data[key] = value;
+      if (value !== null && value !== undefined) {
+        data[key] = value;
+      }
     }
 
     return data;

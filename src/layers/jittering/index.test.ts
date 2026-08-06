@@ -69,11 +69,11 @@ describe('JitterCache', () => {
   describe('getMany', () => {
     test('retrieves multiple values for keys', async () => {
       const jitterCache = new JitteringCache({ cache: mockCache, defaultTTL: 60, maxJitterTTL: 10 });
-      mockCache.getMany.mockResolvedValueOnce({ key1: 'value1', key2: null });
+      mockCache.getMany.mockResolvedValueOnce({ key1: 'value1' });
 
       const result = await jitterCache.getMany(['key1', 'key2']);
 
-      expect(result).toEqual({ key1: 'value1', key2: null });
+      expect(result).toStrictEqual({ key1: 'value1' });
       expect(mockCache.getMany).toHaveBeenCalledWith(['key1', 'key2']);
     });
   });

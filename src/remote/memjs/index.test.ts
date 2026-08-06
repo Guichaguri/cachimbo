@@ -19,13 +19,13 @@ describe('MemJSCache', () => {
       expect(mockMemJSClient.get).toHaveBeenCalledWith('existing-key');
     });
 
-    test('returns null for a non-existing key', async () => {
+    test('returns undefined for a non-existing key', async () => {
       const cache = new MemJSCache({ client: mockMemJSClient });
       mockMemJSClient.get.mockResolvedValueOnce({ value: null });
 
       const result = await cache.get('non-existing-key');
 
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
       expect(mockMemJSClient.get).toHaveBeenCalledWith('non-existing-key');
     });
   });

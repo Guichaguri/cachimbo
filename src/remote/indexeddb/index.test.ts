@@ -23,12 +23,12 @@ describe('IndexedDBCache', () => {
       expect(result).toEqual({ key: 'value' });
     });
 
-    test('returns null for a non-existing key', async () => {
+    test('returns undefined for a non-existing key', async () => {
       const cache = createCache();
 
       const result = await cache.get('non-existing-key');
 
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
     });
   });
 
@@ -39,7 +39,7 @@ describe('IndexedDBCache', () => {
       await cache.delete('key');
 
       const result = await cache.get('key');
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
     });
   });
 
@@ -53,10 +53,9 @@ describe('IndexedDBCache', () => {
 
       const result = await cache.getMany(['key1', 'key2', 'key3']);
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         key1: 'value1',
         key2: 'value2',
-        key3: null,
       });
     });
   });
@@ -74,9 +73,7 @@ describe('IndexedDBCache', () => {
 
       const result = await cache.getMany(['key1', 'key2', 'key3']);
 
-      expect(result).toEqual({
-        key1: null,
-        key2: null,
+      expect(result).toStrictEqual({
         key3: 'value3',
       });
     });
@@ -102,9 +99,7 @@ describe('IndexedDBCache', () => {
 
       const result = await cache.getMany(['key1', 'key2', 'key3', 'key4']);
 
-      expect(result).toEqual({
-        key1: null,
-        key2: null,
+      expect(result).toStrictEqual({
         key3: 'value3',
         key4: 'value4',
       });
@@ -125,9 +120,7 @@ describe('IndexedDBCache', () => {
 
       const result = await cache.getMany(['key1', 'key2', 'key3', 'key4']);
 
-      expect(result).toEqual({
-        key1: null,
-        key2: null,
+      expect(result).toStrictEqual({
         key3: 'value3',
         key4: 'value-updated',
       });
@@ -147,10 +140,7 @@ describe('IndexedDBCache', () => {
 
       const result = await cache.getMany(['key1', 'key2']);
 
-      expect(result).toEqual({
-        key1: null,
-        key2: null,
-      });
+      expect(result).toStrictEqual({});
     });
   });
 

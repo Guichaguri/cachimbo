@@ -3,7 +3,7 @@ import type { ICache } from '../../types/cache.js';
 import { type CacheTier, TieredCache } from './index.js';
 
 const createMockCacheLayer = () => ({
-  get: vi.fn().mockReturnValue(null),
+  get: vi.fn().mockReturnValue(undefined),
   set: vi.fn(),
   delete: vi.fn(),
   getOrLoad: vi.fn((_, load) => load()),
@@ -60,14 +60,14 @@ describe('Tiered Cache', () => {
       expect(remoteCache.get).toHaveBeenCalledWith(key);
     });
 
-    test('should return null if no tier has the value', async () => {
+    test('should return undefined if no tier has the value', async () => {
       const key = 'missing-key';
 
-      remoteCache.get.mockResolvedValueOnce(null);
+      remoteCache.get.mockResolvedValueOnce(undefined);
 
       const result = await tieredCache.get<string>(key);
 
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
       expect(localCache.getOrLoad).toHaveBeenCalledWith(key, expect.any(Function), { ttl: 30 });
       expect(remoteCache.get).toHaveBeenCalledWith(key);
     });
@@ -138,8 +138,8 @@ describe('Tiered Cache', () => {
 
   describe('getMany', () => {
     test('should get values from mixed tiers', async () => {
-      const firstTierResult = { key1: 'value1', key2: null, key3: null };
-      const secondTierResult = { key2: null, key3: 'value3' };
+      const firstTierResult = { key1: 'value1' };
+      const secondTierResult = { key3: 'value3' };
 
       localCache.getMany.mockResolvedValueOnce(firstTierResult);
       remoteCache.getMany.mockResolvedValueOnce(secondTierResult);
@@ -147,7 +147,7 @@ describe('Tiered Cache', () => {
       const keys = ['key1', 'key2', 'key3'];
       const result = await tieredCache.getMany<string>(keys);
 
-      expect(result).toEqual({ key1: 'value1', key2: null, key3: 'value3' });
+      expect(result).toStrictEqual({ key1: 'value1', key3: 'value3' });
       expect(localCache.getMany).toHaveBeenCalledWith(keys);
       expect(remoteCache.getMany).toHaveBeenCalledWith(['key2', 'key3']);
       expect(localCache.setMany).toHaveBeenCalledWith({ key3: 'value3' }, { ttl: 30 });
@@ -170,7 +170,7 @@ describe('Tiered Cache', () => {
     });
 
     test('should not backfill if no tiers have the values', async () => {
-      const tierResult = { key1: null, key2: null, key3: null };
+      const tierResult = {};
 
       localCache.getMany.mockResolvedValueOnce(tierResult);
       remoteCache.getMany.mockResolvedValueOnce(tierResult);

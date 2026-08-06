@@ -3,7 +3,7 @@ import type { ICache } from '../../types/cache.js';
 import { SWRCache } from './index.js';
 
 const mockedCache = {
-  get: vi.fn().mockReturnValue(null),
+  get: vi.fn().mockReturnValue(undefined),
   set: vi.fn(),
   delete: vi.fn(),
   getOrLoad: vi.fn((_, load) => load()),
@@ -28,7 +28,7 @@ describe('SWR Cache', () => {
   });
 
   describe('get', () => {
-    test('should return null when cache miss', async () => {
+    test('should return the value on cache hit', async () => {
       mockedCache.get.mockResolvedValueOnce({ data: 'value' });
 
       const result = await swrCache.get('key1');
@@ -37,12 +37,12 @@ describe('SWR Cache', () => {
       expect(mockedCache.get).toHaveBeenCalledWith('key1');
     });
 
-    test('should return null when cache miss', async () => {
-      mockedCache.get.mockResolvedValueOnce(null);
+    test('should return undefined when cache miss', async () => {
+      mockedCache.get.mockResolvedValueOnce(undefined);
 
       const result = await swrCache.get('key1');
 
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
       expect(mockedCache.get).toHaveBeenCalledWith('key1');
     });
   });
@@ -152,15 +152,13 @@ describe('SWR Cache', () => {
       mockedCache.getMany.mockResolvedValueOnce({
         key1: { data: 'value1' },
         key2: { data: 'value2' },
-        key3: null,
       });
 
       const result = await swrCache.getMany(['key1', 'key2', 'key3']);
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         key1: 'value1',
         key2: 'value2',
-        key3: null,
       });
       expect(mockedCache.getMany).toHaveBeenCalledWith(['key1', 'key2', 'key3']);
     });

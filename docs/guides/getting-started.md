@@ -83,7 +83,7 @@ const data = await cache.getOrLoad<MyData>(
 ##### `get`
 
 ```ts
-// Get data by key, returns the object cached or null if not found
+// Get data by key, returns the object cached or undefined if not found
 const data = await cache.get<MyData>("mykey");
 ```
 
@@ -109,6 +109,7 @@ await cache.delete("mykey");
 
 ```ts
 // Gets multiple cached resources by their keys
+// Keys that are not found are omitted from the record, so reading them results in undefined
 const { mykey, anotherKey } = await cache.getMany<MyData>(["mykey", "anotherKey"]);
 ```
 

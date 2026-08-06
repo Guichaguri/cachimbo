@@ -26,13 +26,13 @@ describe('KeyvCache', () => {
       expect(mockKeyv.get).toHaveBeenCalledWith('existing-key');
     });
 
-    test('returns null for a non-existing key', async () => {
+    test('returns undefined for a non-existing key', async () => {
       const cache = new KeyvCache({ keyv: mockKeyv });
       mockKeyv.get.mockResolvedValueOnce(undefined);
 
       const result = await cache.get('non-existing-key');
 
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
       expect(mockKeyv.get).toHaveBeenCalledWith('non-existing-key');
     });
   });
@@ -72,7 +72,7 @@ describe('KeyvCache', () => {
 
       const result = await cache.getMany(['key1', 'key2', 'key3']);
 
-      expect(result).toEqual({ key1: 'value1', key2: null, key3: 'value3' });
+      expect(result).toStrictEqual({ key1: 'value1', key3: 'value3' });
       expect(mockKeyv.getMany).toHaveBeenCalledWith(['key1', 'key2', 'key3']);
     });
   });

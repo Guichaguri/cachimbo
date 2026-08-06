@@ -3,10 +3,10 @@ import { NoOpCache } from './index.js';
 
 describe('NoOpCache', () => {
   describe('get', () => {
-    test('returns null for any key', async () => {
+    test('returns undefined for any key', async () => {
       const cache = new NoOpCache();
       const result = await cache.get('any-key');
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
     });
   });
 

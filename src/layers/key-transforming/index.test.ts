@@ -81,11 +81,11 @@ describe('KeyTransformingCache', () => {
   describe('getMany', () => {
     test('returns values for transformed keys', async () => {
       const cache = new KeyTransformingCache({ cache: mockCache, suffix: '-suffix' });
-      mockCache.getMany.mockResolvedValueOnce({ 'key1-suffix': 'value1', 'key2-suffix': null });
+      mockCache.getMany.mockResolvedValueOnce({ 'key1-suffix': 'value1', 'key2-suffix': 'value2' });
 
       const result = await cache.getMany(['key1', 'key2']);
 
-      expect(result).toEqual({ key1: 'value1', key2: null });
+      expect(result).toStrictEqual({ key1: 'value1', key2: 'value2' });
       expect(mockCache.getMany).toHaveBeenCalledWith(['key1-suffix', 'key2-suffix']);
     });
   });

@@ -60,8 +60,8 @@ export class IndexedDBCache extends BaseCache {
     this.shouldAutoEvict = options.shouldAutoEvict ?? true;
   }
 
-  async get<T>(key: string): Promise<T | null> {
-    return await this.do('readonly', store => this.storeGet(store, key));
+  async get<T>(key: string): Promise<T | undefined> {
+    return await this.do('readonly', store => this.storeGet<T>(store, key));
   }
 
   async set<T>(key: string, value: T, options: SetCacheOptions = {}): Promise<void> {
@@ -85,12 +85,16 @@ export class IndexedDBCache extends BaseCache {
     });
   }
 
-  override getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
+  override getMany<T>(keys: string[]): Promise<Record<string, T>> {
     return this.do('readonly', async store => {
-      const data: Record<string, T | null> = {};
+      const data: Record<string, T> = {};
 
       await Promise.all(keys.map(async key => {
-        data[key] = await this.storeGet(store, key);
+        const value = await this.storeGet<T>(store, key);
+
+        if (value !== undefined) {
+          data[key] = value;
+        }
       }));
 
       return data;
@@ -203,17 +207,17 @@ export class IndexedDBCache extends BaseCache {
    * @param store The transaction store
    * @param key The item key
    */
-  protected async storeGet<T>(store: IDBObjectStore, key: string): Promise<T | null> {
+  protected async storeGet<T>(store: IDBObjectStore, key: string): Promise<T | undefined> {
     const entry: IDBStoredEntry<T> | undefined = await this.promisifyRequest(store.get(key));
 
     if (entry === undefined) {
-      return null;
+      return undefined;
     }
 
     if (entry.e && Date.now() >= entry.e) {
       // Mark for deletion on next auto-evict
       this.shouldEvict = true;
-      return null;
+      return undefined;
     }
 
     return entry.v;

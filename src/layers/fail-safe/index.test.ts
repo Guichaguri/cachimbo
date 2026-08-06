@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { FailSafeCache } from './index.js';
 
 const cacheMock = {
-  get: vi.fn().mockResolvedValue(null),
+  get: vi.fn().mockResolvedValue(undefined),
   set: vi.fn(),
   delete: vi.fn(),
   getMany: vi.fn().mockResolvedValue({}),
@@ -11,7 +11,7 @@ const cacheMock = {
   deleteMany: vi.fn(),
   getOrLoad: async (key, load, options) => {
     await cacheMock.get(key);
-    const value = await load();
+    const value = await load({ options: options || {} });
     await cacheMock.set(key, value, options);
     return value;
   },
@@ -34,7 +34,7 @@ describe('FailSafeCache', () => {
 
       cacheMock.get.mockRejectedValueOnce(error);
 
-      await expect(cache.get('sample')).resolves.toBeNull();
+      await expect(cache.get('sample')).resolves.toBeUndefined();
 
       expect(cacheMock.get).toHaveBeenCalledWith('sample');
       expect(onError).toHaveBeenCalledWith('get', error);
@@ -47,7 +47,7 @@ describe('FailSafeCache', () => {
 
       cacheMock.get.mockRejectedValueOnce(new Error());
 
-      await expect(cache.get('sample')).resolves.toBeNull();
+      await expect(cache.get('sample')).resolves.toBeUndefined();
 
       expect(cacheMock.get).toHaveBeenCalledWith('sample');
     });
@@ -62,7 +62,7 @@ describe('FailSafeCache', () => {
 
       cacheMock.get.mockRejectedValueOnce(new Error());
 
-      await expect(cache.get('sample')).resolves.toBeNull();
+      await expect(cache.get('sample')).resolves.toBeUndefined();
 
       expect(cacheMock.get).toHaveBeenCalledWith('sample');
     });

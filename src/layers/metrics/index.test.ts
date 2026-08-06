@@ -19,7 +19,7 @@ describe('MetricsCollectingCache', () => {
   describe('get', () => {
     test('increments miss count and time on cache miss', async () => {
       const cache = new MetricsCollectingCache({ cache: mockCache });
-      mockCache.get.mockResolvedValueOnce(null);
+      mockCache.get.mockResolvedValueOnce(undefined);
 
       await cache.get('missing-key');
 
@@ -94,7 +94,6 @@ describe('MetricsCollectingCache', () => {
       const cache = new MetricsCollectingCache({ cache: mockCache });
       mockCache.getMany.mockResolvedValueOnce({
         key1: 'value1',
-        key2: null,
         key3: 'value3',
       });
 

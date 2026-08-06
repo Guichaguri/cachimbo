@@ -41,7 +41,7 @@ export class WeakCache extends BaseLocalCache {
   };
 
   /** @internal */
-  override _get<T>(key: string): T | null {
+  override _get<T>(key: string): T | undefined {
     return this.unwrap(this.cacheInternal._get<WeakValue>(key));
   }
 
@@ -57,14 +57,20 @@ export class WeakCache extends BaseLocalCache {
   }
 
   /** @internal */
-  override _getMany<T>(keys: string[]): Record<string, T | null> {
-    const data = this.cacheInternal._getMany<any>(keys);
+  override _getMany<T>(keys: string[]): Record<string, T> {
+    const data = this.cacheInternal._getMany<WeakValue>(keys);
+    const items: Record<string, T> = {};
 
-    for (const key of keys) {
-      data[key] = this.unwrap(data[key]);
+    for (const [key, value] of Object.entries(data)) {
+      const unwrapped = this.unwrap<T>(value);
+
+      // The referenced object may have already been garbage collected
+      if (unwrapped !== undefined) {
+        items[key] = unwrapped;
+      }
     }
 
-    return data;
+    return items;
   }
 
   /** @internal */
@@ -118,13 +124,13 @@ export class WeakCache extends BaseLocalCache {
    * @param data The data to unwrap
    * @returns The unwrapped value
    */
-  protected unwrap<T>(data: WeakValue | null): T | null {
-    if (data === null) {
-      return null;
+  protected unwrap<T>(data: WeakValue | undefined): T | undefined {
+    if (data === undefined) {
+      return undefined;
     }
 
     if (data.w) {
-      return data.v.deref() ?? null;
+      return data.v.deref();
     }
 
     return data.v;
@@ -135,7 +141,7 @@ export class WeakCache extends BaseLocalCache {
    *
    * @param value The value to unregister
    */
-  protected unregister(value: WeakValue | null): void {
+  protected unregister(value: WeakValue | undefined): void {
     if (value && value.w) {
       const obj = value.v.deref();
 

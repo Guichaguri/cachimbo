@@ -22,13 +22,13 @@ describe('WorkersKVCache', () => {
       expect(mockKVNamespace.get).toHaveBeenCalledWith('existing-key', { type: 'json' });
     });
 
-    test('returns null for a non-existing key', async () => {
+    test('returns undefined for a non-existing key', async () => {
       const cache = new WorkersKVCache({ kv: mockKVNamespace });
       mockKVNamespace.get.mockResolvedValueOnce(null);
 
       const result = await cache.get('non-existing-key');
 
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
       expect(mockKVNamespace.get).toHaveBeenCalledWith('non-existing-key', { type: 'json' });
     });
   });
@@ -80,7 +80,7 @@ describe('WorkersKVCache', () => {
       expect(mockKVNamespace.get).toHaveBeenCalledWith(['key1', 'key2'], { type: 'json' });
     });
 
-    test('returns null for keys that do not exist', async () => {
+    test('omits keys that do not exist', async () => {
       const cache = new WorkersKVCache({ kv: mockKVNamespace });
       mockKVNamespace.get.mockResolvedValueOnce([
         ['key1', { key: 'value1' }],
@@ -89,9 +89,8 @@ describe('WorkersKVCache', () => {
 
       const result = await cache.getMany(['key1', 'key2']);
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         key1: { key: 'value1' },
-        key2: null,
       });
       expect(mockKVNamespace.get).toHaveBeenCalledWith(['key1', 'key2'], { type: 'json' });
     });

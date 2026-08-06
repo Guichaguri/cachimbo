@@ -3,7 +3,7 @@ import type { ICache } from '../../types/cache.js';
 import { CoalescingCache } from './index.js';
 
 const mockedCache = {
-  get: vi.fn(() => waitFor(5).then(() => null)),
+  get: vi.fn(() => waitFor(5).then(() => undefined)),
   set: vi.fn(() => waitFor(5).then(() => undefined)),
   delete: vi.fn(() => waitFor(5).then(() => undefined)),
   getOrLoad: vi.fn((_, load) => load()),
@@ -29,9 +29,9 @@ describe('Coalescing Cache', () => {
         cache.get('key2'),
       ]);
 
-      expect(res1).toBeNull();
-      expect(res2).toBeNull();
-      expect(res3).toBeNull();
+      expect(res1).toBeUndefined();
+      expect(res2).toBeUndefined();
+      expect(res3).toBeUndefined();
       expect(mockedCache.get).toHaveBeenCalledTimes(2);
       expect(mockedCache.get).toHaveBeenCalledWith('key1');
       expect(mockedCache.get).toHaveBeenCalledWith('key2');
@@ -44,9 +44,9 @@ describe('Coalescing Cache', () => {
       const res2 = await cache.get('key1');
       const res3 = await cache.get('key2');
 
-      expect(res1).toBeNull();
-      expect(res2).toBeNull();
-      expect(res3).toBeNull();
+      expect(res1).toBeUndefined();
+      expect(res2).toBeUndefined();
+      expect(res3).toBeUndefined();
       expect(mockedCache.get).toHaveBeenCalledTimes(3);
       expect(mockedCache.get).toHaveBeenCalledWith('key1');
       expect(mockedCache.get).toHaveBeenCalledWith('key2');
@@ -57,7 +57,7 @@ describe('Coalescing Cache', () => {
     test('should coalesce ongoing load requests for the same key', async () => {
       const cache = new CoalescingCache({ cache: mockedCache });
       const load = vi.fn(() => waitFor(5).then(() => 'value'));
-      const load2 = vi.fn(() => waitFor(5).then(() => null));
+      const load2 = vi.fn(() => waitFor(5).then(() => undefined));
 
       const [res1, res2, res3, res4] = await Promise.all([
         cache.getOrLoad('key1', load),
@@ -68,8 +68,8 @@ describe('Coalescing Cache', () => {
 
       expect(res1).toBe('value');
       expect(res2).toBe('value');
-      expect(res3).toBeNull();
-      expect(res4).toBeNull();
+      expect(res3).toBeUndefined();
+      expect(res4).toBeUndefined();
       expect(load).toHaveBeenCalledTimes(1);
       expect(load2).toHaveBeenCalledTimes(1);
       expect(mockedCache.getOrLoad).toHaveBeenCalledTimes(2);
@@ -80,7 +80,7 @@ describe('Coalescing Cache', () => {
     test('should coalesce a get request with a load request for the same key', async () => {
       const cache = new CoalescingCache({ cache: mockedCache });
       const load = vi.fn(() => waitFor(5).then(() => 'value'));
-      const load2 = vi.fn(() => waitFor(5).then(() => null));
+      const load2 = vi.fn(() => waitFor(5).then(() => undefined));
 
       const [res1, res2, res3, res4] = await Promise.all([
         cache.get('key1'),
@@ -89,10 +89,10 @@ describe('Coalescing Cache', () => {
         cache.getOrLoad('key2', load2),
       ]);
 
-      expect(res1).toBeNull();
+      expect(res1).toBeUndefined();
       expect(res2).toBe('value');
-      expect(res3).toBeNull();
-      expect(res4).toBeNull();
+      expect(res3).toBeUndefined();
+      expect(res4).toBeUndefined();
       expect(load).toHaveBeenCalledTimes(1);
       expect(load2).toHaveBeenCalledTimes(1);
       expect(mockedCache.get).toHaveBeenCalledTimes(2);
@@ -153,7 +153,7 @@ describe('Coalescing Cache', () => {
       ]);
 
       expect(res1).toBe('value');
-      expect(res2).toBeNull();
+      expect(res2).toBeUndefined();
       expect(mockedCache.get).toHaveBeenCalledTimes(1);
       expect(mockedCache.delete).toHaveBeenCalledTimes(1);
       expect(mockedCache.get).toHaveBeenCalledWith('key1');
@@ -254,10 +254,7 @@ describe('Coalescing Cache', () => {
         key1: 'value1',
         key2: 'value2',
       });
-      expect(res2).toEqual({
-        key1: null,
-        key2: null,
-      });
+      expect(res2).toStrictEqual({});
       expect(mockedCache.getMany).toHaveBeenCalledTimes(1);
       expect(mockedCache.deleteMany).toHaveBeenCalledTimes(1);
       expect(mockedCache.getMany).toHaveBeenCalledWith(['key1', 'key2']);

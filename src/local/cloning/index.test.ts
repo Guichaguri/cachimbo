@@ -59,7 +59,7 @@ describe('DeepCloningCache', () => {
     const obj2 = await cache.get("key1");
     const obj3 = await cache.get("unknown");
 
-    expect(obj3).toBeNull();
+    expect(obj3).toBeUndefined();
     expect(obj2).toEqual({ a: 1 });
     expect(obj).toEqual({ a: 1, b: 2 });
   });

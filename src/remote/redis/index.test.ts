@@ -26,13 +26,13 @@ describe('RedisCache', () => {
       expect(mockRedisClient.get).toHaveBeenCalledWith('existing-key');
     });
 
-    test('returns null for a non-existing key', async () => {
+    test('returns undefined for a non-existing key', async () => {
       const cache = new RedisCache({ client: mockRedisClient });
       mockRedisClient.get.mockResolvedValueOnce(null);
 
       const result = await cache.get('non-existing-key');
 
-      expect(result).toBeNull();
+      expect(result).toBeUndefined();
       expect(mockRedisClient.get).toHaveBeenCalledWith('non-existing-key');
     });
   });
@@ -94,10 +94,9 @@ describe('RedisCache', () => {
 
       const result = await cache.getMany(['key1', 'key2', 'key3']);
 
-      expect(result).toEqual({
+      expect(result).toStrictEqual({
         key1: { key: 'value1' },
         key2: { key: 'value2' },
-        key3: null,
       });
       expect(mockRedisClient.mGet).toHaveBeenCalledWith(['key1', 'key2', 'key3']);
     });

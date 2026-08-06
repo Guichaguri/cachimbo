@@ -27,12 +27,12 @@ export class MemJSCache extends BaseCache {
     this.defaultTTL = options.defaultTTL;
   }
 
-  async get<T>(key: string): Promise<T | null> {
+  async get<T>(key: string): Promise<T | undefined> {
     this.logger?.debug(this.name, '[get] Running "get" command...', 'key =', key);
 
     const { value } = await this.client.get(key);
 
-    return value ? JSON.parse(value.toString('utf8')) : null;
+    return value ? JSON.parse(value.toString('utf8')) : undefined;
   }
 
   async set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {

@@ -12,11 +12,11 @@ import type { ICache, LoadContext, SetCacheOptions } from '../../types/cache.js'
 export class NoOpCache implements ICache {
   constructor() {}
 
-  async get<T>(key: string): Promise<T | null> {
-    return null;
+  async get<T>(key: string): Promise<T | undefined> {
+    return undefined;
   }
 
-  async getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
+  async getMany<T>(keys: string[]): Promise<Record<string, T>> {
     return {};
   }
 

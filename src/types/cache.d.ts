@@ -42,11 +42,11 @@ export interface ICache {
 
   /**
    * Reads the cached resource from a key.
-   * Returns `null` when the resource is not found.
+   * Returns `undefined` when the resource is not found.
    *
    * @param key The cache key
    */
-  get<T>(key: string): Promise<T | null>;
+  get<T>(key: string): Promise<T | undefined>;
 
   /**
    * Reads the cached resource from a key.
@@ -81,9 +81,12 @@ export interface ICache {
   /**
    * Reads cached resources in batch.
    *
+   * Keys that are not found are omitted from the returned record,
+   * which means reading them results in `undefined`.
+   *
    * @param keys The list of cache keys.
    */
-  getMany<T>(keys: string[]): Promise<Record<string, T | null>>;
+  getMany<T>(keys: string[]): Promise<Record<string, T>>;
 
   /**
    * Writes cache resources in batch.

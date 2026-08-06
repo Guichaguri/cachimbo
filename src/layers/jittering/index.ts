@@ -33,7 +33,7 @@ export class JitteringCache implements ICache {
     this.maxJitterTTL = options.maxJitterTTL;
   }
 
-  get<T>(key: string): Promise<T | null> {
+  get<T>(key: string): Promise<T | undefined> {
     return this.cache.get<T>(key);
   }
 
@@ -49,7 +49,7 @@ export class JitteringCache implements ICache {
     return this.cache.delete(key);
   }
 
-  getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
+  getMany<T>(keys: string[]): Promise<Record<string, T>> {
     return this.cache.getMany(keys);
   }
 

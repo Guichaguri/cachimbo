@@ -56,12 +56,12 @@ export class IORedisCache extends BaseCache {
     this.isMSETEXSupported = options.isMSETEXSupported ?? false;
   }
 
-  async get<T>(key: string): Promise<T | null> {
+  async get<T>(key: string): Promise<T | undefined> {
     this.logger?.debug(this.name, '[get] Running "GET" command...', 'key =', key);
 
     const raw = await this.client.get(key);
 
-    return raw ? JSON.parse(raw) : null;
+    return raw ? JSON.parse(raw) : undefined;
   }
 
   async set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {
@@ -89,17 +89,19 @@ export class IORedisCache extends BaseCache {
     }
   }
 
-  override async getMany<T>(keys: string[]): Promise<Record<string, T | null>> {
+  override async getMany<T>(keys: string[]): Promise<Record<string, T>> {
     this.logger?.debug(this.name, '[getMany] Running "MGET" command...', 'keys =', keys);
 
     const values = await this.client.mget(keys);
 
-    const data: Record<string, T | null> = {};
+    const data: Record<string, T> = {};
 
     for (let i = 0; i < keys.length; i++) {
       const value = values[i];
 
-      data[keys[i]!] = value ? JSON.parse(value) : null;
+      if (value) {
+        data[keys[i]!] = JSON.parse(value);
+      }
     }
 
     return data;
