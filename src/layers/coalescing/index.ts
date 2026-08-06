@@ -1,4 +1,4 @@
-import type { BaseCacheOptions, ICache, LoadContext, SetCacheOptions } from '../../types/cache.d.ts';
+import type { BaseCacheOptions, ICache, LoadContext, SetCacheOptions } from '../../types/cache.js';
 import type { Logger } from '../../types/logger.js';
 
 /**
@@ -99,7 +99,7 @@ export class CoalescingCache implements ICache {
     return request;
   }
 
-  set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {
+  async set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {
     this.logger?.debug(this.name, '[set]', 'key =', key);
 
     const promise = this.cache.set<T>(key, value, options);
@@ -109,7 +109,7 @@ export class CoalescingCache implements ICache {
       type: 'getOrLoad',
     });
 
-    return promise.finally(() => this.ongoingRequests.delete(key));
+    await promise.finally(() => this.ongoingRequests.delete(key));
   }
 
   async delete(key: string): Promise<void> {
@@ -160,7 +160,7 @@ export class CoalescingCache implements ICache {
       }
     }
 
-    const data: Record<string, T> = {};
+    const data: Record<string, T> = Object.create(null);
 
     await Promise.all(
       items.map(async ([key, promise]) => {
@@ -175,7 +175,7 @@ export class CoalescingCache implements ICache {
     return data;
   }
 
-  setMany<T>(data: Record<string, T>, options?: SetCacheOptions): Promise<void> {
+  async setMany<T>(data: Record<string, T>, options?: SetCacheOptions): Promise<void> {
     this.logger?.debug(this.name, '[setMany]', 'data =', data);
 
     const promise = this.cache.setMany(data, options);
@@ -187,7 +187,7 @@ export class CoalescingCache implements ICache {
       });
     }
 
-    return promise;
+    await promise;
   }
 
   async deleteMany(keys: string[]): Promise<void> {
