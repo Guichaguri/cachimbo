@@ -44,3 +44,5 @@ const memjsCache = new MemJSCache({
 ## Remarks
 
 - MemJS does not support getting multiple keys in batch. Therefore, the `getMany()` method will internally call `get()` for each key.
+- Both libraries do not support TTLs greater than 30 days (2592000 seconds). Memcached treats it as an absolute Unix timestamp instead of a relative duration. Keep your TTLs below that limit.
+- Memcached keys are limited to 250 characters and cannot contain spaces or control characters. Use a [Key Transformation](../layers/key-transformation.md) layer to hash keys if yours may exceed that.
