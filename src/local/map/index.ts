@@ -72,6 +72,7 @@ export class LocalMapCache extends BaseLocalCache {
     this.onDispose(key, previousValue, 'delete');
   }
 
+  /** @internal */
   override _setMany(data: Record<string, any>, options?: SetCacheOptions): void {
     this.logger?.debug(this.name, '[setMany]', 'data =', data);
 
