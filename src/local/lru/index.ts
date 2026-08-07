@@ -5,6 +5,11 @@ import { BaseLocalCache } from '../../base/local.js';
 export interface ExistingLRUCacheOptions extends BaseCacheOptions {
   /**
    * The existing instance of a LRUCache.
+   *
+   * @remarks `LRUCache#disposeAfter` is read-only after construction, so this cache cannot emit
+   * disposal events. Do not wrap it in a {@link WeakCache}: entries evicted by the LRU stay
+   * registered in the `FinalizationRegistry` and may delete a newer entry for the same key
+   * once they are garbage collected. Let {@link LocalLRUCache} create the underlying cache instead.
    */
   cache: LRUCache<string, any, LocalLRUCacheFetcherContext>;
 
@@ -37,7 +42,7 @@ export interface LocalLRUCacheOptions extends BaseCacheOptions {
 export type LocalLRUCacheFetcherContext = { load: (ctx: LoadContext) => Promise<any>, options?: SetCacheOptions };
 
 export const LocalLRUCacheFetcher = async (_key: string, _staleValue: any, options: LRUCache.FetcherOptions<string, any, LocalLRUCacheFetcherContext>) => {
-  const context: LoadContext = { options: options.context.options || {} };
+  const context: LoadContext = { options: { ...options.context.options } };
 
   const value = await options.context.load(context);
 
