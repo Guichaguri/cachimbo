@@ -45,3 +45,22 @@ const data = await tieredCache.getOrLoad("key", () => loadData(), { ttl: 60 * 3 
 </p>
 
 In the example above, the tiered cache first checks the in-memory cache for the requested key. If the key is not found there, it checks the external cache, backfilling the in-memory cache to reduce latency on future reads.
+
+## Options per tier
+
+The `options` of a tier take precedence over the options given to `set()`, `setMany()` and `getOrLoad()`, so each tier always keeps its own TTL. Anything a tier does not configure falls back to the options given by the caller.
+
+```ts
+const tieredCache = new TieredCache({
+  tiers: [
+    { cache: new LocalTTLCache(), options: { ttl: 30 } },
+    { cache: new RedisCache(...) },
+  ],
+});
+
+await tieredCache.set("key", data, { ttl: 300 });
+// The in-memory cache uses its own TTL of 30 seconds
+// Redis has no TTL configured, so it uses the 300 seconds from the caller
+```
+
+This means a tier without `options` never stores an entry without a TTL when the caller provided one.

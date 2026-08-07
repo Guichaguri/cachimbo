@@ -18,6 +18,10 @@ export interface CacheTier {
 
   /**
    * The options that will be passed to {@link ICache#getOrLoad}, {@link ICache#set} and {@link ICache#setMany}.
+   *
+   * These take precedence over the options given by the caller, so a tier always keeps its own TTL.
+   * Anything not set here falls back to the options given by the caller,
+   * which avoids storing entries without a TTL in a tier that did not configure one.
    */
   options?: SetCacheOptions;
 }
@@ -62,26 +66,23 @@ export class TieredCache extends BaseCache {
 
       const tier = this.tiers[i]!;
       const isLastTier = i === this.tiers.length - 1;
+      const tierOptions = { ...options, ...tier.options };
 
       if (isLastTier) {
-        return tier.cache.getOrLoad(key, load, options || tier.options);
+        return tier.cache.getOrLoad(key, load, tierOptions);
       }
 
-      return tier.cache.getOrLoad(key, () => next(i + 1), tier.options);
+      return tier.cache.getOrLoad(key, () => next(i + 1), tierOptions);
     };
 
     return next(0);
   }
 
-  async set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {
+  async set<T>(key: string, value: T, options: SetCacheOptions = {}): Promise<void> {
     this.logger?.debug(this.name, '[set] Writing to all tiers in parallel...', 'key =', key);
 
     await Promise.all(
-      this.tiers.map((tier, i) => {
-        const isLastTier = i === this.tiers.length - 1;
-
-        return tier.cache.set(key, value, isLastTier ? (options || tier.options) : tier.options);
-      }),
+      this.tiers.map(tier => tier.cache.set(key, value, { ...options, ...tier.options })),
     );
   }
 
@@ -123,15 +124,11 @@ export class TieredCache extends BaseCache {
     return next(0, keys);
   }
 
-  override async setMany<T>(data: Record<string, T>, options?: SetCacheOptions): Promise<void> {
+  override async setMany<T>(data: Record<string, T>, options: SetCacheOptions = {}): Promise<void> {
     this.logger?.debug(this.name, '[setMany] Writing to all tiers in parallel...', 'data =', data);
 
     await Promise.all(
-      this.tiers.map((tier, i) => {
-        const isLastTier = i === this.tiers.length - 1;
-
-        return tier.cache.setMany(data, isLastTier ? (options || tier.options) : tier.options);
-      }),
+      this.tiers.map(tier => tier.cache.setMany(data, { ...options, ...tier.options })),
     );
   }
 

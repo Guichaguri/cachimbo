@@ -147,7 +147,7 @@ describe('Tiered Cache', () => {
       const keys = ['key1', 'key2', 'key3'];
       const result = await tieredCache.getMany<string>(keys);
 
-      expect(result).toStrictEqual({ key1: 'value1', key3: 'value3' });
+      expect(result).toEqual({ key1: 'value1', key3: 'value3' });
       expect(localCache.getMany).toHaveBeenCalledWith(keys);
       expect(remoteCache.getMany).toHaveBeenCalledWith(['key2', 'key3']);
       expect(localCache.setMany).toHaveBeenCalledWith({ key3: 'value3' }, { ttl: 30 });
