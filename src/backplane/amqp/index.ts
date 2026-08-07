@@ -24,6 +24,7 @@ export interface AmqpBackplaneOptions extends BaseBackplaneOptions {
 export class AmqpBackplane extends BaseBackplane {
   protected readonly connection: ChannelModel | RecoveringChannelModel;
   protected readonly exchange: string;
+  protected readonly ready: Promise<void>;
   protected channel?: Channel;
   protected consumerTag?: string;
 
@@ -33,7 +34,7 @@ export class AmqpBackplane extends BaseBackplane {
     this.connection = options.connection;
     this.exchange = options.exchange;
 
-    this.initialize();
+    this.ready = this.initialize();
   }
 
   protected async initialize(): Promise<void> {
@@ -84,12 +85,24 @@ export class AmqpBackplane extends BaseBackplane {
   };
 
   override async emit(data: BackplaneEvent): Promise<void> {
-    this.channel?.publish(this.exchange, '', Buffer.from(JSON.stringify(data), 'utf8'));
+    // The channel is created asynchronously, so without waiting here every event
+    // published right after construction would be silently dropped
+    await this.ready;
+
+    if (!this.channel) {
+      this.logger?.debug(this.name, '[emit] The channel is not available, the event was not published.',
+        'data =', data);
+      return;
+    }
+
+    this.channel.publish(this.exchange, '', Buffer.from(JSON.stringify(data), 'utf8'));
   }
 
   override dispose(): void {
-    this.close().catch(error =>
-      this.logger?.debug(this.name, '[dispose] Failed to close the channel.', 'error =', error)
-    );
+    this.ready
+      .then(() => this.close())
+      .catch(error =>
+        this.logger?.debug(this.name, '[dispose] Failed to close the channel.', 'error =', error)
+      );
   }
 }

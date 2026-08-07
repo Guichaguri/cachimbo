@@ -150,6 +150,42 @@ describe('AmqpBackplane', () => {
     expect(mockChannel.close).toHaveBeenCalled();
   });
 
+  it('should wait for the initialization before publishing an event', async () => {
+    const backplane = new AmqpBackplane({
+      connection: mockConnection as any,
+      exchange: 'test-exchange',
+      cache: mockCache as any,
+      logger: mockLogger,
+    });
+
+    const event = { action: 'delete', key: 'key1' } as BackplaneEvent;
+
+    // Emitted before the channel exists, it must still reach the exchange
+    await backplane.emit(event);
+
+    expect(mockChannel.publish).toHaveBeenCalledWith('test-exchange', '', Buffer.from(JSON.stringify(event), 'utf8'));
+  });
+
+  it('should log instead of publishing when the initialization failed', async () => {
+    mockConnection.createChannel.mockRejectedValueOnce(new Error('connection refused'));
+
+    const backplane = new AmqpBackplane({
+      connection: mockConnection as any,
+      exchange: 'test-exchange',
+      cache: mockCache as any,
+      logger: mockLogger,
+    });
+
+    await backplane.emit({ action: 'delete', key: 'key1' });
+
+    expect(mockChannel.publish).not.toHaveBeenCalled();
+    expect(mockLogger.debug).toHaveBeenCalledWith(
+      undefined,
+      '[emit] The channel is not available, the event was not published.',
+      'data =', { action: 'delete', key: 'key1' },
+    );
+  });
+
   it('should log an error when closing the channel fails on dispose', async () => {
     const backplane = new AmqpBackplane({
       connection: mockConnection as any,
@@ -171,7 +207,7 @@ describe('AmqpBackplane', () => {
     ));
   });
 
-  it('should do nothing if dispose is called without channel initialized', async () => {
+  it('should still close the channel when dispose is called during the initialization', async () => {
     let resolveChannel: any;
     mockConnection.createChannel.mockReturnValue(new Promise(res => { resolveChannel = res; }));
 
@@ -187,7 +223,26 @@ describe('AmqpBackplane', () => {
 
     expect(mockChannel.close).not.toHaveBeenCalled();
 
-    // Cleanup
     resolveChannel(mockChannel);
+
+    // Disposing waits for the initialization, otherwise the channel would be leaked
+    await vi.waitFor(() => expect(mockChannel.close).toHaveBeenCalled());
+  });
+
+  it('should do nothing on dispose when the initialization failed', async () => {
+    mockConnection.createChannel.mockRejectedValueOnce(new Error('connection refused'));
+
+    const backplane = new AmqpBackplane({
+      connection: mockConnection as any,
+      exchange: 'test-exchange',
+      cache: mockCache as any,
+      logger: mockLogger,
+    });
+
+    backplane.dispose();
+    await sleep();
+
+    expect(mockChannel.cancel).not.toHaveBeenCalled();
+    expect(mockChannel.close).not.toHaveBeenCalled();
   });
 });
