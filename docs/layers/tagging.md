@@ -43,5 +43,7 @@ The tagging layer introduces some overhead due to the additional tracking of tag
 - If you're using an external cache, have a [Tiered Cache](./tiered.md) as the underlying cache, using a [fast in-memory cache](../stores/in-memory.md) as the first layer to mitigate the overhead.
 - It's advisable to keep the number of tags per entry low (ideally 1-3) to avoid performance degradation.
 - The `tagTTL` option has to be greater than or equal to the entry TTL to ensure tags remain valid for the lifetime of the entries they are associated with.
+  - A missing tag entry is read as "never invalidated", so an invalidation is lost if its tag entry expires or is evicted while the items it tags are still cached.
+  - Give the underlying cache enough room for the tag entries: if it has a `max` limit, the tag entries compete with the cached items for that space.
 - The tagging layer adds extra data to each cache entry to store the associated tags, which may increase memory usage.
   - Be aware that this layer cannot be added on top of existing caches without risking data corruption as it changes the structure of the cached data. To avoid that, add a [Key Transformation](./key-transformation.md) layer to version the keys when adding this layer to an existing external cache.

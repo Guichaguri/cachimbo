@@ -17,7 +17,9 @@ export interface TaggedCacheOptions extends BaseCacheOptions {
   /**
    * The amount of seconds the tagging metadata should live in cache.
    *
-   * This should be higher than the highest TTL used in the cache to avoid orphaned tags.
+   * This has to be greater than or equal to the highest TTL used in the cache.
+   * A tag entry that expires before the items it tags makes their invalidation be lost,
+   * since a missing tag entry is read as "never invalidated".
    *
    * @defaultValue 86400 (24 hours)
    */
@@ -147,7 +149,7 @@ export class TaggedCache implements ICache {
     if (!hasLoaded && await this.isItemExpired(value.t, value.d)) {
       this.logger?.debug(this.name, '[getOrLoad] Item expired due to tag invalidation. Loading from source...', 'key =', key);
 
-      const context: LoadContext = { options };
+      const context: LoadContext = { options: { ...options } };
 
       // If it is expired, we force load from source
       value = await loadWithTags(context);
@@ -230,7 +232,12 @@ export class TaggedCache implements ICache {
     for (const tag of keys) {
       const tagTimestamp = tagsExpirations[tag];
 
-      if (!tagTimestamp || tagTimestamp > timestamp) {
+      // A missing tag entry means no invalidation is known for it.
+      // Every write refreshes the tag entries, so they are expected to outlive the items they tag
+      // as long as `tagTTL` is greater than or equal to the highest item TTL.
+      // Treating a missing entry as an invalidation would turn every tagged item into a
+      // permanent cache miss whenever a tag entry is evicted.
+      if (tagTimestamp !== undefined && tagTimestamp > timestamp) {
         return true;
       }
     }
