@@ -23,6 +23,8 @@ const cache = new AsyncLazyCache({
   },
   // Setting lazy to false makes it initialize immediately in background
   lazy: false,
+  // Setting retryCount to 2 means that if the initialization fails, it will retry up to 2 times
+  retryCount: 2,
 });
 
 // At this moment, the factory function has been called in background

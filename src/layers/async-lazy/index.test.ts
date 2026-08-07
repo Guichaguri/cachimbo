@@ -35,6 +35,33 @@ describe('AsyncCache', () => {
 
       expect(mockFactory).toHaveBeenCalledTimes(1);
     });
+
+    test('logs and retries when the eager initialization fails', async () => {
+      const logger = { debug: vi.fn() };
+      const failingFactory = vi.fn()
+        .mockRejectedValueOnce(new Error('connection refused'))
+        .mockResolvedValue(mockCache);
+
+      const cache = new AsyncLazyCache({ factory: failingFactory, lazy: false, logger, retryCount: 3 });
+
+      await vi.waitFor(() => expect(logger.debug).toHaveBeenCalled());
+
+      mockCache.get.mockResolvedValueOnce('value');
+
+      // The failed result is discarded, so the next call initializes it again
+      await expect(cache.get('key')).resolves.toBe('value');
+      expect(failingFactory).toHaveBeenCalledTimes(2);
+    });
+
+    test('rethrows the error of a failed lazy initialization', async () => {
+      const failingFactory = vi.fn().mockRejectedValue(new Error('connection refused'));
+      const cache = new AsyncLazyCache({ factory: failingFactory, lazy: true, retryCount: 1 });
+
+      await expect(cache.get('key')).rejects.toThrow('connection refused');
+      await expect(cache.get('key')).rejects.toThrow('connection refused');
+
+      expect(failingFactory).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('get', () => {

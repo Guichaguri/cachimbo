@@ -1,6 +1,7 @@
-import type { ICache, LoadContext, SetCacheOptions } from '../../types/cache.js';
+import type { BaseCacheOptions, ICache, LoadContext, SetCacheOptions } from '../../types/cache.js';
+import type { Logger } from '../../types/logger.js';
 
-export interface AsyncLazyCacheOptions {
+export interface AsyncLazyCacheOptions extends BaseCacheOptions {
   /**
    * A factory function that will be called to create the underlying cache when needed.
    */
@@ -15,6 +16,17 @@ export interface AsyncLazyCacheOptions {
    * @default `false`
    */
   lazy?: boolean;
+
+  /**
+   * The amount of times it should try to initialize again when the factory throws an except
+   *
+   * - When set to `0`, it will try to initialize it once. If it fails, any cache call will throw an error.
+   * - When set to a positive number, any cache call will try to initialize it again, until the count returns to zero.
+   * - When set to `Infinity`, it will keep on trying to initialize.
+   *
+   * @default `0`
+   */
+  retryCount?: number;
 }
 
 /**
@@ -43,13 +55,23 @@ export interface AsyncLazyCacheOptions {
  */
 export class AsyncLazyCache implements ICache {
   protected readonly factory: () => Promise<ICache> | ICache;
+  protected readonly name?: string;
+  protected readonly logger?: Logger;
+  protected retryCount: number;
   protected cache: Promise<ICache> | null = null;
 
   constructor(options: AsyncLazyCacheOptions) {
     this.factory = options.factory;
+    this.name = options.name;
+    this.logger = options.logger;
+    this.retryCount = options.retryCount ?? 0;
 
     if (!options.lazy) {
-      this.cache = Promise.resolve(this.factory());
+      // Nothing is awaiting the initialization yet, so the failure is only logged here.
+      // The next call retries the factory and propagates the error to the caller.
+      this.resolveCache().catch(error =>
+        this.logger?.debug(this.name, '[constructor] Failed to initialize the cache.', 'error =', error)
+      );
     }
   }
 
@@ -86,7 +108,19 @@ export class AsyncLazyCache implements ICache {
    */
   public resolveCache(): Promise<ICache> {
     if (!this.cache) {
-      this.cache = Promise.resolve(this.factory());
+      this.cache = Promise.resolve(this.factory()).catch(error => {
+        this.logger?.debug(this.name, '[resolveCache] Failed to initialize the cache.', 'error =', error);
+
+        // When the factory fails, the result is discarded so the next call initializes it again.
+        // Otherwise a single transient failure (such as a connection refused on startup)
+        // would keep the cache broken for the entire lifetime of the process.
+        if (this.retryCount > 0) {
+          this.cache = null;
+          this.retryCount--;
+        }
+
+        throw error;
+      });
     }
 
     return this.cache;
