@@ -85,7 +85,7 @@ describe('Tiered Cache', () => {
 
       expect(result).toBe(value);
       expect(localCache.getOrLoad).toHaveBeenCalledWith(key, expect.any(Function), { ttl: 30 });
-      expect(remoteCache.getOrLoad).toHaveBeenCalledWith(key, load, undefined);
+      expect(remoteCache.getOrLoad).toHaveBeenCalledWith(key, load, {});
       expect(load).not.toHaveBeenCalled();
     });
 
@@ -121,7 +121,7 @@ describe('Tiered Cache', () => {
       await tieredCache.set<string>(key, value);
 
       expect(localCache.set).toHaveBeenCalledWith(key, value, { ttl: 30 });
-      expect(remoteCache.set).toHaveBeenCalledWith(key, value, undefined);
+      expect(remoteCache.set).toHaveBeenCalledWith(key, value, {});
     });
   });
 
@@ -202,7 +202,7 @@ describe('Tiered Cache', () => {
       await tieredCache.setMany<string>(values);
 
       expect(localCache.setMany).toHaveBeenCalledWith(values, { ttl: 30 });
-      expect(remoteCache.setMany).toHaveBeenCalledWith(values, undefined);
+      expect(remoteCache.setMany).toHaveBeenCalledWith(values, {});
     });
   });
 
