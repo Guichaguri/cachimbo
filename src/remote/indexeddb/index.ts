@@ -132,14 +132,16 @@ export class IndexedDBCache extends BaseCache {
     await this.do('readwrite', async store => {
       store.index('e')
         .openCursor(IDBKeyRange.upperBound(Date.now()))
-        .onsuccess = async (e) => {
+        .onsuccess = (e) => {
           const cursor: IDBCursorWithValue = (e.target as IDBRequest).result;
 
           if (!cursor) {
             return; // Cursor finished
           }
 
-          await this.promisifyRequest(cursor.delete());
+          // Both calls have to be made synchronously: awaiting the deletion would let the
+          // transaction auto-commit, making `continue()` throw a TransactionInactiveError
+          cursor.delete();
           cursor.continue();
         };
 
