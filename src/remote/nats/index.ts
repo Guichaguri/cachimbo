@@ -41,7 +41,9 @@ export interface NatsCacheOptions extends BaseCacheOptions {
 /**
  * A NATS cache using the Key/Value Store, which is built on top of JetStream.
  *
- * @remarks Per-item TTL is not supported.
+ * @remarks Per-item TTL is ignored, the TTL is defined at the bucket level when creating the KV store.
+ * Layers that rely on a per-item TTL (such as {@link JitteringCache}) will not behave as expected.
+ *
  * @see https://docs.nats.io/nats-concepts/jetstream/key-value-store
  */
 export class NatsCache extends BaseCache {
