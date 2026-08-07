@@ -5,6 +5,11 @@ import { BaseLocalCache } from '../../base/local.js';
 export interface ExistingTTLCacheOptions extends BaseCacheOptions {
   /**
    * Existing instance of a TTLCache
+   *
+   * @remarks This cache cannot emit disposal events. Do not wrap it in a {@link WeakCache}:
+   * entries evicted by the LRU stay registered in the `FinalizationRegistry` and may delete
+   * a newer entry for the same key once they are garbage collected. Let {@link LocalTTLCache}
+   * create the underlying cache instead.
    */
   cache: TTLCache<string, any>;
 }
