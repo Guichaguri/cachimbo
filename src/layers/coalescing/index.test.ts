@@ -102,6 +102,22 @@ describe('Coalescing Cache', () => {
       expect(mockedCache.set).toHaveBeenCalledTimes(1);
       expect(mockedCache.set).toHaveBeenCalledWith('key1', 'value', {});
     });
+
+    test('should not change the options object passed by the caller', async () => {
+      const cache = new CoalescingCache({ cache: mockedCache });
+      const options = { ttl: 30 };
+
+      await Promise.all([
+        cache.get('key1'),
+        cache.getOrLoad('key1', async ctx => {
+          ctx.options.ttl = 5;
+          return 'value';
+        }, options),
+      ]);
+
+      expect(options).toStrictEqual({ ttl: 30 });
+      expect(mockedCache.set).toHaveBeenCalledWith('key1', 'value', { ttl: 5 });
+    });
   });
 
   describe('set', () => {
@@ -129,6 +145,22 @@ describe('Coalescing Cache', () => {
       expect(mockedCache.get).not.toHaveBeenCalled();
       expect(mockedCache.getOrLoad).not.toHaveBeenCalled();
       expect(load).not.toHaveBeenCalled();
+    });
+
+    test('should not crash with an unhandled rejection when the underlying set fails', async () => {
+      const cache = new CoalescingCache({ cache: mockedCache });
+      const onUnhandled = vi.fn();
+
+      process.on('unhandledRejection', onUnhandled);
+      mockedCache.set.mockRejectedValueOnce(new Error('cache is down'));
+
+      // Nothing reads the ongoing request entry, so its rejection must already be handled
+      await expect(cache.set('key1', 'value1')).rejects.toThrow('cache is down');
+
+      await waitFor(10);
+      process.off('unhandledRejection', onUnhandled);
+
+      expect(onUnhandled).not.toHaveBeenCalled();
     });
   });
 
@@ -224,6 +256,22 @@ describe('Coalescing Cache', () => {
       expect(mockedCache.get).not.toHaveBeenCalled();
       expect(mockedCache.getOrLoad).not.toHaveBeenCalled();
       expect(load).not.toHaveBeenCalled();
+    });
+
+    test('should not crash with an unhandled rejection when the underlying setMany fails', async () => {
+      const cache = new CoalescingCache({ cache: mockedCache });
+      const onUnhandled = vi.fn();
+
+      process.on('unhandledRejection', onUnhandled);
+      mockedCache.setMany.mockRejectedValueOnce(new Error('cache is down'));
+
+      // One ongoing request entry is created per key and none of them is read
+      await expect(cache.setMany({ key1: 'value1', key2: 'value2' })).rejects.toThrow('cache is down');
+
+      await waitFor(10);
+      process.off('unhandledRejection', onUnhandled);
+
+      expect(onUnhandled).not.toHaveBeenCalled();
     });
   });
 

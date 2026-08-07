@@ -77,7 +77,7 @@ export class CoalescingCache implements ICache {
 
     this.logger?.debug(this.name, '[getOrLoad] Refreshing the cache...', 'key =', key);
 
-    const context: LoadContext = { options: options || {} };
+    const context: LoadContext = { options: options ? { ...options } : {} };
 
     // Otherwise, we'll load it manually
     const promise = load(context);
@@ -105,7 +105,7 @@ export class CoalescingCache implements ICache {
     const promise = this.cache.set<T>(key, value, options);
 
     this.ongoingRequests.set(key, {
-      promise: promise.then(() => value),
+      promise: this.share(promise.then(() => value)),
       type: 'getOrLoad',
     });
 
@@ -182,12 +182,27 @@ export class CoalescingCache implements ICache {
 
     for (const [key, value] of Object.entries(data)) {
       this.ongoingRequests.set(key, {
-        promise: promise.then(() => value).finally(() => this.ongoingRequests.delete(key)),
+        promise: this.share(promise.then(() => value).finally(() => this.ongoingRequests.delete(key))),
         type: 'getOrLoad',
       });
     }
 
     await promise;
+  }
+
+  /**
+   * Marks a promise that is only stored as an ongoing request as handled.
+   *
+   * Nothing is guaranteed to read these entries, so a rejection would otherwise
+   * bubble up as an unhandled rejection and crash the process.
+   * The rejection is still forwarded to whoever awaits the returned promise.
+   *
+   * @param promise The promise to share between the ongoing requests
+   */
+  protected share<T>(promise: Promise<T>): Promise<T> {
+    promise.catch(() => undefined);
+
+    return promise;
   }
 
   async deleteMany(keys: string[]): Promise<void> {
