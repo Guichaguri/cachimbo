@@ -21,7 +21,7 @@ export class NoOpCache implements ICache {
   }
 
   getOrLoad<T>(key: string, load: (ctx: LoadContext) => Promise<T>, options: SetCacheOptions = {}): Promise<T> {
-    return load({ options });
+    return load({ options: { ...options } });
   }
 
   async set<T>(key: string, value: T, options?: SetCacheOptions): Promise<void> {}
