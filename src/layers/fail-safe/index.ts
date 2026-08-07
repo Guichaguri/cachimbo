@@ -1,4 +1,5 @@
 import type { BaseCacheOptions, ICache, LoadContext, SetCacheOptions } from '../../types/cache.js';
+import type { Logger } from '../../types/logger.js';
 
 export interface FailSafeCacheOptions extends BaseCacheOptions {
   /**
@@ -18,10 +19,8 @@ export interface FailSafeCacheOptions extends BaseCacheOptions {
    * @param operation In which operation call the error occurred
    * @param error The error that occurred
    */
-  onError?: (operation: ErrorPolicyOperation, error: unknown) => void;
+  onError?: (operation: keyof ErrorPolicy, error: unknown) => void;
 }
-
-type ErrorPolicyOperation = 'get' | 'set' | 'delete' | 'getOrLoad';
 
 export interface ErrorPolicy {
   /**
@@ -73,11 +72,15 @@ export interface ErrorPolicy {
  */
 export class FailSafeCache implements ICache {
   protected readonly cache: ICache;
+  protected readonly name?: string;
+  protected readonly logger?: Logger;
   protected readonly policy: ErrorPolicy;
-  protected readonly onError?: (operation: ErrorPolicyOperation, error: unknown) => void;
+  protected readonly onError?: (operation: keyof ErrorPolicy, error: unknown) => void;
 
   constructor(options: FailSafeCacheOptions) {
     this.cache = options.cache;
+    this.name = options.name;
+    this.logger = options.logger;
     this.policy = {
       get: 'fail-open',
       set: 'fail-open',
@@ -140,14 +143,17 @@ export class FailSafeCache implements ICache {
       await this.handleError('getOrLoad', error, undefined);
 
       // In case handleError didn't throw, we load from origin
-      return loadSuccessful ? loadResult! : await load({ options: options || {} });
+      return loadSuccessful ? loadResult! : await load({ options: options ? { ...options } : {} });
     }
   }
 
-  protected handleError<T>(operation: ErrorPolicyOperation, error: unknown, failOpenValue: T): Promise<T> {
-    this.onError?.(operation, error);
-
+  protected handleError<T>(operation: keyof ErrorPolicy, error: unknown, failOpenValue: T): Promise<T> {
     const policy = this.policy[operation];
+
+    this.logger?.debug(this.name, '[handleError] The underlying cache failed.',
+      'operation =', operation, 'policy =', policy, 'error =', error);
+
+    this.onError?.(operation, error);
 
     if (policy === 'fail-open') {
       return Promise.resolve(failOpenValue);

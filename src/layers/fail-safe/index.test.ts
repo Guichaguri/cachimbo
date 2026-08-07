@@ -1,4 +1,4 @@
-import type { ICache } from '../../types/cache.js';
+import type { ICache, LoadContext } from '../../types/cache.js';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { FailSafeCache } from './index.js';
 
@@ -65,6 +65,27 @@ describe('FailSafeCache', () => {
       await expect(cache.get('sample')).resolves.toBeUndefined();
 
       expect(cacheMock.get).toHaveBeenCalledWith('sample');
+    });
+
+    test('should log the error and the policy applied to it', async () => {
+      const logger = { debug: vi.fn() };
+      const cache = new FailSafeCache({
+        cache: cacheMock,
+        policy: { get: 'fail-open' },
+        logger,
+      });
+
+      cacheMock.get.mockRejectedValueOnce(new Error('cache is down'));
+
+      await expect(cache.get('sample')).resolves.toBeUndefined();
+
+      expect(logger.debug).toHaveBeenCalledWith(
+        undefined,
+        '[handleError] The underlying cache failed.',
+        'operation =', 'get',
+        'policy =', 'fail-open',
+        'error =', expect.any(Error),
+      );
     });
 
     test('should throw on fail-closed errors', async () => {
@@ -197,6 +218,24 @@ describe('FailSafeCache', () => {
       expect(cacheMock.get).toHaveBeenCalledWith('sample');
       expect(load).toHaveBeenCalledTimes(1);
       expect(cacheMock.set).not.toHaveBeenCalled();
+    });
+
+    test('should load from origin with a copy of the options', async () => {
+      const cache = new FailSafeCache({
+        cache: cacheMock,
+        policy: { getOrLoad: 'fail-open' },
+      });
+      const options = { ttl: 30 };
+      const load = vi.fn(async (ctx: LoadContext) => {
+        ctx.options.ttl = 5;
+        return 'success';
+      });
+
+      cacheMock.get.mockRejectedValueOnce(new Error());
+
+      await expect(cache.getOrLoad('sample', load, options)).resolves.toBe('success');
+
+      expect(options).toStrictEqual({ ttl: 30 });
     });
 
     test('should handle set errors', async () => {
