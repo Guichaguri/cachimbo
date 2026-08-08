@@ -49,4 +49,5 @@ You should always log cache errors somewhere, as they can indicate issues with y
 - The Fail Safe layer is recommended for use with external cache stores (like Redis, Memcached, etc.) where failures are more likely to occur.
 - For in-memory caches, failures should never happen, so the Fail Safe layer is usually unnecessary.
 - Be cautious when using the Fail-Open policy, as it can lead to increased load on your data source if the cache is frequently failing.
+- This layer handles the error but still waits for the failing call, which is usually a connection timeout. Add a [Circuit Breaker](./circuit-breaker.md) below it to stop calling a store that is consistently failing.
 - Consider combining the Fail Safe layer with monitoring tools to keep track of cache health and performance.

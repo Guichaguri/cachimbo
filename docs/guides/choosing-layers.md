@@ -14,11 +14,13 @@ When building a caching solution with Cachimbo, selecting the appropriate combin
    - To balance freshness and performance, use the Stale-While-Revalidate layer. This layer allows serving stale data while asynchronously updating the cache, ensuring low latency even during cache refreshes.
 6. **Use Tiered Caching for Multi-Level Storage**
    - For applications with diverse access patterns, implement a Tiered Caching layer. This allows you to combine multiple cache stores (e.g., in-memory, Redis) to optimize for both speed and capacity.
-7. **Incorporate Metrics Collection for Monitoring**
+7. **Protect Your Application from an Unhealthy Cache**
+   - If you depend on an external cache store, wrap it in a [Fail-Safe](../layers/fail-safe.md) layer so an outage does not become an application outage. Add a [Circuit Breaker](../layers/circuit-breaker.md) below it so a store that is consistently failing stops being called at all, instead of making every request wait for a timeout.
+8. **Incorporate Metrics Collection for Monitoring**
    - Add a Metrics Collection layer to monitor cache performance, hit/miss rates, and latency. This data is invaluable for tuning your caching strategy over time.
-8. **Consider Your Infrastructure**
+9. **Consider Your Infrastructure**
    - Evaluate your existing infrastructure and choose layers that integrate well with your current systems. For example, if you already use Redis, leveraging it in your caching layers can simplify implementation.
-9. **Test and Iterate**
+10. **Test and Iterate**
    - Implement your chosen layers and monitor their performance. Use the collected metrics to identify bottlenecks and adjust your caching strategy as needed. Caching is often an iterative process.
 
 ## Good Practices

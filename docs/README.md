@@ -33,6 +33,7 @@ npm install cachimbo
 - [Stale-While-Revalidate](./layers/stale-while-revalidate.md)
 - [TTL Jittering](./layers/jittering.md)
 - [Fail-safety](./layers/fail-safe.md)
+- [Circuit Breaker](./layers/circuit-breaker.md) (stops calling an unhealthy cache store)
 - [Tagging](./layers/tagging.md) (easier invalidation)
 - [Backplane](./layers/backplane.md) (distributed invalidation for in-memory caches)
 - [Async/Lazy Initialization](./layers/async-lazy.md)

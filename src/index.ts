@@ -36,6 +36,7 @@ export * from './backplane/broadcast-channel/index.js';
 
 // Layers
 export * from './layers/async-lazy/index.js';
+export * from './layers/circuit-breaker/index.js';
 export * from './layers/coalescing/index.js';
 export * from './layers/fail-safe/index.js';
 export * from './layers/jittering/index.js';

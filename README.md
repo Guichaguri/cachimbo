@@ -32,6 +32,7 @@ It works as an anti-corruption layer, allowing you to easily switch between diff
   - Stale-While-Revalidate
   - TTL jittering
   - Fail-safety
+  - Circuit breaking
   - Tagging
   - Backplane (distributed invalidation)
 - Metrics collection
@@ -101,6 +102,7 @@ Each layer intercepts cache operations to add behavior. Layers can be stacked to
 - [Stale-While-Revalidate](/docs/layers/stale-while-revalidate.md)
 - [TTL Jittering](/docs/layers/jittering.md)
 - [Fail-safety](/docs/layers/fail-safe.md)
+- [Circuit Breaker](/docs/layers/circuit-breaker.md) (stops calling an unhealthy cache store)
 - [Tagging](/docs/layers/tagging.md) (easier invalidation)
 - [Backplane](/docs/layers/backplane.md) (distributed invalidation for in-memory caches)
 - [Async/Lazy Initialization](/docs/layers/async-lazy.md)
