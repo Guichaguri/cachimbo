@@ -2,9 +2,13 @@
 
 [Negative caching](https://en.wikipedia.org/wiki/Negative_cache) is a technique used to improve the performance by caching negative responses, such as "Not Found". This allows your application to avoid making repeated queries for the same resource, which can save time and reduce network traffic.
 
-For example, think of a blog website. In a traditional caching approach, if a user requests a blog post that does not exist, the application would query the database, find that the post is not there, and return a "Not Found" response. If another user requests the same non-existent post shortly after, the application would repeat the same process, resulting in unnecessary database queries. With negative caching, when the first user requests the non-existent post, the application can cache the "Not Found" response. Then, when the second user requests the same post, the application can quickly return the cached "Not Found" response without hitting the database again.
+For example, think of a blog website. In a traditional caching approach, if a user requests a blog post that does not exist, the application would query the database, find that the post is not there, and return a "Not Found" response. If another user requests the same non-existent post shortly after, the application would repeat the same process, resulting in unnecessary database queries.
 
-In Cachimbo, you can implement negative caching by saving a special value in the cache to indicate that error. For example, you can return a specific object or a string that represents the error state. When you check the cache, you can then determine if the value indicates a successful load or a negative cache entry.
+With negative caching, the "Not Found" response of the first request is cached, so the second one is answered without hitting the database again. This matters the most when the missing resource is requested repeatedly, such as a broken link being crawled or a deleted product still being linked from somewhere.
+
+In Cachimbo, you implement negative caching by saving a special value in the cache to represent the failure, since only `undefined` is treated as a cache miss. Return an object or a string that describes the error state, and check it when reading from the cache to determine whether the load was successful.
+
+A negative entry usually deserves a shorter TTL than a successful one, so the cache recovers quickly once the resource exists again. The `context.options` of the `load` function is the place to do that.
 
 Here's an example:
 

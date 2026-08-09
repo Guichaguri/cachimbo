@@ -4,7 +4,7 @@ Since Cachimbo is designed on top of an abstraction layer for cache stores and s
 
 ### Testing caching logic
 
-Let's say you have a function that fetches user data and caches it using a Cachimbo cache:
+Let's say you have a service that fetches user data and caches it using a Cachimbo cache:
 
 ```ts
 import { ICache } from 'cachimbo';
@@ -25,7 +25,7 @@ export class UserService {
 }
 ```
 
-In your actual application, you might use a `RedisCache` or another persistent cache store. However, for testing purposes, you can use an in-memory cache like `LocalMapCache` to simulate caching behavior without external dependencies, or just a `NoOpCache` to completely bypass caching.
+In your actual application, you might use a `RedisCache` or another external cache store. However, for testing purposes, you can use an in-memory cache like `LocalMapCache` to exercise the real caching behavior without external dependencies, or a `NoOpCache` to take caching out of the picture entirely.
 
 #### Using NoOpCache
 
@@ -79,7 +79,7 @@ By using different cache implementations, you can easily test various caching sc
 
 ### Testing cache initialization
 
-Let's say you have a function that initializes your cache based on environment variables:
+Let's say you have a function that initializes your cache based on environment variables. This is the kind of code that is easy to get wrong and never notice, so it is worth a test of its own:
 
 ```ts
 import { ICache, RedisCache, SWRCache, NoOpCache } from 'cachimbo';
@@ -90,7 +90,7 @@ export async function createCache(): Promise<ICache> {
     return new NoOpCache();
   }
 
-  const redisClient = await createClient({
+  const redisClient = createClient({
     url: process.env.REDIS_URL,
   });
   
@@ -112,7 +112,7 @@ Since Cachimbo does not initialize any external caches itself, you only need to 
 import { createClient } from '@redis/client';
 
 jest.mock("@redis/client", () => ({
-  createClient: jest.fn().mockResolvedValue({ connect: jest.fn() }),
+  createClient: jest.fn().mockReturnValue({ connect: jest.fn() }),
 }));
 
 test("should create NoOpCache when caching is disabled", async () => {

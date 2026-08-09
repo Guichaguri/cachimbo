@@ -16,7 +16,7 @@ const nc = await connect({ servers: "demo.nats.io:4222" });
 const kvm = new Kvm(nc);
 const cacheKv = await kvm.create("mycache", {
   ttl: 20_000, // TTL of 20 seconds
-  storage: 'memory', // if you don't need to persistence
+  storage: 'memory', // if you don't need persistence
   history: 0, // if you don't need history
 });
 

@@ -30,7 +30,7 @@ class MyCache implements ICache {
 }
 ```
 
-Alternatively, you can extend existing `BaseCache` implementation, which requires only implementing the `get()`, `set()` and `delete()` methods, other methods are already implemented falling back into these three.
+Alternatively, you can extend the `BaseCache` class, which only requires implementing the `get()`, `set()` and `delete()` methods. The other methods are already implemented on top of these three, running the batch operations in parallel. Override them whenever your store has a real batch command.
 
 ```ts
 import { BaseCache, BaseCacheOptions } from 'cachimbo';
@@ -54,10 +54,10 @@ class MyCache extends BaseCache {
 }
 ```
 
-If you are building a in-memory cache, consider extending `BaseLocalCache` instead.
-This allows layers such as `WeakCache` work with your cache implementation.
+If you are building an in-memory cache, consider extending `BaseLocalCache` instead.
+This allows layers that need synchronous access, such as `WeakCache` and `DeepCloningCache`, to work with your cache implementation.
 
-You only need to implement synchronous methods (`_get()`, `_set()`, `_delete()`) and emit disposal events.
+You only need to implement the synchronous methods (`_get()`, `_set()`, `_delete()`) and emit disposal events whenever an item is overwritten, deleted or evicted.
 
 ```ts
 import { BaseLocalCache, BaseCacheOptions } from 'cachimbo';

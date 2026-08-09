@@ -2,7 +2,7 @@
 
 When fetching data from an external cache introduces a few milliseconds of latency, introducing a small in-memory cache can significantly cut down on repeated round-trips.
 
-The Tiered Cache strategy organizes caches into multiple levels, checking each tier in order until the requested data is found. Once a hit occurs, the strategy backfills the earlier tiers to keep them warm and improving performance for future lookups.
+The Tiered Cache strategy organizes caches into multiple levels, checking each tier in order until the requested data is found. Once a hit occurs, the strategy backfills the earlier tiers to keep them warm, improving the performance of future lookups.
 
 A common recommendation is to use two tiers: a small in-memory cache as the first level and your external cache as the second. The in-memory cache should have a short time-to-live to minimize the risk of serving stale data when the external cache is updated.
 
@@ -15,10 +15,10 @@ const tieredCache = new TieredCache({
   tiers: [
     {
       cache: new LocalTTLCache({
-        max: 50, // 50 items stored at most to limit memory usage
+        max: 100, // 100 items stored at most to limit memory usage
       }),
       options: {
-        ttl: 30,
+        ttl: 30, // Keep any entry cached locally for only 30 seconds
       },
     },
     {
@@ -27,7 +27,7 @@ const tieredCache = new TieredCache({
   ],
 });
 
-const data = await tieredCache.getOrLoad("key", () => loadData(), { ttl: 60 * 3 });
+const data = await tieredCache.getOrLoad("key", () => loadData(), { ttl: 60 * 5 });
 // The tiered cache will first check the LocalTTLCache for the "key"
 // If it's not found, it will then check the RedisCache for the "key"
 // If it's also not found, it will finally run loadData()
@@ -37,7 +37,7 @@ const data = await tieredCache.getOrLoad("key", () => loadData(), { ttl: 60 * 3 
 // and also saving it to the LocalTTLCache with a TTL of 30 seconds
 
 // Once the resource expires from the LocalTTLCache, requesting again will load it from the RedisCache
-// and then backfill the LocalTTLCache with more 30 seconds
+// and then backfill the LocalTTLCache for more 30 seconds
 ```
 
 <p align="center">

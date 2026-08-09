@@ -2,9 +2,13 @@
 
 # cachimbo
 
+A composable caching library that allows layering different strategies in order to maximize the performance.
+
 ```sh
 npm install cachimbo
 ```
+
+New here? Start with the [Getting Started](./guides/getting-started.md) guide.
 
 ## Guides
 - [Getting Started](./guides/getting-started.md)
@@ -17,8 +21,11 @@ npm install cachimbo
 - [Samples](../samples)
 
 ## Cache Stores
+
+Cache stores define *where* the data is stored.
+
 - [In-memory](./stores/in-memory.md)
-- [Redis](stores/redis-valkey.md) (and Valkey)
+- [Redis](./stores/redis-valkey.md) (and Valkey)
 - [Memcached](./stores/memcached.md)
 - [Cloudflare Workers KV](./stores/cloudflare-workers-kv.md)
 - [Hazelcast](./stores/hazelcast.md)
@@ -27,6 +34,8 @@ npm install cachimbo
 - [IndexedDB](./stores/indexeddb.md) (for browsers)
 
 ## Cache Layers
+
+Cache layers define *how* the cache is accessed. They sit between your code and the cache store, and can be stacked to form a pipeline.
 
 - [Request Coalescing](./layers/request-coalescing.md) (deduplication)
 - [Tiered Caching](./layers/tiered.md) (multi-layer caching)

@@ -40,8 +40,8 @@ cache = new SWRCache({
 });
 ```
 
-You can also use other cache stores such as Redis, Memcached or Valkey, Cloudflare Workers KV, or even Keyv as the underlying storage.
-Check [all available cache stores and layers](../README.md), you also might need help to [choose the right combination of layers](./choosing-layers.md).
+You can also use other cache stores such as Redis, Valkey, Memcached, Cloudflare Workers KV, or even Keyv as the underlying storage.
+Check [all the available cache stores and layers](../README.md), and see [how to choose the right combination of layers](./choosing-layers.md) if you are unsure which ones you need.
 
 The `ICache` interface is the common interface for all cache implementations, so you can easily swap out the underlying cache store or layers without changing your application code.
 
@@ -60,10 +60,12 @@ const data = await cache.getOrLoad<MyData>(
 );
 ```
 
+The `load` function is only called when the resource is not in cache, and its result is saved before being returned to you.
+
 You can also use the `context` parameter to set options dynamically based on the load result:
 
 ```ts
-// Get or fetch data
+// Get or fetch data, deciding the TTL from what was loaded
 const data = await cache.getOrLoad<MyData>(
   "mykey", // the cache key
   async (context: LoadContext) => {

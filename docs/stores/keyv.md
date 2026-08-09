@@ -7,7 +7,7 @@ Although both Keyv and Cachimbo provide Redis, Valkey, Memcached and Cloudflare 
 - Cachimbo is a more comprehensive caching library that offers advanced caching strategies (like Stale-While-Revalidate, multi-layer caching, request coalescing) and built-in support for various cache stores.
 - Cachimbo aims to support only cache-specific backends (such as Redis and Memcached) while Keyv supports general-purpose databases (such as PostgreSQL and MongoDB).
 
-If you need to implement one of the backends that Keyv supports but Cachimbo does not, you can create a Cachimbo cache store that uses Keyv as the underlying storage.
+If you need one of the backends that Keyv supports but Cachimbo does not, the `KeyvCache` store bridges the two: Cachimbo handles the caching strategies while Keyv handles the storage.
 
 ```ts
 import { KeyvCache } from 'cachimbo';
@@ -45,3 +45,5 @@ const tieredCache = new TieredCache({
 ```
 
 This cache would first attempt to retrieve data from the in-memory cache. If the data is not found there, it would then check the Keyv cache backed by PostgreSQL. Think of it as a warm cache and a cold cache setup, where the in-memory cache serves as the fast-access layer and the Keyv cache provides persistent storage.
+
+Since these general-purpose databases are usually slower than a dedicated cache store, a [Tiered Cache](../layers/tiered.md) is generally worth it here, even when it wouldn't be in front of Redis or Memcached.

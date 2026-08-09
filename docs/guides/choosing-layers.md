@@ -57,7 +57,7 @@ When building a caching solution with Cachimbo, selecting the appropriate combin
 
 
 <details>
-<summary><strong>Add a version your cache keys when using an external cache store</strong></summary>
+<summary><strong>Add a version to your cache keys when using an external cache store</strong></summary>
 
 > Fact: An external cache makes your application stateful.
 > 
@@ -85,8 +85,8 @@ When building a caching solution with Cachimbo, selecting the appropriate combin
 
 > The cache layers can greatly enhance your application's performance, but they can also hurt it.
 >
-> For example, a Tiered Cache can improve server round-trips with an in-memory cache in front of an external cache, but it also increases memory usage and adds additional overhead.
-> If your external cache has already a ultra low latency, adding a Tiered Cache layer will hurt performance.
+> For example, a Tiered Cache can save server round-trips by putting an in-memory cache in front of an external cache, but it also increases memory usage and adds overhead.
+> If your external cache already has an ultra low latency, adding a Tiered Cache layer will hurt performance.
 >
 > In short, don't try to solve problems you don't have.
 >

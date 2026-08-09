@@ -26,21 +26,25 @@ For instance, let's say you have a cache storing user profiles and their associa
 
 This layer implements the same algorithm implemented in [FusionCache's Tagging](https://github.com/ZiggyCreatures/FusionCache/blob/main/docs/Tagging.md).
 
-Under the hood, the tagging layer checks for invalidated tags during `get`, `getMany` and `getOrLoad` operations. If any of the tags associated with a cache entry have been invalidated, the entry is treated as missing.
+Under the hood, the tagging layer stores the moment each tag was last invalidated, and checks it during `get`, `getMany` and `getOrLoad` operations. If any of the tags associated with a cache entry have been invalidated after it was cached, the entry is treated as missing.
+
+This makes the invalidation lazy: `invalidateTag` is a single write and does not have to find the entries it affects, which is what keeps it cheap no matter how many entries carry the tag.
 
 ### Complexity
 
 The tagging layer introduces some overhead due to the additional tracking of tags and invalidation checks. The complexity of operations is as follows:
 
-- `get` and `getOrLoad` does at least `n + 1` cache operations, being n the number of tags associated with the key.
-- `getMany` does `m * n + 1` cache operations, being m the number of keys requested and n the average number of tags associated with each key.
-- `invalidateTag` and `invalidateTags` does `1` cache operation.
-- `set` and `setMany` does `3` cache operations.
-- `delete` and `deleteMany` does `1` cache operation.
+- `get` and `getOrLoad` do at least `n + 1` cache operations, where n is the number of tags associated with the key.
+- `getMany` does `m * n + 1` cache operations, where m is the number of keys requested and n is the average number of tags associated with each key.
+- `invalidateTag` and `invalidateTags` do `1` cache operation.
+- `set` and `setMany` do `3` cache operations.
+- `delete` and `deleteMany` do `1` cache operation.
+
+Untagged entries are not affected: with no tags to check, reads cost the same as they would without this layer.
 
 ## Caveats
 
-- If you're using an external cache, have a [Tiered Cache](./tiered.md) as the underlying cache, using a [fast in-memory cache](../stores/in-memory.md) as the first layer to mitigate the overhead.
+- If you're using an external cache, have a [Tiered Cache](./tiered.md) as the underlying cache, using a [fast in-memory cache](../stores/in-memory.md) as the first tier to mitigate the overhead of the extra round-trips.
 - It's advisable to keep the number of tags per entry low (ideally 1-3) to avoid performance degradation.
 - The `tagTTL` option has to be greater than or equal to the entry TTL to ensure tags remain valid for the lifetime of the entries they are associated with.
   - A missing tag entry is read as "never invalidated", so an invalidation is lost if its tag entry expires or is evicted while the items it tags are still cached.

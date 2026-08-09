@@ -13,8 +13,8 @@ import { SWRCache } from 'cachimbo';
 
 const swrCache = new SWRCache({
   cache: anotherCache,
-  defaultTTL: 60, // Default TTL that the resource will remain fresh
-  staleTTL: 10, // Additional TTL that the resource will keep cached but stale
+  defaultTTL: 60, // How long the resource remains fresh, when the caller does not set a TTL
+  staleTTL: 10, // How long the resource stays cached after that, serving as stale
 });
 
 const data = await swrCache.getOrLoad("key", () => loadData());
@@ -41,12 +41,12 @@ All requests coming in during the stale period receive the stale data immediatel
   - If you are using an external cache store, make sure to version your cache keys using a [Key Transformation](./key-transformation.md) layer to avoid collisions with other data.
 
 ```ts
-import { SWRCache, KeyTransformingCache, RedisCache } from 'cachimbo';
+import { SWRCache, KeyTransformingCache, RedisCache, ICache } from 'cachimbo';
 
 let myCache: ICache = new RedisCache(...);
 
 if (process.env.ENABLE_SWR === 'true') {
-  // Add both the SWR layer with an Key Transformation layer to version the keys
+  // Add the SWR layer together with a Key Transformation layer to version the keys
   // If you disable the env flag, the keys will change and this will avoid collisions with old data
   myCache = new KeyTransformingCache({
     cache: new SWRCache({

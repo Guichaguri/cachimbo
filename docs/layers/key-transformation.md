@@ -30,4 +30,6 @@ const prefixedCache = new KeyTransformingCache({
 ```
 
 ## Remarks
-- This layer is only recommended for external caches as you can easily create separate instances for different key namespaces in in-memory caches.
+- The transformation has to be deterministic, as it is applied on every read and write.
+- Entries written before this layer was added keep their original keys and are simply never read again. That is exactly what makes it useful for versioning, but it also means the old entries stay in the store until they expire.
+- This layer is mainly useful for external caches. With in-memory caches, creating a separate instance per namespace is simpler.
