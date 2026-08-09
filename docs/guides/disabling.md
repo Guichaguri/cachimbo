@@ -2,10 +2,34 @@
 
 Adding conditions to your own code can be cumbersome, especially when you want to disable caching for specific environments, such as development or testing.
 
-This is why there is a built-in `NoOpCache` implementation that you can use to effectively disable caching without changing the rest of your code.
+##### ❌ Don't do this:
 
 ```ts
-import { NoOpCache } from 'cachimbo';
+import { LocalTTLCache } from 'cachimbo';
+
+const cache = new LocalTTLCache();
+```
+```ts
+if (process.env.CACHE_DISABLED !== 'true') {
+  await cache.set('product:123', myProduct, { ttl: 30 });
+}
+```
+```ts
+let product;
+
+if (process.env.CACHE_DISABLED === 'true') {
+  product = await fetchProduct();
+} else {
+  product = await cache.getOrLoad('product:123', () => fetchProduct());
+}
+```
+
+This is why there is a built-in `NoOpCache` implementation that you can use to effectively disable caching without changing the rest of your code.
+
+##### ✅ Do this:
+
+```ts
+import { NoOpCache, LocalTTLCache, ICache } from 'cachimbo';
 
 function initializeCache(): ICache {
   if (process.env.CACHE_DISABLED === 'true') {
@@ -24,6 +48,8 @@ const cache = initializeCache();
 await cache.set('product:123', myProduct, { ttl: 30 });
 
 // Returns the cached product on an actual cache implementation
-// Always returns `undefined` on NoOpCache
-await cache.get('product:123');
+// Always calls the loader function on NoOpCache
+const product = await cache.getOrLoad('product:123', () => fetchProduct());
 ```
+
+Instead of sprinkling your code with `if` statements to check if caching is enabled, you can simply use the `NoOpCache` implementation. This allows you to keep your code clean and maintainable while still having the flexibility to disable caching when needed.
