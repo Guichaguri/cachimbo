@@ -2,19 +2,26 @@
 
 Adding conditions to your own code can be cumbersome, especially when you want to disable caching for specific environments, such as development or testing.
 
+This is why there is a built-in `NoOpCache` implementation that you can use to effectively disable caching without changing the rest of your code.
+
 ### ❌ DON'T DO THIS:
 
 ```ts
 import { LocalTTLCache } from 'cachimbo';
 
+// Initialize the desired cache here
 const cache = new LocalTTLCache();
 ```
 ```ts
+// Saves the product into the cache with a TTL of 30 seconds
+// ...only if the caching is enabled
 if (process.env.CACHE_DISABLED !== 'true') {
   await cache.set('product:123', myProduct, { ttl: 30 });
 }
 ```
 ```ts
+// Returns the cached product on an actual cache implementation
+// ...only if the caching is enabled, otherwise always fetches the product
 let product;
 
 if (process.env.CACHE_DISABLED === 'true') {
@@ -23,8 +30,6 @@ if (process.env.CACHE_DISABLED === 'true') {
   product = await cache.getOrLoad('product:123', () => fetchProduct());
 }
 ```
-
-This is why there is a built-in `NoOpCache` implementation that you can use to effectively disable caching without changing the rest of your code.
 
 ### ✅ DO THIS INSTEAD:
 
@@ -46,7 +51,8 @@ const cache = initializeCache();
 // Saves the product into the cache with a TTL of 30 seconds
 // Does nothing on NoOpCache
 await cache.set('product:123', myProduct, { ttl: 30 });
-
+```
+```ts
 // Returns the cached product on an actual cache implementation
 // Always calls the loader function on NoOpCache
 const product = await cache.getOrLoad('product:123', () => fetchProduct());
