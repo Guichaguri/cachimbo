@@ -2,7 +2,7 @@
 
 Adding conditions to your own code can be cumbersome, especially when you want to disable caching for specific environments, such as development or testing.
 
-##### ❌ Don't do this:
+### ❌ DON'T DO THIS:
 
 ```ts
 import { LocalTTLCache } from 'cachimbo';
@@ -26,7 +26,7 @@ if (process.env.CACHE_DISABLED === 'true') {
 
 This is why there is a built-in `NoOpCache` implementation that you can use to effectively disable caching without changing the rest of your code.
 
-##### ✅ Do this:
+### ✅ DO THIS INSTEAD:
 
 ```ts
 import { NoOpCache, LocalTTLCache, ICache } from 'cachimbo';
