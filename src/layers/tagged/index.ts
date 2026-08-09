@@ -42,6 +42,29 @@ interface TaggedValue<T> {
   t: string[];
 }
 
+/**
+ * A cache layer that assigns tags to cached entries, so related items can be invalidated together.
+ *
+ * Pass `tags` when writing a resource and call {@link TaggedCache#invalidateTag} or
+ * {@link TaggedCache#invalidateTags} to invalidate every entry carrying them. This is useful when the
+ * keys to invalidate are not known ahead of time.
+ *
+ * Invalidation is lazy: the tags of an entry are checked on read, and an entry tagged with an
+ * invalidated tag is treated as a cache miss.
+ *
+ * Each read costs one extra cache operation per tag, so keep the tags per entry low (ideally 1 to 3)
+ * and consider a {@link TieredCache} with an in-memory first tier to absorb the overhead.
+ *
+ * @remarks Values are wrapped with the tag metadata, which changes the structure of what is stored.
+ * When adding this layer to an existing external cache, version the keys with a
+ * {@link KeyTransformingCache} to avoid reading entries written without it.
+ *
+ * `tagTTL` must be greater than or equal to the highest entry TTL, and the underlying cache needs room
+ * for the tag entries. A missing tag entry is read as "never invalidated", so an invalidation is lost
+ * if its tag entry expires or is evicted while the items it tags are still cached.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/layers/tagging.md
+ */
 export class TaggedCache implements ICache {
   protected readonly cache: ICache;
   protected readonly logger?: Logger;

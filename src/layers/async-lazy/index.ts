@@ -32,9 +32,15 @@ export interface AsyncLazyCacheOptions extends BaseCacheOptions {
 /**
  * A cache layer that initializes the underlying cache asynchronously.
  *
- * This layer can be used to connect to an external cache with the cache methods already available.
+ * This layer can be used to connect to an external cache with the cache methods already available,
+ * without having to deal with promises on construction. Every call awaits the ongoing initialization
+ * before reaching the underlying cache.
  *
  * This layer can also be used to lazily initialize the cache only when it's actually needed.
+ *
+ * When the factory throws, the error is propagated to the caller. Set `retryCount` to let the next
+ * call try to initialize it again, so a transient failure on startup does not break the cache
+ * for the entire lifetime of the process.
  *
  * @example
  * ```ts
@@ -52,6 +58,8 @@ export interface AsyncLazyCacheOptions extends BaseCacheOptions {
  * cache.get("key")
  *   .then(result => console.log('redis was connected and read the key:', value));
  * ```
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/layers/async-lazy.md
  */
 export class AsyncLazyCache implements ICache {
   protected readonly factory: () => Promise<ICache> | ICache;

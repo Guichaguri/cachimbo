@@ -44,6 +44,21 @@ export interface BaseBackplaneOptions extends BaseCacheOptions {
   mode?: 'active' | 'lazy';
 }
 
+/**
+ * The base implementation of a backplane.
+ *
+ * A backplane keeps the in-memory caches of multiple application instances in sync: every write and
+ * invalidation is applied locally and then published to a pub/sub channel, where the other instances
+ * pick it up and apply it to their own cache.
+ *
+ * Reads are served by the underlying cache alone. A failure to publish an event is logged and does not
+ * fail the operation, since the local cache was already updated at that point.
+ *
+ * Subclasses only implement {@link BaseBackplane#emit} and {@link BaseBackplane#dispose}, and call
+ * {@link BaseBackplane#receiveEvent} for each message received from the channel.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/layers/backplane.md
+ */
 export abstract class BaseBackplane implements ICache {
   protected readonly cache: BaseLocalCache;
   protected readonly mode: 'active' | 'lazy';

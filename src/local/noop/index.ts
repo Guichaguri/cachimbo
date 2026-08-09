@@ -1,13 +1,21 @@
 import type { ICache, LoadContext, SetCacheOptions } from '../../types/cache.js';
 
 /**
- * A cache implementation that does nothing.
- * It's useful for disabling cache and unit testing.
+ * A cache implementation that stores nothing.
+ *
+ * Every read misses and every write is discarded, which means {@link ICache#getOrLoad} always calls
+ * the `load` function.
+ *
+ * Use it to disable caching without spreading conditions through your code, such as per environment
+ * or in unit tests.
  *
  * @example
  * ```ts
  * const cache = isCacheEnabled ? new LocalTTLCache() : new NoOpCache();
  * ```
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/guides/disabling.md
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/guides/testing.md
  */
 export class NoOpCache implements ICache {
   constructor() {}

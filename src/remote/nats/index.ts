@@ -39,11 +39,19 @@ export interface NatsCacheOptions extends BaseCacheOptions {
 }
 
 /**
- * A NATS cache using the Key/Value Store, which is built on top of JetStream.
+ * A NATS cache store using the Key/Value Store, which is built on top of JetStream.
+ *
+ * The connection and the KV bucket have to be created by your application, this class only issues operations.
  *
  * @remarks Per-item TTL is ignored, the TTL is defined at the bucket level when creating the KV store.
  * Layers that rely on a per-item TTL (such as {@link JitteringCache}) will not behave as expected.
  *
+ * Keys only support the `[-/_=.a-zA-Z0-9]` characters, a {@link KeyTransformingCache} can hash or
+ * normalize the ones that do not fit.
+ *
+ * NATS KV has no batch commands, so every batch operation runs key by key.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/stores/nats.md
  * @see https://docs.nats.io/nats-concepts/jetstream/key-value-store
  */
 export class NatsCache extends BaseCache {

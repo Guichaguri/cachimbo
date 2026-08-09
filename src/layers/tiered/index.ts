@@ -27,13 +27,22 @@ export interface CacheTier {
 }
 
 /**
- * A cache strategy layer that implements multi-level caching
+ * A cache layer that implements multi-level caching.
  *
  * The objective of a tiered cache is to minimize latency while still having the benefits of a larger, shared cache.
  * This is done by having the first tier being an in-memory cache (such as {@link LocalTTLCache}) that stores a small amount of items with a short TTL,
  * and the second tier being an external cache (such as {@link RedisCache}) that stores a lot more items and may have a longer TTL.
  *
+ * Reads go through the tiers in order until the resource is found, and the tiers above it are
+ * backfilled to keep them warm. Writes and deletions are applied to every tier in parallel.
+ *
+ * Each tier can define its own `options`, which take precedence over the ones given by the caller,
+ * so a tier always keeps its own TTL. Keep the first tier's TTL short to limit how long a stale value
+ * can be served after the shared cache is updated.
+ *
  * This strategy is similarly known as Cache Hierarchy, CPU cache or L1/L2/L3 cache.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/layers/tiered.md
  */
 export class TieredCache extends BaseCache {
   protected readonly tiers: CacheTier[];

@@ -15,7 +15,16 @@ export interface MemcacheCacheOptions extends BaseCacheOptions {
 }
 
 /**
- * A Memcached cache implementation using Memcache
+ * A Memcached cache store using the `memcache` client.
+ *
+ * The client has to be created by your application, this class only issues commands.
+ * Values are stored JSON-serialized, so they **must** be JSON stringifiable.
+ *
+ * @remarks Memcached keys are limited to 250 characters and cannot contain spaces or control characters.
+ * TTLs greater than 30 days (2592000 seconds) are read as absolute unix timestamps by the server,
+ * so keep them below that. A {@link KeyTransformingCache} can hash or normalize keys that may not fit.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/stores/memcached.md
  */
 export class MemcacheCache extends BaseCache {
   protected readonly client: Memcache;

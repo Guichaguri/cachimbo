@@ -5,7 +5,12 @@ import type { Logger } from '../types/logger.js';
  * The base implementation of a cache.
  *
  * This class only requires subclasses to implement {@link ICache#get}, {@link ICache#set} and {@link ICache#delete}.
- * All other methods fall back into these three.
+ * All other methods fall back into these three, running the batch operations in parallel.
+ *
+ * External cache stores should extend this class, overriding the batch methods whenever the client
+ * supports a real batch command. In-memory stores should extend {@link BaseLocalCache} instead.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/guides/extending.md
  */
 export abstract class BaseCache implements ICache {
   protected readonly name?: string;

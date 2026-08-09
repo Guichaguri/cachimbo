@@ -17,6 +17,21 @@ export interface LocalCacheInternal {
   _addDisposeListener(listener: LocalCacheDisposeListener): void;
 }
 
+/**
+ * The base implementation of an in-memory cache.
+ *
+ * Subclasses implement the synchronous {@link BaseLocalCache#_get}, {@link BaseLocalCache#_set} and
+ * {@link BaseLocalCache#_delete} methods. The asynchronous {@link ICache} methods are implemented here
+ * and simply wrap the results in a resolved promise, so no operation ever actually awaits.
+ *
+ * Extending this class instead of {@link BaseCache} is what allows layers that need synchronous access,
+ * such as {@link WeakCache} and {@link DeepCloningCache}, to be stacked on top of the cache.
+ *
+ * Implementations must report overwritten, deleted and evicted items through
+ * {@link BaseLocalCache#onDispose}, otherwise those layers cannot keep track of the stored values.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/guides/extending.md
+ */
 export abstract class BaseLocalCache extends BaseCache {
   protected disposeListeners: LocalCacheDisposeListener[] = [];
 

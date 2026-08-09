@@ -103,6 +103,8 @@ export class CircuitBreakerOpenError extends Error {
  * Since this layer throws when the circuit is open, it is meant to be combined with a
  * {@link FailSafeCache} on top of it, which turns the error into the behaviour your application needs.
  *
+ * Only useful for external cache stores, as in-memory caches do not fail.
+ *
  * @example
  * ```ts
  * const cache = new FailSafeCache({
@@ -112,6 +114,7 @@ export class CircuitBreakerOpenError extends Error {
  * });
  * ```
  *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/layers/circuit-breaker.md
  * @see https://en.wikipedia.org/wiki/Circuit_breaker_design_pattern
  */
 export class CircuitBreakerCache implements ICache {

@@ -19,7 +19,15 @@ export interface WorkersKVCacheOptions extends BaseCacheOptions {
 }
 
 /**
- * A Cloudflare Workers KV cache implementation.
+ * A Cloudflare Workers KV cache store, designed for the Workers binding API (`env.YOUR_NAMESPACE`).
+ *
+ * Values are stored JSON-serialized, so they **must** be JSON stringifiable.
+ *
+ * KV is eventually consistent: a value that was just written may not be visible to the next read,
+ * which is worth keeping in mind when invalidating entries. It also rejects TTLs shorter than 60 seconds.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/stores/cloudflare-workers-kv.md
+ * @see https://developers.cloudflare.com/kv/concepts/how-kv-works/
  */
 export class WorkersKVCache extends BaseCache {
   protected readonly kv: KVNamespace;

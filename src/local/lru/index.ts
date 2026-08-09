@@ -35,6 +35,8 @@ export interface LocalLRUCacheOptions extends BaseCacheOptions {
 
   /**
    * The maximum amount of items stored
+   *
+   * @defaultValue 10000
    */
   max?: number;
 }
@@ -52,11 +54,17 @@ export const LocalLRUCacheFetcher = async (_key: string, _staleValue: any, optio
 };
 
 /**
- * An in-memory cache implementation of a Least-Recently-Used cache eviction algorithm.
+ * An in-memory cache store that evicts the least recently used (LRU) items first.
  *
- * It allows setting an expiration time and a limit of cached items.
+ * Use it when the cached items have different access patterns and you want the most accessed ones
+ * to stay cached. When access patterns are not a concern, {@link LocalTTLCache} is simpler and faster.
  *
- * Once the limit of items is reached, the least recently used items will be purged.
+ * Once the `max` limit of items is reached (10k by default), the least recently used item is purged.
+ * Items also expire on their own when a `ttl` is set.
+ *
+ * Built on top of the `lru-cache` package.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/stores/in-memory.md
  */
 export class LocalLRUCache extends BaseLocalCache {
   protected readonly cache: LRUCache<string, any, LocalLRUCacheFetcherContext>;

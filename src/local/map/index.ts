@@ -14,6 +14,9 @@ export interface LocalMapCacheOptions extends BaseCacheOptions {
   max?: number;
 }
 
+/**
+ * A subset of the {@link Map} interface
+ */
 export interface MapLike<K, V> {
   get(key: K): V | undefined;
   set(key: K, value: V): void;
@@ -25,12 +28,16 @@ export interface MapLike<K, V> {
 }
 
 /**
- * A simple in-memory cache implementation based on {@link Map}.
+ * A simple in-memory cache store based on {@link Map}.
  *
- * It ignores expiration times, but a limit of cached items can be set.
+ * It ignores expiration times entirely, so entries only leave the cache when deleted or evicted.
+ * Once the `max` limit of items is reached, the first inserted key is purged (FIFO).
+ * Without a `max`, the cache grows indefinitely.
  *
- * It implements a simple FIFO eviction policy:
- * Once the limit of items is reached, the first inserted keys will be purged.
+ * Useful for testing, or when neither an expiration nor an access-pattern awareness is needed.
+ * Any object implementing the {@link MapLike} interface can be used as the underlying storage.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/stores/in-memory.md
  */
 export class LocalMapCache extends BaseLocalCache {
   protected readonly map: MapLike<string, any>;

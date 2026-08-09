@@ -22,11 +22,16 @@ export interface DeepCloningCacheOptions extends BaseCacheOptions {
 /**
  * A cache layer that deep clones data when reading and writing.
  *
- * This is useful when you mutate the objects retrieved from cache,
- * and you don't want them to also change in cache.
+ * In-memory caches store a reference to the original object, so mutating an object that was read from
+ * or written to the cache also changes what is cached. This layer isolates them by cloning on both sides.
  *
- * Do not use this layer if you do not intend to mutate cached objects,
- * as the cloning process adds unnecessary overhead.
+ * External stores serialize their values already, so this layer is only meant for in-memory caches.
+ *
+ * Do not use it if you do not intend to mutate cached objects, as the cloning adds unnecessary overhead.
+ * By default it uses `structuredClone()` when available, falling back to a `JSON.parse`/`JSON.stringify`
+ * implementation, both of which require the cached values to be json-serializable.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/stores/in-memory.md
  */
 export class DeepCloningCache extends BaseLocalCache {
   protected readonly cache: BaseLocalCache;

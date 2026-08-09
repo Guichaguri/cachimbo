@@ -30,7 +30,18 @@ export interface IORedisBackplaneOptions extends BaseBackplaneOptions {
 }
 
 /**
- * A Redis Pub/Sub backplane implementation using ioredis or iovalkey.
+ * A backplane that propagates cache updates through Redis Pub/Sub, using the ioredis or iovalkey client.
+ *
+ * Wrap the in-memory cache of each application instance with it, so writes and invalidations made by
+ * one instance are applied by all the others.
+ *
+ * A Redis client cannot subscribe and run regular commands at the same time, so a dedicated
+ * {@link IORedisBackplaneOptions#subscriptionClient} is required (e.g. `client.duplicate()`).
+ *
+ * The subscription is created asynchronously on construction. Call {@link IORedisBackplane#dispose}
+ * to unsubscribe.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/layers/backplane.md
  */
 export class IORedisBackplane extends BaseBackplane {
   protected readonly publishClient: Redis | Valkey;

@@ -47,7 +47,16 @@ export type CacheMetrics = CacheCountMetrics & CacheTimeMetrics;
 /**
  * A cache layer that collects metrics from each cache call.
  *
- * This can be useful to measure the cache effectiveness
+ * It counts how many times the cache was hit, missed, refreshed, updated and invalidated, along with
+ * the average time each of those took. Read them with {@link MetricsCollectingCache#getMetrics}
+ * and clear them with {@link MetricsCollectingCache#resetMetrics}.
+ *
+ * This can be useful to measure the cache effectiveness, but the time measurement and the counting add
+ * overhead to every operation, so it is not recommended for production use.
+ *
+ * In batch operations, the measured time is divided equally among the keys involved.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/layers/metrics-collection.md
  */
 export class MetricsCollectingCache implements ICache {
   protected readonly cache: ICache;

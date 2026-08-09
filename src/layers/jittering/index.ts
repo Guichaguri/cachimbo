@@ -18,9 +18,15 @@ export interface JitteringCacheOptions {
 }
 
 /**
- * A cache layer that adds a random jitter to the TTL of cached items to prevent cache stampedes.
+ * A cache layer that adds a random jitter of up to `maxJitterTTL` seconds to the TTL of every write.
  *
- * This layer is useful in scenarios where many cached items expire simultaneously, causing a sudden surge of requests to the underlying data source.
+ * Resources cached at the same time also expire at the same time, which sends a sudden surge of
+ * requests to the underlying data source. Spreading the expirations out prevents that cache stampede.
+ *
+ * Writes made without a TTL fall back to `defaultTTL`, so this layer always sets one.
+ * It has no effect on stores that ignore per-item TTLs, such as {@link NatsCache}.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/layers/jittering.md
  */
 export class JitteringCache implements ICache {
   protected readonly cache: ICache;

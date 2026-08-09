@@ -11,12 +11,21 @@ export interface WeakCacheOptions extends BaseCacheOptions {
 type WeakValue = { v: WeakRef<any>; w: true; } | { v: any; w: false; };
 
 /**
- * A cache layer that stores objects as weak references.
+ * A cache layer that stores objects as weak references, letting the JavaScript engine reclaim
+ * the memory they use whenever it needs to.
  *
- * When an object is garbage collected, its entry is automatically removed from the underlying cache.
+ * When a cached object is garbage collected, its entry is automatically removed from the underlying cache.
+ * This happens at an unpredictable time and order, so any read may turn out to be a miss.
+ * Only objects are wrapped, primitives are stored as they are.
+ *
+ * The underlying cache must be an in-memory cache that emits disposal events.
+ *
+ * When combined with a {@link DeepCloningCache}, keep the cloning layer on top of this one so the weak
+ * references themselves are not cloned.
  *
  * This implementation requires support for both `WeakRef` and `FinalizationRegistry`.
  *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/stores/in-memory.md
  * @see https://caniuse.com/mdn-javascript_builtins_finalizationregistry
  * @see https://caniuse.com/mdn-javascript_builtins_weakref
  */

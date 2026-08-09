@@ -22,8 +22,14 @@ interface BroadcastBackplaneEvent {
 }
 
 /**
- * A BroadcastChannel based backplane for the web.
- * This backplane shares cache updates with other browser tabs
+ * A backplane that propagates cache updates to other browser tabs through a `BroadcastChannel`.
+ *
+ * Wrap the in-memory cache of your web application with it, so writes and invalidations made in one
+ * tab are applied by all the other tabs of the same origin.
+ *
+ * Call {@link BroadcastChannelBackplane#dispose} to remove the message listener.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/layers/backplane.md
  */
 export class BroadcastChannelBackplane extends BaseBackplane {
   protected readonly channel: BroadcastChannel;

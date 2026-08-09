@@ -66,8 +66,22 @@ export interface ErrorPolicy {
 }
 
 /**
- * Handles errors from an underlying cache according to a specified policy.
+ * A cache layer that keeps a failing cache store from becoming an application outage.
  *
+ * Each operation follows a policy: `fail-open` swallows the error, so reads return `undefined`,
+ * {@link ICache#getOrLoad} loads from origin and writes do nothing, while `fail-closed` rethrows it.
+ * By default every operation fails open, except for `delete`.
+ *
+ * Errors thrown by the `load` function of {@link ICache#getOrLoad} come from your origin and are
+ * always propagated, no matter the policy.
+ *
+ * This layer still waits for the failing call, which is usually a connection timeout, so put a
+ * {@link CircuitBreakerCache} below it to stop calling a store that is consistently failing.
+ *
+ * Recommended for external cache stores, where failures are expected to happen.
+ * Always report the errors through `onError`, as they are otherwise silent.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/layers/fail-safe.md
  * @see https://read.thecoder.cafe/p/fail-open-fail-closed
  */
 export class FailSafeCache implements ICache {

@@ -15,7 +15,14 @@ export interface ValkeyGlideCacheOptions extends BaseCacheOptions {
 }
 
 /**
- * A Valkey cache implementation using @valkey/valkey-glide
+ * A Valkey or Redis cache store using the GLIDE client (`@valkey/valkey-glide`).
+ *
+ * The client has to be created by your application, this class only issues commands.
+ * Values are stored JSON-serialized, so they **must** be JSON stringifiable.
+ *
+ * Batch reads use `MGET` and batch deletions use `UNLINK`, while batch writes run individual `SET` commands.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/stores/redis-valkey.md
  */
 export class ValkeyGlideCache extends BaseCache {
   protected readonly client: BaseClient;

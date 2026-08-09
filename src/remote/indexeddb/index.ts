@@ -40,9 +40,20 @@ interface IDBStoredEntry<T> {
 }
 
 /**
- * An IndexedDB cache store.
+ * An IndexedDB cache store for browsers.
  *
- * This implementation was mostly based on idb-keyval.
+ * It will not work in Node.js, as IndexedDB is a browser API.
+ * The database is opened lazily on the first operation.
+ *
+ * Expired entries are only removed when they are accessed. Call {@link IndexedDBCache#evict} periodically
+ * if you expect a lot of entries to expire without ever being read again.
+ *
+ * The available space depends on the browser's storage quota, so this is not suitable for caching
+ * very large amounts of data.
+ *
+ * This implementation was mostly based on the `idb-keyval` package.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/stores/indexeddb.md
  */
 export class IndexedDBCache extends BaseCache {
   protected readonly idb: IDBFactory;

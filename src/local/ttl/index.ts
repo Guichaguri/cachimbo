@@ -27,9 +27,17 @@ export interface LocalTTLCacheOptions extends BaseCacheOptions {
 }
 
 /**
- * An in-memory cache implementation that allows setting an expiration time and a limit of cached items.
+ * An in-memory cache store that evicts the items closest to expiring first.
  *
- * Once the limit of items is reached, the soonest expiring items will be purged.
+ * Use it when the cached items naturally expire after a fixed duration and access patterns are not a
+ * concern. When you want the most accessed items to be kept instead, use {@link LocalLRUCache}.
+ *
+ * Once the `max` limit of items is reached, the soonest expiring item is purged.
+ * By default there is no limit on the amount of items stored.
+ *
+ * Built on top of the `@isaacs/ttlcache` package.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/stores/in-memory.md
  */
 export class LocalTTLCache extends BaseLocalCache {
   protected readonly cache: TTLCache<string, any>;

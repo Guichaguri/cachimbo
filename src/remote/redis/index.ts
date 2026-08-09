@@ -42,7 +42,15 @@ export interface RedisCacheOptions extends BaseCacheOptions {
 }
 
 /**
- * A Redis cache implementation using node-redis
+ * A Redis, Valkey or Garnet cache store using the node-redis client (`@redis/client`).
+ *
+ * The client has to be created and connected by your application, this class only issues commands.
+ * Values are stored JSON-serialized, so they **must** be JSON stringifiable.
+ *
+ * Batch reads use `MGET` and deletions use `UNLINK` by default, while batch writes fall back to
+ * individual `SET` commands unless {@link RedisCacheOptions#isMSETEXSupported} is enabled.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/stores/redis-valkey.md
  */
 export class RedisCache extends BaseCache {
   protected readonly client: Redis;

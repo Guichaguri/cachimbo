@@ -9,6 +9,17 @@ export interface KeyvCacheOptions extends BaseCacheOptions {
   keyv: Keyv;
 }
 
+/**
+ * A cache store backed by a Keyv instance.
+ *
+ * Useful to reach a backend that Cachimbo does not implement natively, such as SQLite, PostgreSQL,
+ * MongoDB or Etcd. Serialization, TTL handling and batching are all delegated to Keyv and its store adapter.
+ *
+ * Since these backends are usually slower than a dedicated cache store, consider putting it behind a
+ * {@link TieredCache} with an in-memory first tier.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/stores/keyv.md
+ */
 export class KeyvCache extends BaseCache {
   protected readonly keyv: Keyv;
 

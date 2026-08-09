@@ -19,7 +19,17 @@ export interface NatsBackplaneOptions extends BaseBackplaneOptions {
 }
 
 /**
- * A NATS backplane implementation
+ * A backplane that propagates cache updates through a NATS subject.
+ *
+ * Wrap the in-memory cache of each application instance with it, so writes and invalidations made by
+ * one instance are applied by all the others.
+ *
+ * The same connection can be shared with the rest of your application, as long as the subject is unique.
+ * Events are published as core NATS messages, so they are not persisted nor redelivered.
+ *
+ * Call {@link NatsBackplane#dispose} to unsubscribe.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/layers/backplane.md
  */
 export class NatsBackplane extends BaseBackplane {
   protected readonly nats: NatsConnection;

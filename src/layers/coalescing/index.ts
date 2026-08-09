@@ -17,9 +17,19 @@ interface OngoingRequest {
 }
 
 /**
- * A cache strategy layer that deduplicates parallel requests into a single request.
+ * A cache layer that deduplicates parallel requests for the same key into a single one.
  *
- * This strategy can prevent the Thundering Herd problem as all parallel requests will be coalesced into one.
+ * While a request for a key is in flight, any other request for that key awaits the same promise
+ * instead of reaching the underlying cache again. This prevents the Thundering Herd problem from
+ * hitting both the cache store and the origin.
+ *
+ * Writes and deletions also update the in-flight entry, so a concurrent read never returns a value
+ * that was just replaced.
+ *
+ * Deduplication happens in-process and per instance, so it does not coordinate between
+ * application instances.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/layers/request-coalescing.md
  */
 export class CoalescingCache implements ICache {
   protected readonly ongoingRequests: Map<string, OngoingRequest> = new Map();

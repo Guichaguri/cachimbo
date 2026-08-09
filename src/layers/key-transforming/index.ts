@@ -39,6 +39,16 @@ export type KeyTransformingCacheOptions = KeyAffixCacheOptions | KeyTransformerF
  * - Create namespaced caches, avoiding conflicts with shared cache servers.
  * - Add a version number, allowing schema changes without causing incompatibility.
  * - Implement any other key transformations, such as normalizing or hashing.
+ *
+ * Configure it either with a `prefix`/`suffix` pair or with a custom `transform` function.
+ * The transformation has to be deterministic, as it is applied on every read and write.
+ *
+ * Entries that were written before adding this layer keep their original keys and are simply
+ * never read again, which is exactly what makes it useful for versioning.
+ *
+ * Mostly useful for external caches, since separate in-memory instances already act as namespaces.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/layers/key-transformation.md
  */
 export class KeyTransformingCache implements ICache {
   protected readonly cache: ICache;

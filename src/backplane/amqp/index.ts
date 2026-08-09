@@ -19,7 +19,17 @@ export interface AmqpBackplaneOptions extends BaseBackplaneOptions {
 }
 
 /**
- * An AMQP backplane implementation
+ * A backplane that propagates cache updates through an AMQP broker, such as RabbitMQ or Apache ActiveMQ.
+ *
+ * Wrap the in-memory cache of each application instance with it, so writes and invalidations made by
+ * one instance are applied by all the others.
+ *
+ * On construction it opens its own channel and declares a non-durable fanout exchange bound to an
+ * exclusive auto-deleting queue, so each instance receives every event but its own.
+ *
+ * Call {@link AmqpBackplane#dispose} to cancel the consumer and close the channel.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/layers/backplane.md
  */
 export class AmqpBackplane extends BaseBackplane {
   protected readonly connection: ChannelModel | RecoveringChannelModel;

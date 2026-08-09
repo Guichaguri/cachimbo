@@ -20,7 +20,16 @@ export interface HazelcastBackplaneOptions extends BaseBackplaneOptions {
 }
 
 /**
- * A Hazelcast topic backplane implementation
+ * A backplane that propagates cache updates through a Hazelcast topic.
+ *
+ * Wrap the in-memory cache of each application instance with it, so writes and invalidations made by
+ * one instance are applied by all the others.
+ *
+ * A reliable topic (`client.getReliableTopic()`) is recommended, as a plain topic may drop messages.
+ *
+ * Call {@link HazelcastBackplane#dispose} to remove the message listener.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/layers/backplane.md
  */
 export class HazelcastBackplane extends BaseBackplane {
   protected readonly topic: ITopic<BackplaneEvent>;

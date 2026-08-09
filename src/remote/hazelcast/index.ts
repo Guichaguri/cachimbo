@@ -21,7 +21,12 @@ export interface HazelcastCacheOptions extends BaseCacheOptions {
 }
 
 /**
- * A Hazelcast cache implementation using an IMap
+ * A Hazelcast cache store backed by an {@link IMap}.
+ *
+ * The client and the map have to be created by your application, this class only issues operations.
+ * Values are serialized by the Hazelcast client itself, not by this class.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/stores/hazelcast.md
  */
 export class HazelcastCache extends BaseCache {
   protected readonly map: IMap<string, any>;

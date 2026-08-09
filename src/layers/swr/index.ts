@@ -27,11 +27,24 @@ interface CachedItem<T> {
 }
 
 /**
- * A cache strategy that returns stale resources immediately while it refreshes the cache in background.
+ * A cache layer that returns stale resources immediately while it refreshes the cache in background.
+ *
+ * An entry stays fresh for the TTL given by the caller (or `defaultTTL`) and is then kept for another
+ * `staleTTL` seconds. During that stale window, reads return the cached value right away and the first
+ * of them triggers a single background refresh, which keeps the read latency low. After the stale
+ * window, the entry is gone and the next read has to load from origin in foreground.
  *
  * This is an implementation of the Stale-While-Revalidate algorithm.
  *
  * This strategy is only effective when calling {@link ICache#getOrLoad}.
+ * The other methods behave as they would in the underlying cache.
+ *
+ * @remarks Values are wrapped with freshness metadata, which changes the structure of what is stored.
+ * When adding this layer to an existing external cache, version the keys with a
+ * {@link KeyTransformingCache} to avoid reading entries written without it.
+ *
+ * @see https://github.com/Guichaguri/cachimbo/blob/HEAD/docs/layers/stale-while-revalidate.md
+ * @see https://web.dev/articles/stale-while-revalidate
  */
 export class SWRCache implements ICache {
   protected readonly revalidating: Map<string, Promise<any>> = new Map<string, Promise<any>>();
