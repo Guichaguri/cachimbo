@@ -17,6 +17,7 @@ It works as an anti-corruption layer, allowing you to easily switch between diff
   - Valkey
   - Memcached
   - Cloudflare Workers KV
+  - Vercel Runtime Cache
   - Hazelcast
   - NATS
   - Keyv (SQLite, PostgreSQL, MongoDB, etc.)
@@ -86,6 +87,7 @@ External caches (like Redis, Memcached, etc.) provide fast, scalable, shared sto
 - [Redis](/docs/stores/redis-valkey.md) (and Valkey)
 - [Memcached](/docs/stores/memcached.md)
 - [Cloudflare Workers KV](/docs/stores/cloudflare-workers-kv.md)
+- [Vercel Runtime Cache](/docs/stores/vercel-runtime-cache.md)
 - [Hazelcast](/docs/stores/hazelcast.md)
 - [NATS](/docs/stores/nats.md)
 - [Keyv](/docs/stores/keyv.md) (SQLite, PostgreSQL, MongoDB, etc.)

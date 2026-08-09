@@ -28,6 +28,7 @@ Cache stores define *where* the data is stored.
 - [Redis](./stores/redis-valkey.md) (and Valkey)
 - [Memcached](./stores/memcached.md)
 - [Cloudflare Workers KV](./stores/cloudflare-workers-kv.md)
+- [Vercel Runtime Cache](./stores/vercel-runtime-cache.md)
 - [Hazelcast](./stores/hazelcast.md)
 - [NATS](./stores/nats.md)
 - [Keyv](./stores/keyv.md) (SQLite, PostgreSQL, MongoDB, etc.)
