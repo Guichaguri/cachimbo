@@ -32,7 +32,7 @@ const cache = new VercelRuntimeCache({
 
 ## Tag invalidation
 
-The Runtime Cache invalidates by tag on its own. Write the items with a `tags` list and call `expireTag()` to expire all of them at once:
+The Runtime Cache invalidates by tag on its own. Write the items with a `tags` list and call `invalidateTag()` to expire all of them at once:
 
 ```ts
 await cache.set("post:1", post, { ttl: 3600, tags: ["posts"] });
@@ -56,6 +56,6 @@ Prefer the native tags when this store is the only one you cache into. Reach for
   - The `name` option on writes is only used by Vercel's observability, and defaults to the key you passed rather than the hashed one that is actually stored.
 - Outside of a Vercel deployment, such as when running locally, `getCache()` falls back to an in-memory cache scoped to the process. This keeps the code working in development, but that cache is not shared between instances and does not survive a restart.
 - A missing item reads as `undefined`, which makes a cached `null` indistinguishable from a miss. See the [negative caching](../guides/negative-caching.md) guide if you need to cache the absence of a resource.
-- Stacking a `TaggedCache` on top of this store also writes its tags as native Vercel tags, since the write options are passed through. Its `invalidateTag()` still does not call `invalidateTag()` — the two remain independent.
+- Stacking a `TaggedCache` on top of this store also writes its tags as native Vercel tags, since the write options are passed through. The layer's own `invalidateTag()` still only updates its tag entries and never reaches Vercel's tags — the two remain independent.
 
 More information about the Runtime Cache can be found in the [official documentation](https://vercel.com/docs/caching/runtime-cache).
